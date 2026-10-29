@@ -43,6 +43,7 @@ export default function Header() {
   const [quickActionOpen, setQuickActionOpen] = useState(false);
   const [themeDropdownOpen, setThemeDropdownOpen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [pendingTasksCount, setPendingTasksCount] = useState<number>(0);
 
   useEffect(() => {
     setSoundEnabled(isAudioEnabled());
@@ -54,6 +55,35 @@ export default function Header() {
     };
     window.addEventListener('sound-toggle-change', onSoundChange);
     return () => window.removeEventListener('sound-toggle-change', onSoundChange);
+  }, []);
+
+  // Sync Pending Tasks count with Calendar
+  useEffect(() => {
+    const updatePendingCount = () => {
+      try {
+        const stored = localStorage.getItem('sah_master_crm_tasks');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) {
+            const count = parsed.filter((t: any) => t.status === 'PENDING').length;
+            setPendingTasksCount(count);
+            return;
+          }
+        }
+        // Default initial tasks pending count
+        setPendingTasksCount(4);
+      } catch (e) {
+        setPendingTasksCount(0);
+      }
+    };
+
+    updatePendingCount();
+    window.addEventListener('storage', updatePendingCount);
+    window.addEventListener('calendar-tasks-updated', updatePendingCount);
+    return () => {
+      window.removeEventListener('storage', updatePendingCount);
+      window.removeEventListener('calendar-tasks-updated', updatePendingCount);
+    };
   }, []);
 
   const switchCompany = (code: CompanyCode) => {
@@ -374,14 +404,16 @@ export default function Header() {
             )}
           </button>
 
-          {/* Agenda Reminder Bell */}
+          {/* Agenda Reminder Bell - Red dot only appears when pendingTasksCount > 0 */}
           <Link
             href={`/calendar?company=${activeCompany}`}
-            title="Today's Priority Agenda"
+            title={pendingTasksCount > 0 ? `Today's Priority Agenda (${pendingTasksCount} Pending)` : "All Action Items Completed (0 Pending)"}
             className="relative rounded-lg border border-[#2C5240] bg-[#162B22] p-2 text-[#CFE0D5] hover:text-white hover:bg-[#2C5240] transition-colors"
           >
             <Bell className="h-4 w-4" />
-            <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-rose-500 animate-pulse" />
+            {pendingTasksCount > 0 && (
+              <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-rose-500 animate-pulse" />
+            )}
           </Link>
 
           {/* Executive Vault Lock Button */}

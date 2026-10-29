@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { 
   CalendarDays, 
@@ -41,6 +41,69 @@ export interface TaskItem {
   createdAt?: string;
 }
 
+const DEFAULT_TASKS: TaskItem[] = [
+  {
+    id: 'task-1',
+    company: 'BIZMAN',
+    title: 'Call Sajjad Hossain (Grameenphone) to finalize Ramadan screen bundle rate',
+    dueDate: 'Today',
+    dueTime: '3:30 PM',
+    priority: 'URGENT',
+    status: 'PENDING',
+    relatedDeal: 'Grameenphone Ramadan DOOH Campaign',
+    actionType: 'CALL',
+    notes: 'Direct CEO discussion with GP Media Head to lock Q4 digital rates.',
+  },
+  {
+    id: 'task-2',
+    company: 'LINDA',
+    title: 'Review architectural blueprints & pool plumbing for Couple Private Pool Villas',
+    dueDate: 'Today',
+    dueTime: '5:00 PM',
+    priority: 'HIGH',
+    status: 'PENDING',
+    relatedDeal: 'Linda Resort Fast-Track 9-Month Execution Plan',
+    actionType: 'REVIEW',
+    notes: 'Verify pipe slope and infinity pool filtration vendor warranty.',
+  },
+  {
+    id: 'task-3',
+    company: 'ARIELMC',
+    title: 'Track DHL express package delivery for EcoLiving UK Jute prototypes',
+    dueDate: 'Tomorrow',
+    dueTime: '11:00 AM',
+    priority: 'HIGH',
+    status: 'PENDING',
+    relatedDeal: 'EcoLiving UK Order',
+    actionType: 'EXPORT_DISPATCH',
+    notes: 'Confirm courier airway bill tracking with UK customs broker.',
+  },
+  {
+    id: 'task-4',
+    company: 'BIZMAN',
+    title: 'Sign vendor settlement agreement for 4x Chittagong LED screens',
+    dueDate: 'Oct 31, 2026',
+    dueTime: '2:00 PM',
+    priority: 'MEDIUM',
+    status: 'COMPLETED',
+    relatedDeal: 'Vendor Network Settlement',
+    actionType: 'SETTLEMENT',
+    notes: 'Fully reconciled vendor accounts payable for Chittagong highway sites.',
+  },
+  {
+    id: 'task-5',
+    company: 'ARIELMC',
+    title: 'Email REACH chemical test report to Munich Ceramics buyer',
+    dueDate: 'Nov 02, 2026',
+    dueTime: '4:00 PM',
+    priority: 'MEDIUM',
+    status: 'PENDING',
+    relatedDeal: 'Munich Living Ceramics',
+    actionType: 'MEETING',
+    notes: 'Attach lab SGS lead & cadmium heavy metal extraction test certificates.',
+  },
+];
+
 export default function CalendarPage() {
   const searchParams = useSearchParams();
   const urlCompany = (searchParams.get('company') as CompanyCode) || 'CONSOLIDATED';
@@ -48,69 +111,38 @@ export default function CalendarPage() {
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'PENDING' | 'COMPLETED'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Initial Tasks
-  const [tasks, setTasks] = useState<TaskItem[]>([
-    {
-      id: 'task-1',
-      company: 'BIZMAN',
-      title: 'Call Sajjad Hossain (Grameenphone) to finalize Ramadan screen bundle rate',
-      dueDate: 'Today',
-      dueTime: '3:30 PM',
-      priority: 'URGENT',
-      status: 'PENDING',
-      relatedDeal: 'Grameenphone Ramadan DOOH Campaign',
-      actionType: 'CALL',
-      notes: 'Direct CEO discussion with GP Media Head to lock Q4 digital rates.',
-    },
-    {
-      id: 'task-2',
-      company: 'LINDA',
-      title: 'Review architectural blueprints & pool plumbing for Couple Private Pool Villas',
-      dueDate: 'Today',
-      dueTime: '5:00 PM',
-      priority: 'HIGH',
-      status: 'PENDING',
-      relatedDeal: 'Linda Resort Fast-Track 9-Month Execution Plan',
-      actionType: 'REVIEW',
-      notes: 'Verify pipe slope and infinity pool filtration vendor warranty.',
-    },
-    {
-      id: 'task-3',
-      company: 'ARIELMC',
-      title: 'Track DHL express package delivery for EcoLiving UK Jute prototypes',
-      dueDate: 'Tomorrow',
-      dueTime: '11:00 AM',
-      priority: 'HIGH',
-      status: 'PENDING',
-      relatedDeal: 'EcoLiving UK Order',
-      actionType: 'EXPORT_DISPATCH',
-      notes: 'Confirm courier airway bill tracking with UK customs broker.',
-    },
-    {
-      id: 'task-4',
-      company: 'BIZMAN',
-      title: 'Sign vendor settlement agreement for 4x Chittagong LED screens',
-      dueDate: 'Oct 31, 2026',
-      dueTime: '2:00 PM',
-      priority: 'MEDIUM',
-      status: 'COMPLETED',
-      relatedDeal: 'Vendor Network Settlement',
-      actionType: 'SETTLEMENT',
-      notes: 'Fully reconciled vendor accounts payable for Chittagong highway sites.',
-    },
-    {
-      id: 'task-5',
-      company: 'ARIELMC',
-      title: 'Email REACH chemical test report to Munich Ceramics buyer',
-      dueDate: 'Nov 02, 2026',
-      dueTime: '4:00 PM',
-      priority: 'MEDIUM',
-      status: 'PENDING',
-      relatedDeal: 'Munich Living Ceramics',
-      actionType: 'MEETING',
-      notes: 'Attach lab SGS lead & cadmium heavy metal extraction test certificates.',
-    },
-  ]);
+  // Initial Tasks with Browser Storage Persistence
+  const [tasks, setTasks] = useState<TaskItem[]>(DEFAULT_TASKS);
+  const [isLoadedFromStorage, setIsLoadedFromStorage] = useState(false);
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('sah_master_crm_tasks');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setTasks(parsed);
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('Could not read tasks from localStorage', e);
+    } finally {
+      setIsLoadedFromStorage(true);
+    }
+  }, []);
+
+  // Sync tasks to localStorage and notify Header
+  useEffect(() => {
+    if (!isLoadedFromStorage) return;
+    try {
+      localStorage.setItem('sah_master_crm_tasks', JSON.stringify(tasks));
+      window.dispatchEvent(new Event('calendar-tasks-updated'));
+    } catch (e) {
+      console.error('Failed to sync tasks', e);
+    }
+  }, [tasks, isLoadedFromStorage]);
 
   // Selection State for Bulk Operations
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
