@@ -129,23 +129,23 @@ export default function Sidebar() {
                   <span className="h-1.5 w-1.5 rounded-full bg-[var(--sidebar-active-text)]" />
                 </div>
 
-                {/* Line 1: Brand Logos Row */}
-                <div className="flex items-center justify-between pt-0.5">
+                {/* Line 1: Brand Logos Row (Centered) */}
+                <div className="relative flex items-center justify-center pt-0.5 min-h-[32px]">
                   {activeCompany === 'ARIELMC' && (
-                    <div className="h-7 w-12 rounded-lg overflow-hidden border border-[var(--sidebar-border)] bg-white p-0.5 flex items-center justify-center shadow">
-                      <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-6 w-auto object-contain" />
+                    <div className="h-8 w-16 rounded-lg overflow-hidden border border-[var(--sidebar-border)] bg-white p-0.5 flex items-center justify-center shadow">
+                      <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-7 w-auto object-contain" />
                     </div>
                   )}
 
                   {activeCompany === 'BIZMAN' && (
-                    <div className="h-7 w-7 rounded-lg overflow-hidden border border-[var(--sidebar-border)] bg-[#0D3B29] p-0.5 flex items-center justify-center shadow">
+                    <div className="h-8 w-8 rounded-lg overflow-hidden border border-[var(--sidebar-border)] bg-[#0D3B29] p-0.5 flex items-center justify-center shadow">
                       <img src="/logos/bizman-logo.jpg" alt="Bizman Media" className="h-full w-full object-contain" />
                     </div>
                   )}
 
                   {activeCompany === 'LINDA' && (
-                    <div className="h-7 px-2 rounded-lg overflow-hidden border border-[var(--sidebar-border)] bg-[#112717] flex items-center justify-center shadow">
-                      <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-5 w-auto object-contain" />
+                    <div className="h-8 px-3 rounded-lg overflow-hidden border border-[var(--sidebar-border)] bg-[#112717] flex items-center justify-center shadow">
+                      <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-6 w-auto object-contain" />
                     </div>
                   )}
 
@@ -163,7 +163,7 @@ export default function Sidebar() {
                     </div>
                   )}
 
-                  <span className="font-mono text-[8.5px] font-bold text-[var(--sidebar-active-text)] bg-[var(--sidebar-hover)] px-1.5 py-0.5 rounded border border-[var(--sidebar-border)]">
+                  <span className="absolute right-0 font-mono text-[8.5px] font-bold text-[var(--sidebar-active-text)] bg-[var(--sidebar-hover)] px-1.5 py-0.5 rounded border border-[var(--sidebar-border)]">
                     {currentMeta.currency}
                   </span>
                 </div>
