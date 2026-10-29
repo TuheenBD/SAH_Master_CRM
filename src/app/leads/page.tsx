@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { 
   Users, 
@@ -47,7 +47,7 @@ import {
   CustomerPaymentStatus, 
   EntityPayoutStatus 
 } from '@/lib/types';
-import { INITIAL_LEADS, INITIAL_COMPANY_LEADS } from '@/lib/mock-data';
+import { INITIAL_LEADS, INITIAL_COMPANY_LEADS, INITIAL_CONTACTS } from '@/lib/mock-data';
 
 const STAGE_CONFIG: Record<PipelineStage, {
   label: string;
@@ -213,8 +213,10 @@ export default function LeadsPage() {
     notepadMarkdown: '',
   });
 
-  // Create Modal State
+  // Create Modal State: Organization & Contact Dropdown controls
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isCustomOrg, setIsCustomOrg] = useState(false);
+  const [isCustomContact, setIsCustomContact] = useState(false);
   const [formData, setFormData] = useState({
     companyCode: (activeCompany === 'CONSOLIDATED' ? 'BIZMAN' : activeCompany) as 'ARIELMC' | 'BIZMAN' | 'LINDA',
     title: '',
@@ -235,6 +237,154 @@ export default function LeadsPage() {
     pipelineType: 'DOOH Screen Advertising',
     notepadMarkdown: '',
   });
+
+  // Corporate companies registered under the selected operating entity
+  const entityMatchingCompanies = useMemo(() => {
+    return companyLeads
+      .filter(c => !formData.companyCode || c.companyCode === formData.companyCode)
+      .map(c => c.companyName.trim())
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b));
+  }, [companyLeads, formData.companyCode]);
+
+  // All other registered corporate companies
+  const otherRegisteredCompanies = useMemo(() => {
+    const matchingSet = new Set(entityMatchingCompanies.map(n => n.toLowerCase()));
+    return companyLeads
+      .map(c => c.companyName.trim())
+      .filter(Boolean)
+      .filter(name => !matchingSet.has(name.toLowerCase()))
+      .sort((a, b) => a.localeCompare(b));
+  }, [companyLeads, entityMatchingCompanies]);
+
+  // Additional organizations from Master Contact Database
+  const otherMasterContactOrgs = useMemo(() => {
+    const regSet = new Set(companyLeads.map(c => c.companyName.trim().toLowerCase()));
+    const orgs = INITIAL_CONTACTS
+      .map(c => c.organization?.trim())
+      .filter(Boolean)
+      .filter(org => !regSet.has(org.toLowerCase()));
+    return Array.from(new Set(orgs)).sort((a, b) => a.localeCompare(b));
+  }, [companyLeads]);
+
+  // Contacts belonging to the currently chosen Client Organization
+  const contactsForSelectedOrg = useMemo(() => {
+    if (!formData.customerName.trim()) {
+      return [];
+    }
+    const q = formData.customerName.trim().toLowerCase();
+
+    // 1. From companyLeads (Company Accounts)
+    const matchedComp = companyLeads.find(c => c.companyName.trim().toLowerCase() === q);
+    const compContacts = matchedComp ? matchedComp.contacts.map(c => ({
+      id: c.id,
+      name: c.name,
+      designation: c.designation,
+      phone: c.phone,
+      whatsapp: c.whatsapp,
+      email: c.email,
+      source: 'Company Account',
+    })) : [];
+
+    // 2. From Master Contact Database
+    const masterContacts = INITIAL_CONTACTS
+      .filter(c => c.organization && c.organization.trim().toLowerCase() === q)
+      .map(c => ({
+        id: c.id,
+        name: c.fullName,
+        designation: c.designation,
+        phone: c.primaryPhone,
+        whatsapp: c.whatsappNumber,
+        email: c.email,
+        source: 'Master Contacts',
+      }));
+
+    // Deduplicate by name + phone
+    const combined = [...compContacts, ...masterContacts];
+    const seen = new Set<string>();
+    const unique: typeof combined = [];
+    for (const c of combined) {
+      const key = `${c.name.toLowerCase()}-${c.phone}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        unique.push(c);
+      }
+    }
+    return unique;
+  }, [formData.customerName, companyLeads]);
+
+  const handleSelectOrganization = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    if (val === '__CUSTOM__') {
+      setIsCustomOrg(true);
+      setIsCustomContact(true);
+      setFormData(prev => ({
+        ...prev,
+        customerName: '',
+        contactPerson: '',
+        phone: '',
+        whatsapp: '',
+        email: '',
+      }));
+      return;
+    }
+
+    setIsCustomOrg(false);
+
+    // Look up company and contacts
+    const matchedComp = companyLeads.find(c => c.companyName.toLowerCase() === val.toLowerCase());
+    let firstContact = matchedComp?.contacts[0];
+    if (!firstContact) {
+      const masterC = INITIAL_CONTACTS.find(c => c.organization && c.organization.toLowerCase() === val.toLowerCase());
+      if (masterC) {
+        firstContact = {
+          id: masterC.id,
+          name: masterC.fullName,
+          designation: masterC.designation,
+          phone: masterC.primaryPhone,
+          whatsapp: masterC.whatsappNumber,
+          email: masterC.email,
+          department: '',
+          roleType: 'PRIMARY_DECISION_MAKER',
+          isPrimary: true,
+        };
+      }
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      customerName: val,
+      country: matchedComp?.country || prev.country,
+      currency: matchedComp?.companyCode === 'ARIELMC' ? 'USD' : prev.currency,
+      contactPerson: firstContact ? `${firstContact.name}${firstContact.designation ? ` (${firstContact.designation})` : ''}` : '',
+      phone: firstContact?.phone || '',
+      whatsapp: firstContact?.whatsapp || (firstContact?.phone ? firstContact.phone.replace(/[^0-9]/g, '') : ''),
+      email: firstContact?.email || '',
+    }));
+
+    setIsCustomContact(!firstContact);
+  };
+
+  const handleSelectContactPerson = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    if (val === '__CUSTOM__') {
+      setIsCustomContact(true);
+      setFormData(prev => ({ ...prev, contactPerson: '' }));
+      return;
+    }
+
+    const matched = contactsForSelectedOrg.find(c => c.name === val);
+    if (matched) {
+      setIsCustomContact(false);
+      setFormData(prev => ({
+        ...prev,
+        contactPerson: `${matched.name}${matched.designation ? ` (${matched.designation})` : ''}`,
+        phone: matched.phone || prev.phone,
+        whatsapp: matched.whatsapp || (matched.phone ? matched.phone.replace(/[^0-9]/g, '') : prev.whatsapp),
+        email: matched.email || prev.email,
+      }));
+    }
+  };
 
   // Automatically open modal when navigated from Quick Action (?action=new or ?action=new-company)
   useEffect(() => {
@@ -2481,26 +2631,135 @@ export default function LeadsPage() {
 
               {/* Customer & Point of Contact */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Client Organization Dropdown */}
                 <div>
-                  <label className="block font-extrabold text-[#1F3A2E] mb-1">Client Organization *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Unilever Bangladesh Limited"
-                    value={formData.customerName}
-                    onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
-                    className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2.5 text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
-                  />
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-extrabold text-[#1F3A2E]">
+                      Client Organization <span className="text-rose-500">*</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsCustomOrg(!isCustomOrg);
+                        if (!isCustomOrg) {
+                          setFormData(prev => ({ ...prev, customerName: '', contactPerson: '' }));
+                        }
+                      }}
+                      className="text-[10.5px] text-[#8C6D2D] hover:underline font-bold"
+                    >
+                      {isCustomOrg ? 'Choose from list' : '+ Enter custom'}
+                    </button>
+                  </div>
+
+                  {!isCustomOrg ? (
+                    <select
+                      required
+                      value={formData.customerName}
+                      onChange={handleSelectOrganization}
+                      className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2.5 text-xs text-[#1A1A1A] font-semibold focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
+                    >
+                      <option value="">-- Select Listed Client Organization --</option>
+
+                      {entityMatchingCompanies.length > 0 && (
+                        <optgroup label={`🏢 ${formData.companyCode} Company Accounts (${entityMatchingCompanies.length})`}>
+                          {entityMatchingCompanies.map(name => (
+                            <option key={`match-${name}`} value={name}>
+                              {name}
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
+
+                      {otherRegisteredCompanies.length > 0 && (
+                        <optgroup label={`🌐 Other Registered Company Accounts (${otherRegisteredCompanies.length})`}>
+                          {otherRegisteredCompanies.map(name => (
+                            <option key={`other-${name}`} value={name}>
+                              {name}
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
+
+                      {otherMasterContactOrgs.length > 0 && (
+                        <optgroup label={`📋 Organizations from Master Contacts (${otherMasterContactOrgs.length})`}>
+                          {otherMasterContactOrgs.map(name => (
+                            <option key={`morg-${name}`} value={name}>
+                              {name}
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
+
+                      <option value="__CUSTOM__">➕ Enter New / Unlisted Organization...</option>
+                    </select>
+                  ) : (
+                    <div className="space-y-1">
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Unilever Bangladesh Limited, Robi Axiata..."
+                        value={formData.customerName}
+                        onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
+                        className="w-full rounded-lg border border-[#1F3A2E] bg-[#FBF9F4] p-2.5 text-xs text-[#1A1A1A] font-bold focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
+                      />
+                      <div className="text-[10px] text-[#6B7269]">
+                        Custom organization mode. Click &ldquo;Choose from list&rdquo; to pick from listed accounts.
+                      </div>
+                    </div>
+                  )}
                 </div>
+
+                {/* Contact Person Name Dropdown */}
                 <div>
-                  <label className="block font-extrabold text-[#1F3A2E] mb-1">Contact Person Name</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Sajjad Hossain (Head of Media)"
-                    value={formData.contactPerson}
-                    onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
-                    className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2.5 text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
-                  />
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-extrabold text-[#1F3A2E]">
+                      Contact Person Name
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setIsCustomContact(!isCustomContact)}
+                      className="text-[10.5px] text-[#8C6D2D] hover:underline font-bold"
+                    >
+                      {isCustomContact ? 'Choose from list' : '+ Enter custom'}
+                    </button>
+                  </div>
+
+                  {!isCustomContact && contactsForSelectedOrg.length > 0 ? (
+                    <select
+                      value={contactsForSelectedOrg.find(c => formData.contactPerson.startsWith(c.name))?.name || ''}
+                      onChange={handleSelectContactPerson}
+                      className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2.5 text-xs text-[#1A1A1A] font-semibold focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
+                    >
+                      <option value="">
+                        -- Select Contact ({contactsForSelectedOrg.length} listed for {formData.customerName || 'org'}) --
+                      </option>
+                      {contactsForSelectedOrg.map((cnt) => (
+                        <option key={cnt.id} value={cnt.name}>
+                          {cnt.name} {cnt.designation ? `(${cnt.designation})` : ''} - {cnt.phone}
+                        </option>
+                      ))}
+                      <option value="__CUSTOM__">➕ Enter Other Contact Person...</option>
+                    </select>
+                  ) : (
+                    <div className="space-y-1">
+                      <input
+                        type="text"
+                        placeholder="e.g. Sajjad Hossain (Head of Media)"
+                        value={formData.contactPerson}
+                        onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
+                        className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2.5 text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
+                      />
+                      {contactsForSelectedOrg.length > 0 ? (
+                        <div className="text-[10px] text-[#4338CA]">
+                          💡 {contactsForSelectedOrg.length} contacts found for {formData.customerName}. Click &ldquo;Choose from list&rdquo; to pick.
+                        </div>
+                      ) : (
+                        <div className="text-[10px] text-[#6B7269]">
+                          No pre-listed contacts for this organization. You can type the contact person directly.
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
