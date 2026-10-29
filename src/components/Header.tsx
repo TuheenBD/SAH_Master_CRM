@@ -23,7 +23,8 @@ import {
   FolderPlus,
   FolderKanban,
   Volume2,
-  VolumeX
+  VolumeX,
+  Menu
 } from 'lucide-react';
 import { CompanyCode, COMPANIES } from '@/lib/types';
 import { useTheme, THEMES } from '@/lib/theme';
@@ -81,47 +82,85 @@ export default function Header() {
   const activeThemeMeta = THEMES.find(t => t.id === currentTheme) || THEMES[0];
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[var(--header-border)] bg-[var(--header-bg)] text-[var(--header-text)] shadow-md">
-      <div className="flex flex-col md:flex-row md:min-h-16 md:items-center justify-between px-4 sm:px-6 lg:px-8 py-2 gap-3">
-        {/* Left: Breadcrumb / Page Title with Active Entity Logo */}
-        <div className="flex items-center gap-3 shrink-0">
-          {activeCompany === 'ARIELMC' && (
-            <div className="h-8 w-11 rounded-lg overflow-hidden border border-[var(--header-border)] bg-white p-0.5 shadow flex items-center justify-center shrink-0">
-              <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-7 w-auto object-contain" />
-            </div>
-          )}
-          {activeCompany === 'BIZMAN' && (
-            <div className="h-8 w-8 rounded-lg overflow-hidden border border-[var(--header-border)] bg-[#0D3B29] p-0.5 shadow flex items-center justify-center shrink-0">
-              <img src="/logos/bizman-logo.jpg" alt="Bizman Media" className="h-full w-full object-contain" />
-            </div>
-          )}
-          {activeCompany === 'LINDA' && (
-            <div className="h-9 px-2.5 rounded-lg overflow-hidden border border-[var(--header-border)] bg-[#112717] shadow flex items-center justify-center shrink-0">
-              <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-7 w-auto object-contain" />
-            </div>
-          )}
-          {activeCompany === 'CONSOLIDATED' && (
-            <div className="h-9 w-9 rounded-xl overflow-hidden border border-[#C8A96A]/60 bg-[#0A1628] shadow flex items-center justify-center shrink-0 p-0.5">
-              <img src="/logos/master-crm-icon.png" alt="Master CRM" className="h-full w-full object-contain" />
-            </div>
-          )}
+    <header className="sticky top-0 z-40 border-b border-[var(--header-border)] bg-[var(--header-bg)] text-[var(--header-text)] shadow-md w-full">
+      <div className="flex flex-col md:flex-row md:min-h-16 md:items-center justify-between px-3 sm:px-6 lg:px-8 py-2 gap-2.5 w-full max-w-full">
+        {/* Row 1 on Mobile / Left on Desktop: Hamburger + Breadcrumb / Page Title */}
+        <div className="flex items-center justify-between md:justify-start gap-2.5 w-full md:w-auto shrink-0">
+          <div className="flex items-center gap-2.5 min-w-0">
+            {/* Mobile Hamburger Toggle Button */}
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent('toggle-mobile-sidebar'))}
+              className="lg:hidden p-2 rounded-lg border border-[var(--header-border)] bg-[var(--sidebar-box-bg)] hover:bg-[var(--sidebar-hover)] text-white shadow-xs shrink-0"
+              title="Open Navigation Menu"
+            >
+              <Menu className="h-4 w-4 text-[var(--header-accent)]" />
+            </button>
 
-          <div>
-            <div className="flex items-center gap-1.5 text-[10px] text-[var(--header-sub)] font-mono uppercase tracking-wider">
-              <span>{meta.code === 'CONSOLIDATED' ? 'GROUP' : meta.code === 'ARIELMC' ? 'ArielMC' : meta.code}</span>
-              <span>/</span>
-              <span className="text-[var(--header-accent)] font-bold">{getPageTitle()}</span>
+            {/* Active Entity Logo */}
+            {activeCompany === 'ARIELMC' && (
+              <div className="h-8 w-11 rounded-lg overflow-hidden border border-[var(--header-border)] bg-white p-0.5 shadow flex items-center justify-center shrink-0">
+                <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-7 w-auto object-contain" />
+              </div>
+            )}
+            {activeCompany === 'BIZMAN' && (
+              <div className="h-8 w-8 rounded-lg overflow-hidden border border-[var(--header-border)] bg-[#0D3B29] p-0.5 shadow flex items-center justify-center shrink-0">
+                <img src="/logos/bizman-logo.jpg" alt="Bizman Media" className="h-full w-full object-contain" />
+              </div>
+            )}
+            {activeCompany === 'LINDA' && (
+              <div className="h-8 px-2 rounded-lg overflow-hidden border border-[var(--header-border)] bg-[#112717] shadow flex items-center justify-center shrink-0">
+                <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-6 w-auto object-contain" />
+              </div>
+            )}
+            {activeCompany === 'CONSOLIDATED' && (
+              <div className="h-8 w-8 rounded-xl overflow-hidden border border-[#C8A96A]/60 bg-[#0A1628] shadow flex items-center justify-center shrink-0 p-0.5">
+                <img src="/logos/master-crm-icon.png" alt="Master CRM" className="h-full w-full object-contain" />
+              </div>
+            )}
+
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 text-[9.5px] text-[var(--header-sub)] font-mono uppercase tracking-wider truncate">
+                <span>{meta.code === 'CONSOLIDATED' ? 'GROUP' : meta.code === 'ARIELMC' ? 'ArielMC' : meta.code}</span>
+                <span>/</span>
+                <span className="text-[var(--header-accent)] font-bold">{getPageTitle()}</span>
+              </div>
+              <h1 className="text-xs sm:text-base font-extrabold text-white tracking-tight leading-tight truncate">
+                {getPageTitle()}
+              </h1>
             </div>
-            <h1 className="text-sm sm:text-base font-extrabold text-white tracking-tight">
-              {getPageTitle()}
-            </h1>
+          </div>
+
+          {/* Mobile Right Actions: Quick Action + Sound (Hidden on Desktop) */}
+          <div className="flex md:hidden items-center gap-1.5 shrink-0">
+            {/* Quick Action Button for Mobile */}
+            <Link
+              href={`/leads?company=${activeCompany}&action=new`}
+              className="flex items-center gap-1 rounded-lg bg-[var(--header-accent)] text-[var(--header-bg)] px-2.5 py-1.5 text-[11px] font-black shadow-sm"
+              title="New Lead / Deal"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span>Lead</span>
+            </Link>
+
+            {/* Audio Toggle for Mobile */}
+            <button
+              onClick={() => {
+                const next = toggleAudioEnabled();
+                setSoundEnabled(next);
+              }}
+              className="p-1.5 rounded-lg border border-[var(--header-border)] bg-[var(--sidebar-box-bg)] text-[var(--header-sub)]"
+              title="Toggle Audio"
+            >
+              {soundEnabled ? <Volume2 className="h-3.5 w-3.5 text-[#C8A96A]" /> : <VolumeX className="h-3.5 w-3.5 opacity-60" />}
+            </button>
           </div>
         </div>
 
         {/* Center: ACTIVE ENTITY VIEW with Brand Logos & Centered Designation */}
-        <div className="flex flex-col items-center justify-center gap-1.5 bg-[var(--sidebar-box-bg)] px-3.5 py-1.5 rounded-xl border border-[var(--header-border)] shadow-sm md:mx-auto">
-          {/* Top Row: Entity Switcher Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto max-w-full justify-center">
+        <div className="flex flex-col items-center justify-center gap-1 bg-[var(--sidebar-box-bg)] px-2.5 py-1.5 rounded-xl border border-[var(--header-border)] shadow-sm w-full md:w-auto md:mx-auto overflow-hidden">
+          {/* Top Row: Entity Switcher Pills (Touch-scrollable on mobile) */}
+          <div className="flex items-center gap-1 overflow-x-auto max-w-full justify-start sm:justify-center w-full py-0.5 no-scrollbar">
             {(Object.keys(COMPANIES) as CompanyCode[]).map((code) => {
               const isSelected = activeCompany === code;
               let activeStyle = "text-[var(--header-sub)] hover:text-white hover:bg-[var(--sidebar-hover)]";
@@ -134,19 +173,19 @@ export default function Header() {
                 <button
                   key={code}
                   onClick={() => switchCompany(code)}
-                  className={`rounded-lg px-2.5 sm:px-3 py-1 text-xs transition-all whitespace-nowrap flex items-center gap-1.5 ${activeStyle}`}
+                  className={`rounded-lg px-2 sm:px-3 py-1 text-[11px] sm:text-xs transition-all whitespace-nowrap flex items-center gap-1 shrink-0 ${activeStyle}`}
                 >
                   {code === 'CONSOLIDATED' && (
-                    <img src="/logos/master-crm-icon.png" alt="Master CRM" className="h-4 w-4 rounded-full object-contain shrink-0 border border-[#C8A96A]/40" />
+                    <img src="/logos/master-crm-icon.png" alt="Master CRM" className="h-3.5 w-3.5 rounded-full object-contain shrink-0 border border-[#C8A96A]/40" />
                   )}
                   {code === 'ARIELMC' && (
-                    <img src="/logos/arielmc-logo.png" alt="ArielMC" className="h-4 w-auto object-contain shrink-0 bg-white px-0.5 rounded shadow-xs" />
+                    <img src="/logos/arielmc-logo.png" alt="ArielMC" className="h-3.5 w-auto object-contain shrink-0 bg-white px-0.5 rounded shadow-xs" />
                   )}
                   {code === 'BIZMAN' && (
-                    <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-4 w-4 rounded object-contain shrink-0 shadow-xs" />
+                    <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-3.5 w-3.5 rounded object-contain shrink-0 shadow-xs" />
                   )}
                   {code === 'LINDA' && (
-                    <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-4 w-auto max-w-[60px] object-contain shrink-0 shadow-xs" />
+                    <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-3.5 w-auto max-w-[50px] object-contain shrink-0 shadow-xs" />
                   )}
                   <span>{code === 'CONSOLIDATED' ? 'ALL ENTITIES' : code === 'ARIELMC' ? 'ArielMC' : code === 'BIZMAN' ? 'Bizman' : 'Linda Resort'}</span>
                 </button>
@@ -155,18 +194,18 @@ export default function Header() {
           </div>
 
           {/* Bottom Row: Active Designation in Dead Center */}
-          <div className="flex items-center justify-center gap-2 text-[11px] pt-1 border-t border-[var(--header-border)]/70 w-full text-center">
-            <span className="text-[var(--header-sub)]/80 text-[10px] uppercase tracking-wider font-semibold">Designation:</span>
-            <span className="text-white font-extrabold tracking-wide">{meta.role}</span>
+          <div className="flex items-center justify-center gap-1.5 text-[10px] sm:text-[11px] pt-1 border-t border-[var(--header-border)]/70 w-full text-center">
+            <span className="text-[var(--header-sub)]/80 text-[9.5px] uppercase tracking-wider font-semibold">Designation:</span>
+            <span className="text-white font-extrabold tracking-wide truncate max-w-[180px] sm:max-w-none">{meta.role}</span>
             <span className="h-1 w-1 rounded-full bg-[var(--header-accent)] opacity-80" />
-            <span className="rounded bg-[var(--sidebar-hover)] px-1.5 py-0.5 font-mono font-bold text-[var(--header-accent)] text-[10px]">
+            <span className="rounded bg-[var(--sidebar-hover)] px-1.5 py-0.2 font-mono font-bold text-[var(--header-accent)] text-[9.5px]">
               {meta.currency}
             </span>
           </div>
         </div>
 
-        {/* Right: Theme Switcher, Quick Action & Notifications */}
-        <div className="flex items-center gap-2 shrink-0 self-end md:self-auto">
+        {/* Right on Desktop: Theme Switcher, Quick Action & Notifications */}
+        <div className="hidden md:flex items-center gap-2 shrink-0 self-end md:self-auto">
           {/* Theme Dropdown */}
           <div className="relative">
             <button

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { 
@@ -14,14 +14,14 @@ import {
   Send, 
   CalendarDays, 
   FileEdit, 
-  BarChart3,
-  Contact,
-  Wallet,
-  FileSpreadsheet,
-  FolderKanban,
-  Menu,
-  X,
-  Sparkles
+  BarChart3, 
+  Contact, 
+  Wallet, 
+  FileSpreadsheet, 
+  FolderKanban, 
+  Menu, 
+  X, 
+  Sparkles 
 } from 'lucide-react';
 import { CompanyCode, COMPANIES } from '@/lib/types';
 
@@ -31,6 +31,17 @@ export default function Sidebar() {
   const searchParams = useSearchParams();
   const activeCompany = (searchParams.get('company') as CompanyCode) || 'CONSOLIDATED';
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    const handleToggle = () => setMobileOpen(prev => !prev);
+    const handleClose = () => setMobileOpen(false);
+    window.addEventListener('toggle-mobile-sidebar', handleToggle);
+    window.addEventListener('close-mobile-sidebar', handleClose);
+    return () => {
+      window.removeEventListener('toggle-mobile-sidebar', handleToggle);
+      window.removeEventListener('close-mobile-sidebar', handleClose);
+    };
+  }, []);
 
   const currentMeta = COMPANIES[activeCompany] || COMPANIES.CONSOLIDATED;
 
@@ -66,35 +77,17 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile Top Navbar */}
-      <div className="lg:hidden sticky top-0 z-50 flex items-center justify-between border-b border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] px-4 py-3 text-white">
-        <div className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-full bg-[var(--sidebar-active-text)] animate-pulse" />
-          <span className="font-extrabold text-sm tracking-wide">
-            MASTER_<span className="text-[var(--sidebar-active-text)] font-extrabold">CRM</span>
-          </span>
-          <span className="text-[10px] rounded bg-[var(--sidebar-hover)] text-[var(--sidebar-muted)] px-1.5 py-0.5 font-mono">v2.4</span>
-        </div>
-
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="rounded-lg p-2 text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-white"
-        >
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
-      </div>
-
       {/* Mobile Backdrop */}
       {mobileOpen && (
         <div 
           onClick={() => setMobileOpen(false)}
-          className="lg:hidden fixed inset-0 z-40 bg-black/70 backdrop-blur-sm"
+          className="lg:hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm transition-opacity"
         />
       )}
 
       {/* Persistent Left Sidebar: Dark Themed (Non-scrollable, fits viewport) */}
       <aside className={`
-        fixed inset-y-0 left-0 z-50 w-64 border-r border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] text-white flex flex-col justify-between transition-transform duration-200 ease-in-out shadow-xl h-screen overflow-hidden
+        fixed inset-y-0 left-0 z-50 w-64 border-r border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] text-white flex flex-col justify-between transition-transform duration-200 ease-in-out shadow-2xl h-screen overflow-hidden
         ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="flex flex-col h-full justify-between overflow-hidden">
@@ -117,9 +110,18 @@ export default function Sidebar() {
                   </div>
                 </div>
 
-                <span className="rounded bg-[var(--sidebar-border)] px-1.5 py-0.5 text-[8.5px] font-mono text-[var(--sidebar-active-text)] font-bold">
-                  ERP
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="rounded bg-[var(--sidebar-border)] px-1.5 py-0.5 text-[8.5px] font-mono text-[var(--sidebar-active-text)] font-bold">
+                    ERP
+                  </span>
+                  <button
+                    onClick={() => setMobileOpen(false)}
+                    className="lg:hidden p-1 rounded-md text-[var(--sidebar-muted)] hover:text-white hover:bg-[var(--sidebar-hover)]"
+                    title="Close Menu"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
 
               {/* Selected Active Entity Box with Official Brand Logo */}

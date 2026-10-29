@@ -123,7 +123,7 @@ export default function MasterDashboard() {
               </div>
             )}
             {activeCompany === 'CONSOLIDATED' && (
-              <div className="flex items-center gap-3 shrink-0 pt-1">
+              <div className="flex items-center gap-2 sm:gap-3 shrink-0 pt-1 flex-wrap sm:flex-nowrap">
                 <div className="h-16 w-16 rounded-2xl overflow-hidden border border-[#C8A96A] bg-[#0A1628] p-1 shadow-md flex items-center justify-center shrink-0">
                   <img src="/logos/master-crm-icon.png" alt="Master CRM" className="h-full w-full object-contain" />
                 </div>
