@@ -9,6 +9,7 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'Master CRM | Syed Akramul Hassan - Executive OS',
   description: 'Multi-Company CRM & Double-Entry Financial Engine for ArielMC, Bizman Media Limited, and Linda Resort Limited - Owned by Syed Akramul Hassan',
+  manifest: '/manifest.json',
   icons: {
     icon: '/logos/master-crm-icon.png',
     shortcut: '/logos/master-crm-icon.png',
