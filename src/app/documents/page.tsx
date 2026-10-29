@@ -90,18 +90,23 @@ export default function DocumentCenterPage() {
     return () => clearTimeout(timer);
   }, [toastMessage]);
 
-  // Load from localStorage on mount
+  // Load from localStorage on mount & merge newly seeded documents
   useEffect(() => {
     try {
       const stored = localStorage.getItem('sah_master_crm_documents_v2');
       if (stored) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setDocuments(parsed);
+          const storedIds = new Set(parsed.map((d: DocumentRecord) => d.id));
+          const missingDefaults = INITIAL_DOCUMENTS.filter(d => !storedIds.has(d.id));
+          setDocuments([...parsed, ...missingDefaults]);
+          return;
         }
       }
+      setDocuments(INITIAL_DOCUMENTS);
     } catch (e) {
       console.warn('Could not read documents from localStorage', e);
+      setDocuments(INITIAL_DOCUMENTS);
     } finally {
       setIsLoadedFromStorage(true);
     }

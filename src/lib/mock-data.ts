@@ -23199,5 +23199,27 @@ export const INITIAL_DOCUMENTS: DocumentRecord[] = [
     "uploadedBy": "Syed Akramul Hassan",
     "version": "1.0",
     "downloadCount": 1
+  },
+  {
+    "id": "doc-passport-sah-2026",
+    "title": "Passport Copy - Syed Akramul Hassan",
+    "fileName": "Passport Copy - Syed Akramul Hassan.jpg",
+    "fileSize": "532 KB",
+    "fileType": "IMAGE",
+    "companyCode": "PERSONAL",
+    "category": "PERSONAL_VAULT",
+    "securityLevel": "INTERNAL",
+    "uploadDate": "2026-10-29",
+    "expiryDate": "2033-08-05",
+    "tags": [
+      "Passport Copy - Syed Akramul Hassan",
+      "Identification",
+      "Passport",
+      "Personal Vault"
+    ],
+    "notes": "Official verified national passport record of Syed Akramul Hassan. Expiry Date: August 05, 2033.",
+    "uploadedBy": "Syed Akramul Hassan",
+    "version": "1.0",
+    "downloadCount": 0
   }
 ];
