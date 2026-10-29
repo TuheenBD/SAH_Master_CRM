@@ -21,7 +21,8 @@ import {
   FolderKanban, 
   Menu, 
   X, 
-  Sparkles 
+  Sparkles,
+  Lock 
 } from 'lucide-react';
 import { CompanyCode, COMPANIES } from '@/lib/types';
 
@@ -227,6 +228,19 @@ export default function Sidebar() {
                   <span>Owner & Director</span>
                 </div>
               </div>
+
+              {/* Quick Lock Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileOpen(false);
+                  window.dispatchEvent(new CustomEvent('lock-crm-vault'));
+                }}
+                title="Lock Executive Vault"
+                className="p-1.5 rounded-lg border border-[var(--sidebar-border)] bg-[var(--sidebar-box-bg)] hover:bg-rose-950/70 text-[#C8A96A] hover:text-rose-300 transition-colors shrink-0"
+              >
+                <Lock className="h-3.5 w-3.5" />
+              </button>
             </div>
           </div>
         </div>

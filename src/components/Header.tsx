@@ -24,7 +24,8 @@ import {
   FolderKanban,
   Volume2,
   VolumeX,
-  Menu
+  Menu,
+  Lock
 } from 'lucide-react';
 import { CompanyCode, COMPANIES } from '@/lib/types';
 import { useTheme, THEMES } from '@/lib/theme';
@@ -382,6 +383,17 @@ export default function Header() {
             <Bell className="h-4 w-4" />
             <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-rose-500 animate-pulse" />
           </Link>
+
+          {/* Executive Vault Lock Button */}
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent('lock-crm-vault'))}
+            title="Lock Executive Vault (Requires Passcode / Biometric to return)"
+            className="flex items-center gap-1.5 rounded-lg border border-[#C8A96A]/60 bg-[#162B22] hover:bg-rose-950/70 p-2 text-[#C8A96A] hover:text-rose-300 transition-all shadow-xs shrink-0"
+          >
+            <Lock className="h-4 w-4" />
+            <span className="hidden xl:inline text-xs font-bold">Lock Vault</span>
+          </button>
         </div>
       </div>
     </header>

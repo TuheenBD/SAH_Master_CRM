@@ -124,3 +124,5 @@ export function playMildSound(type: 'button' | 'card' = 'button', target?: Event
   }
 }
 
+export const playClickSound = (type: 'button' | 'card' = 'button') => playMildSound(type);
+
