@@ -127,14 +127,17 @@ export default function MasterDashboard() {
                 <div className="h-16 w-16 rounded-2xl overflow-hidden border border-[#C8A96A] bg-[#0A1628] p-1 shadow-md flex items-center justify-center shrink-0">
                   <img src="/logos/master-crm-icon.png" alt="Master CRM" className="h-full w-full object-contain" />
                 </div>
-                <div className="flex items-center -space-x-1.5 shrink-0">
-                  <div className="h-12 w-14 rounded-xl overflow-hidden border border-[#DDE3DD] bg-white p-1 shadow-sm flex items-center justify-center">
+                <div className="flex items-center -space-x-2 shrink-0">
+                  {/* ArielMC — Elevated to Front Layer */}
+                  <div className="relative z-30 h-12 px-3 rounded-xl overflow-hidden border-2 border-white bg-white p-1 shadow-md flex items-center justify-center">
                     <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-10 w-auto object-contain" />
                   </div>
-                  <div className="h-12 w-12 rounded-xl overflow-hidden border border-[#DDE3DD] bg-[#0D3B29] p-1 shadow-sm flex items-center justify-center">
+                  {/* Bizman Media — Middle Layer */}
+                  <div className="relative z-20 h-12 w-12 rounded-xl overflow-hidden border-2 border-white bg-[#0D3B29] p-1 shadow-sm flex items-center justify-center">
                     <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-full w-full object-contain" />
                   </div>
-                  <div className="h-12 px-2.5 rounded-xl overflow-hidden border border-[#DDE3DD] bg-[#112717] shadow-sm flex items-center justify-center shrink-0">
+                  {/* Linda Resort — Base Layer */}
+                  <div className="relative z-10 h-12 px-2.5 rounded-xl overflow-hidden border-2 border-white bg-[#112717] shadow-sm flex items-center justify-center shrink-0">
                     <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-7 w-auto object-contain" />
                   </div>
                 </div>
