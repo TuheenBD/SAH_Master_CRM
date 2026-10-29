@@ -41,30 +41,40 @@ export default function MasterDashboard() {
     ? INITIAL_EXPENSES
     : INITIAL_EXPENSES.filter(e => e.companyCode === activeCompany);
 
-  // Financial summary based on active view
-  let totalRevenueDisplay = '৳ 2,51,50,000 / $198,000';
-  let grossProfitDisplay = '৳ 1,24,00,000 / $72,800';
-  let netProfitDisplay = '৳ 78,50,000 / $32,100';
-  let netMarginDisplay = '31.2%';
+  // Dynamic financial summary calculated from actual posted ledger accounts
+  const plBizman = generatePLStatement('BIZMAN');
+  const plLinda = generatePLStatement('LINDA');
+  const plAriel = generatePLStatement('ARIELMC');
+
+  const consolidatedRevBDT = plBizman.totalRevenue + plLinda.totalRevenue;
+  const consolidatedRevUSD = plAriel.totalRevenue;
+  const consolidatedGrossBDT = plBizman.grossProfit + plLinda.grossProfit;
+  const consolidatedGrossUSD = plAriel.grossProfit;
+  const consolidatedNetBDT = plBizman.netProfit + plLinda.netProfit;
+  const consolidatedNetUSD = plAriel.netProfit;
+
+  let totalRevenueDisplay = `৳ ${consolidatedRevBDT.toLocaleString()} / $${consolidatedRevUSD.toLocaleString()}`;
+  let grossProfitDisplay = `৳ ${consolidatedGrossBDT.toLocaleString()} / $${consolidatedGrossUSD.toLocaleString()}`;
+  let netProfitDisplay = `৳ ${consolidatedNetBDT.toLocaleString()} / $${consolidatedNetUSD.toLocaleString()}`;
+  let netMarginDisplay = (consolidatedRevBDT + consolidatedRevUSD) > 0
+    ? `${(((consolidatedNetBDT + consolidatedNetUSD) / (consolidatedRevBDT + consolidatedRevUSD)) * 100).toFixed(1)}%`
+    : '0.0%';
 
   if (activeCompany === 'BIZMAN') {
-    const pl = generatePLStatement('BIZMAN');
-    totalRevenueDisplay = `৳ ${(pl.totalRevenue).toLocaleString()}`;
-    grossProfitDisplay = `৳ ${(pl.grossProfit).toLocaleString()}`;
-    netProfitDisplay = `৳ ${(pl.netProfit).toLocaleString()}`;
-    netMarginDisplay = `${pl.netMarginPercent.toFixed(1)}%`;
+    totalRevenueDisplay = `৳ ${(plBizman.totalRevenue).toLocaleString()}`;
+    grossProfitDisplay = `৳ ${(plBizman.grossProfit).toLocaleString()}`;
+    netProfitDisplay = `৳ ${(plBizman.netProfit).toLocaleString()}`;
+    netMarginDisplay = `${plBizman.netMarginPercent.toFixed(1)}%`;
   } else if (activeCompany === 'LINDA') {
-    const pl = generatePLStatement('LINDA');
-    totalRevenueDisplay = `৳ ${(pl.totalRevenue).toLocaleString()}`;
-    grossProfitDisplay = `৳ ${(pl.grossProfit).toLocaleString()}`;
-    netProfitDisplay = `৳ ${(pl.netProfit).toLocaleString()}`;
-    netMarginDisplay = `${pl.netMarginPercent.toFixed(1)}%`;
+    totalRevenueDisplay = `৳ ${(plLinda.totalRevenue).toLocaleString()}`;
+    grossProfitDisplay = `৳ ${(plLinda.grossProfit).toLocaleString()}`;
+    netProfitDisplay = `৳ ${(plLinda.netProfit).toLocaleString()}`;
+    netMarginDisplay = `${plLinda.netMarginPercent.toFixed(1)}%`;
   } else if (activeCompany === 'ARIELMC') {
-    const pl = generatePLStatement('ARIELMC');
-    totalRevenueDisplay = `$${(pl.totalRevenue).toLocaleString()}`;
-    grossProfitDisplay = `$${(pl.grossProfit).toLocaleString()}`;
-    netProfitDisplay = `$${(pl.netProfit).toLocaleString()}`;
-    netMarginDisplay = `${pl.netMarginPercent.toFixed(1)}%`;
+    totalRevenueDisplay = `$${(plAriel.totalRevenue).toLocaleString()}`;
+    grossProfitDisplay = `$${(plAriel.grossProfit).toLocaleString()}`;
+    netProfitDisplay = `$${(plAriel.netProfit).toLocaleString()}`;
+    netMarginDisplay = `${plAriel.netMarginPercent.toFixed(1)}%`;
   }
 
   // Pipeline metrics
@@ -185,12 +195,30 @@ export default function MasterDashboard() {
 
         {/* Dynamic Key Stats Banner */}
         <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3 border-t border-[#DDE3DD] pt-4">
-          {meta.stats.map((stat, idx) => (
-            <div key={idx} className="rounded-lg bg-[#F4F6F4] p-3 border border-[#DDE3DD]">
-              <div className="text-[11px] font-bold text-[#6B7269] uppercase tracking-wider">{stat.label}</div>
-              <div className="text-sm md:text-base font-extrabold text-[#1F3A2E] mt-0.5">{stat.value}</div>
+          <div className="rounded-lg bg-[#F4F6F4] p-3 border border-[#DDE3DD]">
+            <div className="text-[11px] font-bold text-[#6B7269] uppercase tracking-wider">
+              {activeCompany === 'CONSOLIDATED' ? 'Operating Entities' : 'Active Entity'}
             </div>
-          ))}
+            <div className="text-sm md:text-base font-extrabold text-[#1F3A2E] mt-0.5">
+              {activeCompany === 'CONSOLIDATED' ? '3 Companies' : activeCompany}
+            </div>
+          </div>
+          <div className="rounded-lg bg-[#F4F6F4] p-3 border border-[#DDE3DD]">
+            <div className="text-[11px] font-bold text-[#6B7269] uppercase tracking-wider">
+              {activeCompany === 'CONSOLIDATED' ? 'Active Pipeline Leads' : 'Company Leads'}
+            </div>
+            <div className="text-sm md:text-base font-extrabold text-[#1F3A2E] mt-0.5">
+              {filteredLeads.length} Leads
+            </div>
+          </div>
+          <div className="rounded-lg bg-[#F4F6F4] p-3 border border-[#DDE3DD]">
+            <div className="text-[11px] font-bold text-[#6B7269] uppercase tracking-wider">
+              {activeCompany === 'CONSOLIDATED' ? 'Consolidated YTD Revenue' : 'Company YTD Revenue'}
+            </div>
+            <div className="text-sm md:text-base font-extrabold text-[#1F3A2E] mt-0.5">
+              {totalRevenueDisplay}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -221,7 +249,7 @@ export default function MasterDashboard() {
           </div>
           <div className="my-3 text-2xl font-extrabold text-[#1F3A2E] font-mono tracking-tight text-center">{grossProfitDisplay}</div>
           <div className="text-xs text-[#6B7269] text-center">
-            Deducts 50+/70+ vendor screen payouts & materials
+            Net revenue after cost of goods & direct expenses
           </div>
         </div>
 

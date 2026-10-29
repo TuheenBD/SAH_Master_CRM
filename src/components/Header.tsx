@@ -61,7 +61,7 @@ export default function Header() {
   useEffect(() => {
     const updatePendingCount = () => {
       try {
-        const stored = localStorage.getItem('sah_master_crm_tasks');
+        const stored = localStorage.getItem('sah_master_crm_tasks_v3') || localStorage.getItem('sah_master_crm_tasks');
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed)) {
@@ -70,8 +70,8 @@ export default function Header() {
             return;
           }
         }
-        // Default initial tasks pending count
-        setPendingTasksCount(4);
+        // Default when no custom tasks exist
+        setPendingTasksCount(0);
       } catch (e) {
         setPendingTasksCount(0);
       }

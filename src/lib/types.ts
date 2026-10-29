@@ -27,8 +27,8 @@ export const COMPANIES: Record<CompanyCode, CompanyMeta> = {
     logoUrl: '/logos/master-crm-icon.png',
     stats: [
       { label: 'Operating Entities', value: '3 Companies' },
-      { label: 'Consolidated Active Deals', value: '42 Deals' },
-      { label: 'Consolidated YTD Revenue', value: '৳ 5.40 Cr / $198K' },
+      { label: 'Active Pipeline Leads', value: '284 Leads' },
+      { label: 'Consolidated YTD Revenue', value: '৳ 0 / $0' },
     ],
   },
   ARIELMC: {
