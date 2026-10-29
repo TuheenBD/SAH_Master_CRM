@@ -27,6 +27,11 @@ export const INITIAL_LEADS: LeadItem[] = [
     currency: 'BDT',
     probability: 85,
     expectedCloseDate: '2026-11-15',
+    commissionRate: 10,
+    commissionAmount: 485000,
+    customerPaymentStatus: 'RECEIVED',
+    entityPayoutStatus: 'READY_FOR_SETTLEMENT',
+    payoutAmountReceived: 0,
     notepadMarkdown: `### Grameenphone Campaign Brief
 - **Target Screens:** 15 Own LED screens in Dhaka (Dhanmondi, Gulshan, Banani, Uttara) + 25 Vendor screens in Chittagong & Sylhet.
 - **Duration:** 30 Days (Ramadan Festive Rush).
@@ -56,6 +61,11 @@ export const INITIAL_LEADS: LeadItem[] = [
     currency: 'BDT',
     probability: 65,
     expectedCloseDate: '2026-11-20',
+    commissionRate: 12,
+    commissionAmount: 264000,
+    customerPaymentStatus: 'PENDING',
+    entityPayoutStatus: 'AWAITING_CUSTOMER_PAYMENT',
+    payoutAmountReceived: 0,
     notepadMarkdown: `### Apex Footwear Event Activation
 - 3-day on-ground youth activation at Jamuna Future Park & Shimanto Square.
 - Custom fabricated booths, interactive selfie LED backdrop, branded leather gift packaging for VIP loyalty cardholders.`,
@@ -84,6 +94,11 @@ export const INITIAL_LEADS: LeadItem[] = [
     currency: 'BDT',
     probability: 100,
     expectedCloseDate: '2026-10-28',
+    commissionRate: 15,
+    commissionAmount: 480000,
+    customerPaymentStatus: 'RECEIVED',
+    entityPayoutStatus: 'SETTLED',
+    payoutAmountReceived: 480000,
     notepadMarkdown: `### Linda Resort - SCB Corporate Retreat
 - Confirmed 10 Couple Private Pool Villas + 5 Family Villas for executive board members.
 - Grand Banquet Hall reserved for 120 guests with organic farm-to-table banquet catering.
@@ -111,6 +126,11 @@ export const INITIAL_LEADS: LeadItem[] = [
     currency: 'BDT',
     probability: 75,
     expectedCloseDate: '2026-11-15',
+    commissionRate: 20,
+    commissionAmount: 500000,
+    customerPaymentStatus: 'PENDING',
+    entityPayoutStatus: 'AWAITING_CUSTOMER_PAYMENT',
+    payoutAmountReceived: 0,
     notepadMarkdown: `### Linda Resort Timeshare Equity Pitch
 - Presentation given on 1-Unit Luxury Couple Private Pool Villa investment model.
 - Reviewing fast-track 9-month execution schedule and 30-day annual complimentary owner stay.
@@ -140,6 +160,11 @@ export const INITIAL_LEADS: LeadItem[] = [
     currency: 'USD',
     probability: 80,
     expectedCloseDate: '2026-11-10',
+    commissionRate: 8,
+    commissionAmount: 6240,
+    customerPaymentStatus: 'RECEIVED',
+    entityPayoutStatus: 'READY_FOR_SETTLEMENT',
+    payoutAmountReceived: 0,
     notepadMarkdown: `### EcoLiving UK Order Details
 - **Product:** 100% Biodegradable Laminated Jute Beach Bags with cotton rope handles.
 - **Quantity:** 25,000 Units.
@@ -171,6 +196,11 @@ export const INITIAL_LEADS: LeadItem[] = [
     currency: 'USD',
     probability: 70,
     expectedCloseDate: '2026-11-30',
+    commissionRate: 10,
+    commissionAmount: 4650,
+    customerPaymentStatus: 'PENDING',
+    entityPayoutStatus: 'AWAITING_CUSTOMER_PAYMENT',
+    payoutAmountReceived: 0,
     notepadMarkdown: `### Munich Living Ceramics Inquiry
 - Glazed pottery, stoneware decorative vases and traditional Bangladeshi terracotta tea sets.
 - Packaging must withstand drop tests (ISTA 3A certified packaging).
@@ -198,6 +228,11 @@ export const INITIAL_LEADS: LeadItem[] = [
     currency: 'USD',
     probability: 45,
     expectedCloseDate: '2026-12-15',
+    commissionRate: 10,
+    commissionAmount: 3200,
+    customerPaymentStatus: 'PENDING',
+    entityPayoutStatus: 'AWAITING_CUSTOMER_PAYMENT',
+    payoutAmountReceived: 0,
     notepadMarkdown: `### Australian Buyer Requirement
 - Vegetable-tanned cowhide wallets, travel duffels, and passport sleeves.
 - REACH compliance certificate requested.`,
@@ -225,6 +260,9 @@ export const INITIAL_EXPENSES: ExpenseItem[] = [
     paidFromAccount: '1020 - Operating Bank A/C',
     expenseAccount: '5010 - Vendor Billboard Rental Cost',
     isVerified: true,
+    paidBy: 'MY_PERSONAL_FUNDS',
+    isReimbursable: true,
+    reimbursementStatus: 'PENDING_REIMBURSEMENT',
   },
   {
     id: 'exp-2',
@@ -241,6 +279,9 @@ export const INITIAL_EXPENSES: ExpenseItem[] = [
     paidFromAccount: '1010 - Petty Cash A/C',
     expenseAccount: '6010 - Client Entertainment & Dinners',
     isVerified: true,
+    paidBy: 'MY_PERSONAL_FUNDS',
+    isReimbursable: true,
+    reimbursementStatus: 'PENDING_REIMBURSEMENT',
   },
   {
     id: 'exp-3',
@@ -257,6 +298,9 @@ export const INITIAL_EXPENSES: ExpenseItem[] = [
     paidFromAccount: '1020 - Brac Bank Corporate Resort Operations A/C',
     expenseAccount: '5010 - Resort Operations & Pool Maintenance',
     isVerified: true,
+    paidBy: 'ENTITY_DIRECT',
+    isReimbursable: false,
+    reimbursementStatus: 'NON_REIMBURSABLE',
   },
   {
     id: 'exp-4',
@@ -273,6 +317,9 @@ export const INITIAL_EXPENSES: ExpenseItem[] = [
     paidFromAccount: '1020 - HSBC Corporate USD Bank A/C',
     expenseAccount: '5020 - Shipping & Express Courier Expense',
     isVerified: true,
+    paidBy: 'MY_PERSONAL_FUNDS',
+    isReimbursable: true,
+    reimbursementStatus: 'PENDING_REIMBURSEMENT',
   },
   {
     id: 'exp-5',
@@ -287,6 +334,9 @@ export const INITIAL_EXPENSES: ExpenseItem[] = [
     paidFromAccount: '1010 - Petty Cash A/C',
     expenseAccount: '6050 - Hardware Maintenance & Repairs',
     isVerified: true,
+    paidBy: 'ENTITY_DIRECT',
+    isReimbursable: false,
+    reimbursementStatus: 'NON_REIMBURSABLE',
   },
 ];
 

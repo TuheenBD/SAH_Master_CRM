@@ -30,7 +30,7 @@ import {
   Search,
   CheckSquare
 } from 'lucide-react';
-import { CompanyCode, LeadItem, PipelineStage } from '@/lib/types';
+import { CompanyCode, LeadItem, PipelineStage, CustomerPaymentStatus, EntityPayoutStatus } from '@/lib/types';
 import { INITIAL_LEADS } from '@/lib/mock-data';
 
 const STAGE_CONFIG: Record<PipelineStage, {
@@ -117,6 +117,7 @@ export default function LeadsPage() {
     country: 'Bangladesh',
     estimatedValue: 500000,
     currency: 'BDT' as 'USD' | 'BDT',
+    commissionRate: 10,
     stage: 'NEW_INQUIRY' as PipelineStage,
     probability: 40,
     expectedCloseDate: '2026-11-30',
@@ -183,12 +184,52 @@ export default function LeadsPage() {
     }
   };
 
+  const handleUpdateCustomerPayment = (leadId: string, status: CustomerPaymentStatus) => {
+    setLeads(prev => prev.map(l => {
+      if (l.id === leadId) {
+        // If customer has fully paid, automatically make entity payout ready for settlement if not already settled
+        const nextEntityPayout: EntityPayoutStatus = 
+          status === 'RECEIVED' 
+            ? (l.entityPayoutStatus === 'SETTLED' ? 'SETTLED' : 'READY_FOR_SETTLEMENT')
+            : (status === 'PARTIAL' ? 'READY_FOR_SETTLEMENT' : 'AWAITING_CUSTOMER_PAYMENT');
+
+        const updated: LeadItem = {
+          ...l,
+          customerPaymentStatus: status,
+          entityPayoutStatus: nextEntityPayout,
+        };
+        if (selectedLead?.id === leadId) setSelectedLead(updated);
+        return updated;
+      }
+      return l;
+    }));
+  };
+
+  const handleUpdateEntityPayout = (leadId: string, status: EntityPayoutStatus) => {
+    setLeads(prev => prev.map(l => {
+      if (l.id === leadId) {
+        const updated: LeadItem = {
+          ...l,
+          entityPayoutStatus: status,
+          payoutAmountReceived: status === 'SETTLED' ? (l.commissionAmount || Math.round(l.estimatedValue * (l.commissionRate / 100))) : 0,
+        };
+        if (selectedLead?.id === leadId) setSelectedLead(updated);
+        return updated;
+      }
+      return l;
+    }));
+  };
+
   const handleCreateSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title || !formData.customerName) {
       alert('Please enter Opportunity Title and Customer Name.');
       return;
     }
+
+    const estVal = Number(formData.estimatedValue) || 100000;
+    const commRate = Number(formData.commissionRate) || 10;
+    const commAmount = Math.round(estVal * (commRate / 100));
 
     const newLead: LeadItem = {
       id: `lead-user-${Date.now()}`,
@@ -200,13 +241,18 @@ export default function LeadsPage() {
       whatsapp: formData.whatsapp || formData.phone || '+880 1711 000000',
       email: formData.email || 'lead@client.com',
       country: formData.country || 'Bangladesh',
-      estimatedValue: Number(formData.estimatedValue) || 100000,
+      estimatedValue: estVal,
       currency: formData.currency,
+      commissionRate: commRate,
+      commissionAmount: commAmount,
+      customerPaymentStatus: 'PENDING',
+      entityPayoutStatus: 'AWAITING_CUSTOMER_PAYMENT',
+      payoutAmountReceived: 0,
       stage: formData.stage,
       probability: Number(formData.probability) || 50,
       expectedCloseDate: formData.expectedCloseDate || '2026-11-30',
       pipelineType: formData.pipelineType || 'General Commercial Lead',
-      notepadMarkdown: formData.notepadMarkdown || `### Deal Brief: ${formData.title}\n- Client: ${formData.customerName}\n- Created via Master CRM Quick Action`,
+      notepadMarkdown: formData.notepadMarkdown || `### Deal Brief: ${formData.title}\n- Client: ${formData.customerName}\n- Agreed Commission: ${commRate}%\n- Created via Master CRM Quick Action`,
       specifics: {
         createdVia: 'Master CRM Quick Action',
         assignedOwner: 'Syed Akramul Hassan',
@@ -231,6 +277,7 @@ export default function LeadsPage() {
       country: 'Bangladesh',
       estimatedValue: 500000,
       currency: 'BDT',
+      commissionRate: 10,
       stage: 'NEW_INQUIRY',
       probability: 40,
       expectedCloseDate: '2026-11-30',
@@ -312,29 +359,75 @@ export default function LeadsPage() {
       </div>
 
       {/* =================================================================== */}
-      {/* FILTER & PIPELINE SUMMARY STRIP */}
+      {/* FILTER & EXECUTIVE COMMISSION PIPELINE SUMMARY STRIP */}
       {/* =================================================================== */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#DDE3DD] shadow-xs text-xs">
-        <div className="flex items-center gap-2 flex-1 max-w-md">
+      <div className="space-y-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {/* Total Contract Pipeline */}
+          <div className="rounded-xl border border-[#DDE3DD] bg-white p-3 shadow-xs">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-[#6B7269]">
+              Total Deals Contract Value
+            </div>
+            <div className="text-sm font-black font-mono text-[#1F3A2E] mt-1">
+              ৳ {filteredLeads.filter(l => l.currency === 'BDT').reduce((s, l) => s + l.estimatedValue, 0).toLocaleString()}
+              <span className="text-xs text-[#6B7269] font-normal"> + </span>
+              ${filteredLeads.filter(l => l.currency === 'USD').reduce((s, l) => s + l.estimatedValue, 0).toLocaleString()}
+            </div>
+            <div className="text-[10px] text-[#6B7269] mt-0.5">{filteredLeads.length} Personal Project Deals</div>
+          </div>
+
+          {/* My Expected Commission Pipeline */}
+          <div className="rounded-xl border border-[#C8A96A]/50 bg-[#FBF9F4] p-3 shadow-xs">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-[#8C6D2D]">
+              My Expected Commission
+            </div>
+            <div className="text-sm font-black font-mono text-[#8C6D2D] mt-1">
+              ৳ {filteredLeads.filter(l => l.currency === 'BDT').reduce((s, l) => s + (l.commissionAmount || Math.round(l.estimatedValue * ((l.commissionRate || 10) / 100))), 0).toLocaleString()}
+              <span className="text-xs text-[#8C6D2D]/70 font-normal"> + </span>
+              ${filteredLeads.filter(l => l.currency === 'USD').reduce((s, l) => s + (l.commissionAmount || Math.round(l.estimatedValue * ((l.commissionRate || 10) / 100))), 0).toLocaleString()}
+            </div>
+            <div className="text-[10px] text-[#8C6D2D] mt-0.5 font-semibold">Across Sourced Projects</div>
+          </div>
+
+          {/* Ready for Entity Payout to Me */}
+          <div className="rounded-xl border border-[#D8B4FE] bg-[#FAF5FF] p-3 shadow-xs">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-[#6B21A8]">
+              Ready for Entity Payout to Me
+            </div>
+            <div className="text-sm font-black font-mono text-[#7E22CE] mt-1">
+              ৳ {filteredLeads.filter(l => l.currency === 'BDT' && l.entityPayoutStatus === 'READY_FOR_SETTLEMENT').reduce((s, l) => s + (l.commissionAmount || Math.round(l.estimatedValue * ((l.commissionRate || 10) / 100))), 0).toLocaleString()}
+              <span className="text-xs text-[#6B21A8]/70 font-normal"> + </span>
+              ${filteredLeads.filter(l => l.currency === 'USD' && l.entityPayoutStatus === 'READY_FOR_SETTLEMENT').reduce((s, l) => s + (l.commissionAmount || Math.round(l.estimatedValue * ((l.commissionRate || 10) / 100))), 0).toLocaleString()}
+            </div>
+            <div className="text-[10px] text-[#6B21A8] mt-0.5 font-medium">Customer Paid &bull; Entity Settlement Due</div>
+          </div>
+
+          {/* Realized / Settled to My Account */}
+          <div className="rounded-xl border border-[#A7F3D0] bg-[#F0FDF4] p-3 shadow-xs">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-[#166534]">
+              Realized & Settled to Me
+            </div>
+            <div className="text-sm font-black font-mono text-[#15803D] mt-1">
+              ৳ {filteredLeads.filter(l => l.currency === 'BDT' && l.entityPayoutStatus === 'SETTLED').reduce((s, l) => s + (l.payoutAmountReceived || l.commissionAmount || Math.round(l.estimatedValue * ((l.commissionRate || 10) / 100))), 0).toLocaleString()}
+              <span className="text-xs text-[#166534]/70 font-normal"> + </span>
+              ${filteredLeads.filter(l => l.currency === 'USD' && l.entityPayoutStatus === 'SETTLED').reduce((s, l) => s + (l.payoutAmountReceived || l.commissionAmount || Math.round(l.estimatedValue * ((l.commissionRate || 10) / 100))), 0).toLocaleString()}
+            </div>
+            <div className="text-[10px] text-[#15803D] mt-0.5 font-bold">100% Disbursed to My Personal Funds</div>
+          </div>
+        </div>
+
+        {/* Search Bar Strip */}
+        <div className="flex items-center gap-2 bg-white p-2 rounded-xl border border-[#DDE3DD] shadow-xs text-xs">
           <div className="relative w-full">
             <Search className="h-3.5 w-3.5 text-[#888] absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search by deal name, client company, contact person..."
+              placeholder="Search by deal/project title, client company, contact person..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full rounded-lg border border-[#DDE3DD] bg-[#F4F6F4] pl-9 pr-3 py-1.5 text-xs text-[#1A1A1A] placeholder:text-[#888] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
             />
           </div>
-        </div>
-
-        <div className="flex items-center gap-3 text-xs font-mono">
-          <span className="text-[#6B7269]">Total Pipeline Value:</span>
-          <span className="font-extrabold text-[#1E6B3A] bg-[#E4F3E9] px-2.5 py-1 rounded border border-[#B6E2C5]">
-            ৳ {filteredLeads.filter(l => l.currency === 'BDT').reduce((s, l) => s + l.estimatedValue, 0).toLocaleString()}
-            {' '}+{' '}
-            ${filteredLeads.filter(l => l.currency === 'USD').reduce((s, l) => s + l.estimatedValue, 0).toLocaleString()}
-          </span>
         </div>
       </div>
 
@@ -346,20 +439,22 @@ export default function LeadsPage() {
           {/* Left Column: Opportunity List Cards (5 Cols) */}
           <div className="lg:col-span-5 space-y-3">
             <div className="flex items-center justify-between text-xs text-[#6B7269] px-1 font-semibold">
-              <span>Showing {filteredLeads.length} Opportunities</span>
-              <span>Click to inspect & edit notepad</span>
+              <span>Showing {filteredLeads.length} Personal Project Deals</span>
+              <span>Click to inspect & settle</span>
             </div>
 
             <div className="space-y-3 max-h-[calc(100vh-260px)] overflow-y-auto pr-1">
               {filteredLeads.map((lead) => {
                 const isSelected = selectedLead?.id === lead.id;
                 const stageCfg = STAGE_CONFIG[lead.stage] || STAGE_CONFIG.NEW_INQUIRY;
+                const commRate = lead.commissionRate || 10;
+                const commAmount = lead.commissionAmount || Math.round(lead.estimatedValue * (commRate / 100));
 
                 return (
                   <div
                     key={lead.id}
                     onClick={() => handleSelectLead(lead)}
-                    className={`cursor-pointer rounded-xl border p-4 transition-all relative ${
+                    className={`cursor-pointer rounded-xl border p-3.5 transition-all relative ${
                       isSelected
                         ? 'border-[#1F3A2E] bg-white shadow-md ring-1 ring-[#1F3A2E]/20'
                         : 'border-[#DDE3DD] bg-white hover:border-[#1F3A2E] hover:shadow-xs'
@@ -376,17 +471,52 @@ export default function LeadsPage() {
                       </span>
 
                       {/* Deal Value */}
-                      <span className="font-mono text-[#1E6B3A] font-black text-sm">
-                        {lead.currency === 'USD' ? '$' : '৳'}{lead.estimatedValue.toLocaleString()}
+                      <span className="font-mono text-[#556055] font-semibold text-xs">
+                        Contract: <strong className="text-[#1A1A1A] font-black">{lead.currency === 'USD' ? '$' : '৳'}{lead.estimatedValue.toLocaleString()}</strong>
                       </span>
                     </div>
 
-                    <h3 className="mt-2 text-sm font-extrabold text-[#1F3A2E] line-clamp-1">{lead.title}</h3>
+                    <h3 className="mt-1.5 text-sm font-extrabold text-[#1F3A2E] line-clamp-1">{lead.title}</h3>
                     <div className="text-xs text-[#556055] font-medium mt-0.5">
                       <strong className="text-[#1A1A1A]">{lead.customerName}</strong> &bull; {lead.country}
                     </div>
 
-                    <div className="mt-3 flex items-center justify-between border-t border-[#DDE3DD] pt-2 text-[11px]">
+                    {/* My Commission Strip */}
+                    <div className="mt-2.5 rounded-lg bg-[#FBF9F4] border border-[#C8A96A]/40 p-2 flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] font-extrabold uppercase text-[#8C6D2D] bg-[#C8A96A]/20 px-1.5 py-0.5 rounded">
+                          My Comm ({commRate}%)
+                        </span>
+                        <span className="font-mono font-black text-[#8C6D2D]">
+                          {lead.currency === 'USD' ? '$' : '৳'}{commAmount.toLocaleString()}
+                        </span>
+                      </div>
+
+                      {/* Customer Payment & Entity Settlement Badges */}
+                      <div className="flex items-center gap-1">
+                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${
+                          lead.customerPaymentStatus === 'RECEIVED'
+                            ? 'bg-[#DCFCE7] text-[#15803D] border-[#86EFAC]'
+                            : lead.customerPaymentStatus === 'PARTIAL'
+                            ? 'bg-[#E0F2FE] text-[#0369A1] border-[#BAE6FD]'
+                            : 'bg-[#FEF3C7] text-[#B45309] border-[#FDE68A]'
+                        }`}>
+                          Cust: {lead.customerPaymentStatus === 'RECEIVED' ? 'Paid' : lead.customerPaymentStatus === 'PARTIAL' ? 'Partial' : 'Pending'}
+                        </span>
+
+                        <span className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded border ${
+                          lead.entityPayoutStatus === 'SETTLED'
+                            ? 'bg-[#DCFCE7] text-[#15803D] border-[#86EFAC]'
+                            : lead.entityPayoutStatus === 'READY_FOR_SETTLEMENT'
+                            ? 'bg-[#F3E8FF] text-[#7E22CE] border-[#D8B4FE] animate-pulse'
+                            : 'bg-[#F1F5F9] text-[#64748B] border-[#CBD5E1]'
+                        }`}>
+                          Entity: {lead.entityPayoutStatus === 'SETTLED' ? 'Settled' : lead.entityPayoutStatus === 'READY_FOR_SETTLEMENT' ? 'Due to Me' : 'Awaiting Cust'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="mt-2.5 flex items-center justify-between border-t border-[#DDE3DD] pt-2 text-[11px]">
                       {/* Distinct Stage Badge */}
                       <span className={`rounded px-2 py-0.5 text-[10px] ${stageCfg.badge}`}>
                         {stageCfg.label}
@@ -401,7 +531,7 @@ export default function LeadsPage() {
                           <PhoneCall className="h-3 w-3 text-[#0369A1] group-hover:text-white transition-colors" />
                         </a>
                         <span className="font-mono text-[#6B7269] text-xs font-semibold">
-                          Target: {lead.expectedCloseDate}
+                          Close: {lead.expectedCloseDate}
                         </span>
                       </div>
                     </div>
@@ -413,7 +543,7 @@ export default function LeadsPage() {
 
           {/* Right Column: Selected Lead Inspector with Markdown Notepad (7 Cols) */}
           {selectedLead && (
-            <div className="lg:col-span-7 rounded-xl border border-[#DDE3DD] bg-white p-6 space-y-6 shadow-sm">
+            <div className="lg:col-span-7 rounded-xl border border-[#DDE3DD] bg-white p-6 space-y-5 shadow-sm">
               {/* Header Info */}
               <div className="border-b border-[#DDE3DD] pb-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -455,6 +585,158 @@ export default function LeadsPage() {
                 <h2 className="mt-3 text-xl font-extrabold text-[#1F3A2E]">{selectedLead.title}</h2>
                 <div className="mt-1 text-xs text-[#556055]">
                   Client Organization: <strong className="text-[#1A1A1A] font-extrabold">{selectedLead.customerName}</strong> &bull; Point of Contact: <strong className="text-[#1F3A2E]">{selectedLead.contactPerson}</strong>
+                </div>
+              </div>
+
+              {/* =================================================================== */}
+              {/* DEDICATED SECTION: MY EXECUTIVE COMMISSION & ENTITY SETTLEMENT */}
+              {/* =================================================================== */}
+              <div className="rounded-xl border-2 border-[#C8A96A] bg-gradient-to-br from-[#FBF9F4] to-white p-4 space-y-3.5 shadow-sm">
+                <div className="flex items-center justify-between border-b border-[#C8A96A]/30 pb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="h-7 w-7 rounded-lg bg-[#1F3A2E] text-[#C8A96A] flex items-center justify-center font-bold shadow-xs">
+                      <DollarSign className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-black text-[#1F3A2E] uppercase tracking-wide">
+                        My Executive Project Commission & Settlement
+                      </div>
+                      <div className="text-[10px] text-[#6B7269]">
+                        Entity pays Syed Akramul Hassan upon Customer Payment receipt
+                      </div>
+                    </div>
+                  </div>
+
+                  <span className="text-[10.5px] font-mono font-extrabold text-[#8C6D2D] bg-[#C8A96A]/20 px-2.5 py-0.5 rounded-full border border-[#C8A96A]/40">
+                    Agreed Commission: {selectedLead.commissionRate || 10}%
+                  </span>
+                </div>
+
+                {/* Key Numbers Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                  <div className="bg-white p-2.5 rounded-lg border border-[#DDE3DD]">
+                    <div className="text-[10.5px] text-[#6B7269] font-medium">Total Contract Value:</div>
+                    <div className="text-sm font-black font-mono text-[#1F3A2E] mt-0.5">
+                      {selectedLead.currency === 'USD' ? '$' : '৳'}{selectedLead.estimatedValue.toLocaleString()}
+                    </div>
+                  </div>
+
+                  <div className="bg-[#FAF5FF] p-2.5 rounded-lg border border-[#D8B4FE]">
+                    <div className="text-[10.5px] text-[#7E22CE] font-bold">My Commission Payout:</div>
+                    <div className="text-sm font-black font-mono text-[#7E22CE] mt-0.5">
+                      {selectedLead.currency === 'USD' ? '$' : '৳'}
+                      {(selectedLead.commissionAmount || Math.round(selectedLead.estimatedValue * ((selectedLead.commissionRate || 10) / 100))).toLocaleString()}
+                    </div>
+                  </div>
+
+                  <div className="bg-white p-2.5 rounded-lg border border-[#DDE3DD]">
+                    <div className="text-[10.5px] text-[#6B7269] font-medium">Entity Settlement Status:</div>
+                    <div className="text-xs font-extrabold mt-1">
+                      {selectedLead.entityPayoutStatus === 'SETTLED' ? (
+                        <span className="text-[#15803D] flex items-center gap-1">
+                          <CheckCircle2 className="h-3.5 w-3.5" /> 100% Settled to Me
+                        </span>
+                      ) : selectedLead.entityPayoutStatus === 'READY_FOR_SETTLEMENT' ? (
+                        <span className="text-[#7E22CE] font-black">
+                          ⚡ Ready for Entity Payout
+                        </span>
+                      ) : (
+                        <span className="text-[#64748B]">
+                          ⏳ Awaiting Customer Pay
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 1: Customer Payment Status Controller */}
+                <div className="pt-1">
+                  <div className="flex items-center justify-between text-xs font-bold text-[#556055] mb-1.5">
+                    <span>Step 1: Has Customer / Lead Paid {selectedLead.companyCode === 'ARIELMC' ? 'ArielMC' : selectedLead.companyCode === 'LINDA' ? 'Linda Resort' : 'Bizman Media'}?</span>
+                    <span className="text-[10px] text-[#6B7269] font-mono">Current: {selectedLead.customerPaymentStatus || 'PENDING'}</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleUpdateCustomerPayment(selectedLead.id, 'PENDING')}
+                      className={`py-1.5 px-2 rounded-lg text-xs font-bold border transition-all text-center ${
+                        (selectedLead.customerPaymentStatus || 'PENDING') === 'PENDING'
+                          ? 'bg-[#FEF3C7] text-[#B45309] border-[#FDE68A] shadow-xs'
+                          : 'bg-white border-[#DDE3DD] text-[#6B7269] hover:bg-[#F4F6F4]'
+                      }`}
+                    >
+                      Pending Customer Pay
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleUpdateCustomerPayment(selectedLead.id, 'PARTIAL')}
+                      className={`py-1.5 px-2 rounded-lg text-xs font-bold border transition-all text-center ${
+                        selectedLead.customerPaymentStatus === 'PARTIAL'
+                          ? 'bg-[#E0F2FE] text-[#0369A1] border-[#BAE6FD] shadow-xs'
+                          : 'bg-white border-[#DDE3DD] text-[#6B7269] hover:bg-[#F4F6F4]'
+                      }`}
+                    >
+                      Partial Advance Received
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleUpdateCustomerPayment(selectedLead.id, 'RECEIVED')}
+                      className={`py-1.5 px-2 rounded-lg text-xs font-black border transition-all text-center ${
+                        selectedLead.customerPaymentStatus === 'RECEIVED'
+                          ? 'bg-[#DCFCE7] text-[#15803D] border-[#86EFAC] shadow-xs ring-1 ring-[#15803D]'
+                          : 'bg-white border-[#DDE3DD] text-[#6B7269] hover:bg-[#F4F6F4]'
+                      }`}
+                    >
+                      ✓ Customer Paid in Full
+                    </button>
+                  </div>
+                </div>
+
+                {/* Step 2: Entity Payout to Syed Akramul Hassan Controller */}
+                <div className="pt-1 border-t border-[#C8A96A]/20">
+                  <div className="flex items-center justify-between text-xs font-bold text-[#556055] mb-1.5">
+                    <span>Step 2: Entity Payout / Settlement to Syed Akramul Hassan:</span>
+                    {selectedLead.entityPayoutStatus === 'READY_FOR_SETTLEMENT' && (
+                      <span className="text-[10px] text-[#7E22CE] font-bold animate-pulse">
+                        Ready to disburse!
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleUpdateEntityPayout(selectedLead.id, 'AWAITING_CUSTOMER_PAYMENT')}
+                      className={`py-1.5 px-3 rounded-lg text-xs font-bold border transition-all text-center flex-1 ${
+                        selectedLead.entityPayoutStatus === 'AWAITING_CUSTOMER_PAYMENT'
+                          ? 'bg-[#F1F5F9] text-[#64748B] border-[#CBD5E1] shadow-xs'
+                          : 'bg-white border-[#DDE3DD] text-[#6B7269] hover:bg-[#F4F6F4]'
+                      }`}
+                    >
+                      Awaiting Customer Pay
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleUpdateEntityPayout(selectedLead.id, 'READY_FOR_SETTLEMENT')}
+                      className={`py-1.5 px-3 rounded-lg text-xs font-extrabold border transition-all text-center flex-1 ${
+                        selectedLead.entityPayoutStatus === 'READY_FOR_SETTLEMENT'
+                          ? 'bg-[#F3E8FF] text-[#7E22CE] border-[#D8B4FE] shadow-xs ring-1 ring-[#7E22CE]'
+                          : 'bg-white border-[#DDE3DD] text-[#6B7269] hover:bg-[#F4F6F4]'
+                      }`}
+                    >
+                      Ready for Settlement
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleUpdateEntityPayout(selectedLead.id, 'SETTLED')}
+                      className={`py-1.5 px-3 rounded-lg text-xs font-black border transition-all text-center flex-1 ${
+                        selectedLead.entityPayoutStatus === 'SETTLED'
+                          ? 'bg-[#15803D] text-white border-[#15803D] shadow-sm'
+                          : 'bg-[#DCFCE7] text-[#15803D] border-[#86EFAC] hover:bg-[#15803D] hover:text-white'
+                      }`}
+                    >
+                      ✓ Mark Entity Paid Me
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -568,17 +850,21 @@ export default function LeadsPage() {
               <thead className="bg-[#F4F6F4] border-b border-[#DDE3DD] text-[#1F3A2E] font-extrabold uppercase tracking-wider text-[11px]">
                 <tr>
                   <th className="py-3 px-4">Entity</th>
-                  <th className="py-3 px-4">Opportunity & Customer</th>
+                  <th className="py-3 px-4">Project & Customer</th>
                   <th className="py-3 px-4">Stage</th>
-                  <th className="py-3 px-4">Estimated Value</th>
-                  <th className="py-3 px-4 text-center">Prob %</th>
-                  <th className="py-3 px-4">Close Date</th>
+                  <th className="py-3 px-4">Contract Value</th>
+                  <th className="py-3 px-4 text-center">Comm %</th>
+                  <th className="py-3 px-4">My Commission</th>
+                  <th className="py-3 px-4">Customer Pay</th>
+                  <th className="py-3 px-4">Entity Payout</th>
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#DDE3DD] font-mono text-[#1A1A1A]">
                 {filteredLeads.map((lead) => {
                   const stageCfg = STAGE_CONFIG[lead.stage] || STAGE_CONFIG.NEW_INQUIRY;
+                  const commRate = lead.commissionRate || 10;
+                  const commAmount = lead.commissionAmount || Math.round(lead.estimatedValue * (commRate / 100));
 
                   return (
                     <tr key={lead.id} className="hover:bg-[#F9FAF9] transition-colors">
@@ -609,19 +895,47 @@ export default function LeadsPage() {
                         </span>
                       </td>
 
-                      {/* Value */}
+                      {/* Contract Value */}
                       <td className="py-3.5 px-4 font-black text-[#1E6B3A] text-xs">
                         {lead.currency === 'USD' ? '$' : '৳'}{lead.estimatedValue.toLocaleString()}
                       </td>
 
-                      {/* Probability */}
-                      <td className="py-3.5 px-4 text-center font-bold text-[#1F3A2E]">
-                        {lead.probability}%
+                      {/* Commission Rate */}
+                      <td className="py-3.5 px-4 text-center font-bold text-[#8C6D2D]">
+                        <span className="bg-[#C8A96A]/20 px-2 py-0.5 rounded font-mono">
+                          {commRate}%
+                        </span>
                       </td>
 
-                      {/* Close Date */}
-                      <td className="py-3.5 px-4 text-[#556055] text-xs font-semibold">
-                        {lead.expectedCloseDate}
+                      {/* My Commission */}
+                      <td className="py-3.5 px-4 font-mono font-black text-[#8C6D2D] text-xs">
+                        {lead.currency === 'USD' ? '$' : '৳'}{commAmount.toLocaleString()}
+                      </td>
+
+                      {/* Customer Payment Status */}
+                      <td className="py-3.5 px-4 font-sans">
+                        <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded border inline-block ${
+                          lead.customerPaymentStatus === 'RECEIVED'
+                            ? 'bg-[#DCFCE7] text-[#15803D] border-[#86EFAC]'
+                            : lead.customerPaymentStatus === 'PARTIAL'
+                            ? 'bg-[#E0F2FE] text-[#0369A1] border-[#BAE6FD]'
+                            : 'bg-[#FEF3C7] text-[#B45309] border-[#FDE68A]'
+                        }`}>
+                          {lead.customerPaymentStatus === 'RECEIVED' ? '✓ Paid' : lead.customerPaymentStatus === 'PARTIAL' ? 'Partial' : 'Pending'}
+                        </span>
+                      </td>
+
+                      {/* Entity Payout Status */}
+                      <td className="py-3.5 px-4 font-sans">
+                        <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded border inline-block ${
+                          lead.entityPayoutStatus === 'SETTLED'
+                            ? 'bg-[#DCFCE7] text-[#15803D] border-[#86EFAC]'
+                            : lead.entityPayoutStatus === 'READY_FOR_SETTLEMENT'
+                            ? 'bg-[#F3E8FF] text-[#7E22CE] border-[#D8B4FE]'
+                            : 'bg-[#F1F5F9] text-[#64748B] border-[#CBD5E1]'
+                        }`}>
+                          {lead.entityPayoutStatus === 'SETTLED' ? '✓ Settled' : lead.entityPayoutStatus === 'READY_FOR_SETTLEMENT' ? '⚡ Due to Me' : 'Awaiting Cust'}
+                        </span>
                       </td>
 
                       {/* Actions */}
@@ -647,17 +961,17 @@ export default function LeadsPage() {
                             <MessageSquare className="h-3.5 w-3.5" />
                           </a>
 
-                          {/* Primary Inspect & Manage Deal Button */}
+                          {/* Primary Inspect & Settle Button */}
                           <button
                             onClick={() => {
                               setSelectedLead(lead);
                               setViewMode('GRID');
                             }}
                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1F3A2E] hover:bg-[#2C5240] text-[#C8A96A] border border-[#1F3A2E] text-xs font-bold transition-all shadow-sm"
-                            title="Inspect Deal, Stages & Notepad"
+                            title="Inspect Deal, Stages & Commission Settlement"
                           >
                             <FileEdit className="h-3.5 w-3.5 text-[#C8A96A]" />
-                            <span>Inspect</span>
+                            <span>Settle</span>
                           </button>
                         </div>
                       </td>
@@ -706,67 +1020,80 @@ export default function LeadsPage() {
 
                     {/* Stage Card Stack */}
                     <div className="space-y-2.5 mt-3 max-h-[550px] overflow-y-auto pr-0.5">
-                      {stageLeads.map((lead) => (
-                        <div
-                          key={lead.id}
-                          className="rounded-xl border border-[#DDE3DD] bg-white p-3 shadow-xs hover:border-[#1F3A2E] transition-all space-y-2"
-                        >
-                          <div className="flex items-center justify-between text-[10px]">
-                            <span className={`px-1.5 py-0.5 font-bold rounded shadow-xs ${
-                              lead.companyCode === 'BIZMAN' ? 'bg-[#ECFDF5] text-[#065F46] border border-[#A7F3D0]' :
-                              lead.companyCode === 'LINDA' ? 'bg-black text-white px-1 py-0.5 text-[8px] font-extrabold tracking-wider' :
-                              'bg-[#F0FDF4] text-[#166534] border border-[#BBF7D0]'
-                            }`}>
-                              {lead.companyCode === 'ARIELMC' ? 'ArielMC' : lead.companyCode === 'LINDA' ? 'Linda' : lead.companyCode}
-                            </span>
-                            <span className="font-mono text-[#1E6B3A] font-black">
-                              {lead.currency === 'USD' ? '$' : '৳'}{lead.estimatedValue.toLocaleString()}
-                            </span>
-                          </div>
+                      {stageLeads.map((lead) => {
+                        const commRate = lead.commissionRate || 10;
+                        const commAmount = lead.commissionAmount || Math.round(lead.estimatedValue * (commRate / 100));
 
-                          <h4 
-                            onClick={() => { setSelectedLead(lead); setViewMode('GRID'); }}
-                            className="text-xs font-bold text-[#1F3A2E] hover:underline cursor-pointer line-clamp-2"
+                        return (
+                          <div
+                            key={lead.id}
+                            className="rounded-xl border border-[#DDE3DD] bg-white p-3 shadow-xs hover:border-[#1F3A2E] transition-all space-y-2"
                           >
-                            {lead.title}
-                          </h4>
+                            <div className="flex items-center justify-between text-[10px]">
+                              <span className={`px-1.5 py-0.5 font-bold rounded shadow-xs ${
+                                lead.companyCode === 'BIZMAN' ? 'bg-[#ECFDF5] text-[#065F46] border border-[#A7F3D0]' :
+                                lead.companyCode === 'LINDA' ? 'bg-black text-white px-1 py-0.5 text-[8px] font-extrabold tracking-wider' :
+                                'bg-[#F0FDF4] text-[#166534] border border-[#BBF7D0]'
+                              }`}>
+                                {lead.companyCode === 'ARIELMC' ? 'ArielMC' : lead.companyCode === 'LINDA' ? 'Linda' : lead.companyCode}
+                              </span>
+                              <span className="font-mono text-[#556055] font-semibold text-[11px]">
+                                {lead.currency === 'USD' ? '$' : '৳'}{lead.estimatedValue.toLocaleString()}
+                              </span>
+                            </div>
 
-                          <div className="text-[11px] text-[#556055] font-medium truncate">
-                            {lead.customerName}
-                          </div>
+                            <h4 
+                              onClick={() => { setSelectedLead(lead); setViewMode('GRID'); }}
+                              className="text-xs font-bold text-[#1F3A2E] hover:underline cursor-pointer line-clamp-2"
+                            >
+                              {lead.title}
+                            </h4>
 
-                          <div className="flex items-center justify-between border-t border-[#DDE3DD] pt-2 text-[10px]">
-                            <span className="text-[#888] font-mono">{lead.expectedCloseDate}</span>
-                            
-                            <div className="flex items-center gap-1.5">
-                              {/* Quick Call */}
-                              <a
-                                href={`tel:${lead.phone}`}
-                                onClick={(e) => e.stopPropagation()}
-                                className="p-1 rounded bg-[#E0F2FE] text-[#0369A1] hover:bg-[#0284C7] hover:text-white border border-[#BAE6FD] hover:border-[#0284C7] transition-all shadow-xs group"
-                                title={`Call ${lead.contactPerson} (${lead.phone})`}
-                              >
-                                <PhoneCall className="h-3 w-3 text-[#0369A1] group-hover:text-white transition-colors" />
-                              </a>
+                            <div className="text-[11px] text-[#556055] font-medium truncate">
+                              {lead.customerName}
+                            </div>
 
-                              {/* Advance Stage Shortcut */}
-                              {stgKey !== 'WON' && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleAdvanceStage(lead.id, lead.stage);
-                                  }}
-                                  className="flex items-center gap-1 rounded-lg bg-[#E8F5E9] text-[#166534] hover:bg-[#166534] hover:text-white border border-[#A7F3D0] hover:border-[#166534] px-2 py-0.5 font-bold text-[10px] transition-all shadow-xs group cursor-pointer"
-                                  title="Advance to next pipeline stage"
+                            {/* My Commission Pill */}
+                            <div className="rounded bg-[#FBF9F4] border border-[#C8A96A]/40 px-2 py-1 flex items-center justify-between text-[10px]">
+                              <span className="font-bold text-[#8C6D2D]">My Comm ({commRate}%):</span>
+                              <span className="font-mono font-black text-[#8C6D2D]">
+                                {lead.currency === 'USD' ? '$' : '৳'}{commAmount.toLocaleString()}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center justify-between border-t border-[#DDE3DD] pt-2 text-[10px]">
+                              <span className="text-[#888] font-mono">{lead.expectedCloseDate}</span>
+                              
+                              <div className="flex items-center gap-1.5">
+                                {/* Quick Call */}
+                                <a
+                                  href={`tel:${lead.phone}`}
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="p-1 rounded bg-[#E0F2FE] text-[#0369A1] hover:bg-[#0284C7] hover:text-white border border-[#BAE6FD] hover:border-[#0284C7] transition-all shadow-xs group"
+                                  title={`Call ${lead.contactPerson} (${lead.phone})`}
                                 >
-                                  <span>Advance</span>
-                                  <ArrowRight className="h-3 w-3 text-[#166534] group-hover:text-white transition-transform group-hover:translate-x-0.5" />
-                                </button>
-                              )}
+                                  <PhoneCall className="h-3 w-3 text-[#0369A1] group-hover:text-white transition-colors" />
+                                </a>
+
+                                {/* Advance Stage Shortcut */}
+                                {stgKey !== 'WON' && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleAdvanceStage(lead.id, lead.stage);
+                                    }}
+                                    className="flex items-center gap-1 rounded-lg bg-[#E8F5E9] text-[#166534] hover:bg-[#166534] hover:text-white border border-[#A7F3D0] hover:border-[#166534] px-2 py-0.5 font-bold text-[10px] transition-all shadow-xs group cursor-pointer"
+                                    title="Advance to next pipeline stage"
+                                  >
+                                    <span>Advance</span>
+                                    <ArrowRight className="h-3 w-3 text-[#166534] group-hover:text-white transition-transform group-hover:translate-x-0.5" />
+                                  </button>
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
 
                       {stageLeads.length === 0 && (
                         <div className="p-4 text-center text-xs text-[#888] italic border border-dashed border-[#DDE3DD] rounded-lg">
@@ -969,6 +1296,64 @@ export default function LeadsPage() {
                     onChange={(e) => setFormData({ ...formData, probability: Number(e.target.value) })}
                     className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2.5 text-xs text-[#1A1A1A] font-mono font-bold focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
                   />
+                </div>
+              </div>
+
+              {/* Agreed Personal Commission % (Mandatory for My Projects) */}
+              <div className="rounded-xl border-2 border-[#C8A96A] bg-[#FBF9F4] p-3.5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="block font-black text-[#1F3A2E] text-xs uppercase tracking-wide">
+                    My Agreed Commission Rate (%) *
+                  </label>
+                  <span className="text-[10px] text-[#8C6D2D] font-bold">
+                    Per-Project Negotiated Payout
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="w-32">
+                    <input
+                      type="number"
+                      min="1"
+                      max="100"
+                      required
+                      value={formData.commissionRate}
+                      onChange={(e) => setFormData({ ...formData, commissionRate: Number(e.target.value) })}
+                      className="w-full rounded-lg border border-[#C8A96A] bg-white p-2 text-xs font-mono font-black text-[#8C6D2D] text-center focus:outline-none focus:ring-2 focus:ring-[#C8A96A]"
+                    />
+                  </div>
+
+                  {/* Preset Quick Click Pills */}
+                  <div className="flex flex-wrap items-center gap-1.5 flex-1">
+                    {[5, 8, 10, 12, 15, 20, 25].map((rate) => (
+                      <button
+                        key={rate}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, commissionRate: rate })}
+                        className={`px-2 py-1 rounded text-xs font-bold border transition-all ${
+                          formData.commissionRate === rate
+                            ? 'bg-[#1F3A2E] text-[#C8A96A] border-[#1F3A2E] shadow-xs'
+                            : 'bg-white border-[#DDE3DD] text-[#6B7269] hover:border-[#C8A96A] hover:text-[#1F3A2E]'
+                        }`}
+                      >
+                        {rate}%
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Real-time Calculation Projection */}
+                <div className="rounded-lg bg-white border border-[#C8A96A]/40 p-2.5 flex items-center justify-between text-xs">
+                  <div>
+                    <span className="text-[#6B7269] text-[11px]">My Projected Executive Commission:</span>
+                    <div className="font-mono font-black text-sm text-[#8C6D2D] mt-0.5">
+                      {formData.currency === 'USD' ? '$' : '৳'}
+                      {Math.round((Number(formData.estimatedValue) || 0) * ((Number(formData.commissionRate) || 0) / 100)).toLocaleString()}
+                    </div>
+                  </div>
+                  <div className="text-[10px] text-[#6B7269] text-right max-w-[200px]">
+                    Payable to Syed Akramul Hassan once Customer payment is received
+                  </div>
                 </div>
               </div>
 

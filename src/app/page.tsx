@@ -76,6 +76,31 @@ export default function MasterDashboard() {
     .filter(l => l.currency === 'USD')
     .reduce((sum, l) => sum + l.estimatedValue, 0);
 
+  // Executive Personal Commission & Settlement Pipeline for Syed Akramul Hassan
+  const myTotalCommissionBDT = filteredLeads
+    .filter(l => l.currency === 'BDT')
+    .reduce((s, l) => s + (l.commissionAmount || Math.round(l.estimatedValue * ((l.commissionRate || 10) / 100))), 0);
+
+  const myTotalCommissionUSD = filteredLeads
+    .filter(l => l.currency === 'USD')
+    .reduce((s, l) => s + (l.commissionAmount || Math.round(l.estimatedValue * ((l.commissionRate || 10) / 100))), 0);
+
+  const myReadyPayoutBDT = filteredLeads
+    .filter(l => l.currency === 'BDT' && l.entityPayoutStatus === 'READY_FOR_SETTLEMENT')
+    .reduce((s, l) => s + (l.commissionAmount || Math.round(l.estimatedValue * ((l.commissionRate || 10) / 100))), 0);
+
+  const myReadyPayoutUSD = filteredLeads
+    .filter(l => l.currency === 'USD' && l.entityPayoutStatus === 'READY_FOR_SETTLEMENT')
+    .reduce((s, l) => s + (l.commissionAmount || Math.round(l.estimatedValue * ((l.commissionRate || 10) / 100))), 0);
+
+  const reimbursablesDueBDT = filteredExpenses
+    .filter(e => e.currency === 'BDT' && e.isReimbursable && e.reimbursementStatus === 'PENDING_REIMBURSEMENT')
+    .reduce((s, e) => s + e.amount, 0);
+
+  const reimbursablesDueUSD = filteredExpenses
+    .filter(e => e.currency === 'USD' && e.isReimbursable && e.reimbursementStatus === 'PENDING_REIMBURSEMENT')
+    .reduce((s, e) => s + e.amount, 0);
+
   return (
     <div className="space-y-6">
       {/* Executive Welcome Card */}
@@ -226,6 +251,97 @@ export default function MasterDashboard() {
           </div>
           <div className="text-xs text-[#6B7269] text-center">
             Across {filteredLeads.length} active opportunities
+          </div>
+        </div>
+      </div>
+
+      {/* =================================================================== */}
+      {/* SYED AKRAMUL HASSAN — EXECUTIVE COMMISSION & SETTLEMENT PIPELINE */}
+      {/* =================================================================== */}
+      <div className="rounded-2xl border-2 border-[#C8A96A] bg-gradient-to-br from-[#FBF9F4] via-white to-[#F4F6F4] p-5 shadow-sm space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#C8A96A]/30 pb-3">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-[#1F3A2E] text-[#C8A96A] flex items-center justify-center font-bold shadow-sm">
+              <DollarSign className="h-6 w-6" />
+            </div>
+            <div>
+              <div className="text-xs font-bold uppercase tracking-wider text-[#8C6D2D]">
+                Executive Personal Transaction Engine
+              </div>
+              <h2 className="text-base sm:text-lg font-black text-[#1F3A2E]">
+                Syed Akramul Hassan — Project Commissions & Entity Settlements
+              </h2>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/leads?company=${activeCompany}`}
+              className="rounded-lg bg-[#1F3A2E] text-[#C8A96A] hover:bg-[#2C5240] px-3 py-1.5 text-xs font-bold transition-all shadow-xs"
+            >
+              Manage Commissions
+            </Link>
+            <Link
+              href={`/expenses?company=${activeCompany}`}
+              className="rounded-lg border border-[#C8A96A] text-[#8C6D2D] hover:bg-[#FBF9F4] px-3 py-1.5 text-xs font-bold transition-all"
+            >
+              Reimbursable Ledger
+            </Link>
+          </div>
+        </div>
+
+        {/* 3 Core Numbers for Syed Akramul Hassan */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* Total Commission Pipeline */}
+          <div className="bg-white p-3.5 rounded-xl border border-[#DDE3DD] shadow-2xs">
+            <div className="text-[10.5px] font-bold text-[#6B7269] uppercase tracking-wider">
+              Total Sourced Commission Pipeline
+            </div>
+            <div className="text-lg font-black font-mono text-[#8C6D2D] mt-1">
+              ৳ {myTotalCommissionBDT.toLocaleString()}
+              {myTotalCommissionUSD > 0 && ` + $${myTotalCommissionUSD.toLocaleString()}`}
+            </div>
+            <div className="text-[11px] text-[#6B7269] mt-0.5">
+              Across personal project agreements (8% – 20%)
+            </div>
+          </div>
+
+          {/* Customer Paid & Ready for Entity Payout to Me */}
+          <div className="bg-[#FAF5FF] p-3.5 rounded-xl border border-[#D8B4FE] shadow-2xs">
+            <div className="flex items-center justify-between">
+              <span className="text-[10.5px] font-bold text-[#6B21A8] uppercase tracking-wider">
+                Ready for Entity Payout to Me
+              </span>
+              <span className="px-1.5 py-0.5 rounded bg-[#7E22CE] text-white text-[9px] font-black animate-pulse">
+                Customer Paid
+              </span>
+            </div>
+            <div className="text-lg font-black font-mono text-[#7E22CE] mt-1">
+              ৳ {myReadyPayoutBDT.toLocaleString()}
+              {myReadyPayoutUSD > 0 && ` + $${myReadyPayoutUSD.toLocaleString()}`}
+            </div>
+            <div className="text-[11px] text-[#7E22CE] mt-0.5 font-medium">
+              Client received by entity &bull; Payout ready for disbursement
+            </div>
+          </div>
+
+          {/* Reimbursable Project Outlays Owed by Entities */}
+          <div className="bg-[#FFFBEB] p-3.5 rounded-xl border border-[#FDE68A] shadow-2xs">
+            <div className="flex items-center justify-between">
+              <span className="text-[10.5px] font-bold text-[#92400E] uppercase tracking-wider">
+                Project Expenses Owed by Entities
+              </span>
+              <span className="px-1.5 py-0.5 rounded bg-[#D97706] text-white text-[9px] font-black">
+                Reimbursable
+              </span>
+            </div>
+            <div className="text-lg font-black font-mono text-[#B45309] mt-1">
+              ৳ {reimbursablesDueBDT.toLocaleString()}
+              {reimbursablesDueUSD > 0 && ` + $${reimbursablesDueUSD.toLocaleString()}`}
+            </div>
+            <div className="text-[11px] text-[#92400E] mt-0.5 font-medium">
+              Out-of-pocket project costs advanced from personal funds
+            </div>
           </div>
         </div>
       </div>

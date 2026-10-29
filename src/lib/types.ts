@@ -87,6 +87,9 @@ export type PipelineStage =
   | 'WON'
   | 'LOST';
 
+export type CustomerPaymentStatus = 'PENDING' | 'PARTIAL' | 'RECEIVED';
+export type EntityPayoutStatus = 'AWAITING_CUSTOMER_PAYMENT' | 'READY_FOR_SETTLEMENT' | 'SETTLED';
+
 export interface LeadItem {
   id: string;
   companyCode: 'BIZMAN' | 'LINDA' | 'ARIELMC';
@@ -106,7 +109,17 @@ export interface LeadItem {
   notepadMarkdown: string;
   specifics: Record<string, any>;
   createdAt: string;
+
+  // Executive Personal Project & Commission Tracking
+  commissionRate: number; // e.g. 10 for 10%
+  commissionAmount: number; // estimatedValue * (commissionRate / 100)
+  customerPaymentStatus: CustomerPaymentStatus;
+  entityPayoutStatus: EntityPayoutStatus;
+  payoutAmountReceived?: number;
 }
+
+export type ExpensePayer = 'MY_PERSONAL_FUNDS' | 'ENTITY_DIRECT';
+export type ReimbursementStatus = 'NON_REIMBURSABLE' | 'PENDING_REIMBURSEMENT' | 'REIMBURSED';
 
 export interface ExpenseItem {
   id: string;
@@ -125,6 +138,11 @@ export interface ExpenseItem {
   expenseAccount: string;
   receiptUrl?: string;
   isVerified: boolean;
+
+  // Executive Outlay & Entity Settlement Tracking
+  paidBy: ExpensePayer; // Paid from My Pocket vs Entity Direct
+  isReimbursable: boolean; // True if Entity should pay me back for this project expense
+  reimbursementStatus: ReimbursementStatus;
 }
 
 export interface JournalLineItem {
