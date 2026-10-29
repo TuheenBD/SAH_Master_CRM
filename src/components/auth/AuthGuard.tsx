@@ -42,7 +42,6 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const [passwordInput, setPasswordInput] = useState<string>('');
   const [totpCode, setTotpCode] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [rememberDevice, setRememberDevice] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isLoadingStorage, setIsLoadingStorage] = useState<boolean>(true);
   const [lockoutRemaining, setLockoutRemaining] = useState<number>(0);
@@ -87,15 +86,18 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     };
   }, [isAuthenticated]);
 
-  // Check persistent session on mount
+  // Check tab session on mount (Strict Zero-Trust: Never saved to localStorage)
   useEffect(() => {
     try {
-      const savedAuth = localStorage.getItem('sah_master_crm_auth_session');
-      if (savedAuth === 'AUTHENTICATED') {
+      // Purge any lingering permanent device trust tokens
+      localStorage.removeItem('sah_master_crm_auth_session');
+
+      const savedTabAuth = sessionStorage.getItem('sah_master_crm_tab_session');
+      if (savedTabAuth === 'AUTHENTICATED') {
         setIsAuthenticated(true);
       }
     } catch (e) {
-      // LocalStorage fallback
+      // SessionStorage fallback
     } finally {
       setIsLoadingStorage(false);
     }
@@ -113,14 +115,12 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     try {
       localStorage.removeItem('sah_failed_attempts');
       localStorage.removeItem('sah_lockout_until');
+      localStorage.removeItem('sah_master_crm_auth_session');
+      // Store in memory for active window only; destroyed when closed
+      sessionStorage.setItem('sah_master_crm_tab_session', 'AUTHENTICATED');
     } catch (e) {}
     setLockoutRemaining(0);
 
-    if (rememberDevice) {
-      try {
-        localStorage.setItem('sah_master_crm_auth_session', 'AUTHENTICATED');
-      } catch (e) {}
-    }
     setIsAuthenticated(true);
     setAuthStep('PASSWORD');
     setPasswordInput('');
@@ -150,6 +150,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const lockVault = () => {
     try {
       localStorage.removeItem('sah_master_crm_auth_session');
+      sessionStorage.removeItem('sah_master_crm_tab_session');
     } catch (e) {}
     setIsAuthenticated(false);
     setAuthStep('PASSWORD');
@@ -427,17 +428,12 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
               </form>
             )}
 
-            {/* Remember Device Checkbox */}
+            {/* Zero-Trust Strict Authentication Badge */}
             <div className="flex items-center justify-between text-xs pt-3 border-t border-[#2C5240]/60">
-              <label className="flex items-center gap-2 cursor-pointer text-[11px] text-[#9BB1A6]">
-                <input
-                  type="checkbox"
-                  checked={rememberDevice}
-                  onChange={(e) => setRememberDevice(e.target.checked)}
-                  className="rounded border-[#2C5240] text-[#C8A96A] focus:ring-[#C8A96A] h-3.5 w-3.5 bg-[#091510]"
-                />
-                <span>Trust this device (30 Days)</span>
-              </label>
+              <div className="flex items-center gap-1.5 text-[10px] text-[#86EFAC] font-mono font-bold tracking-wider uppercase">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#86EFAC] animate-pulse" />
+                <span>ZERO-TRUST SESSION &bull; AUTHENTICATE EVERY VISIT</span>
+              </div>
 
               <span className="text-[10px] text-[#C8A96A] font-mono">AES-256 GCM</span>
             </div>
