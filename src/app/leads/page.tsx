@@ -128,6 +128,60 @@ export default function LeadsPage() {
   );
   const [companySaveStatus, setCompanySaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
+  // Modal: Add Corporate Company / Account (Customer, Supplier, Buyer, Vendor)
+  const [isCreateCompanyModalOpen, setIsCreateCompanyModalOpen] = useState(false);
+  const [showOptionalContactInCompanyModal, setShowOptionalContactInCompanyModal] = useState(false);
+  const [newCompanyData, setNewCompanyData] = useState({
+    companyName: '',
+    companyCode: (activeCompany === 'CONSOLIDATED' ? 'BIZMAN' : activeCompany) as 'ARIELMC' | 'BIZMAN' | 'LINDA',
+    clientType: 'Direct Brand' as string,
+    industry: 'Telecommunications',
+    priorityTemp: 'WARM' as 'HOT' | 'WARM' | 'COLD',
+    country: 'Bangladesh',
+    city: 'Dhaka',
+    website: '',
+    address: '',
+    notes: '',
+    // Optional initial contact if known
+    initialContactName: '',
+    initialContactDesignation: '',
+    initialContactPhone: '',
+    initialContactEmail: '',
+  });
+
+  // Load saved corporate company leads from localStorage if available
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('sah_master_crm_company_leads');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setCompanyLeads(parsed);
+            setSelectedCompany(parsed[0]);
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load company leads from localStorage', e);
+      }
+    }
+  }, []);
+
+  // Helper to update company leads and persist to localStorage
+  const updateAndPersistCompanyLeads = (updater: (prev: CompanyLead[]) => CompanyLead[]) => {
+    setCompanyLeads(prev => {
+      const updated = updater(prev);
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('sah_master_crm_company_leads', JSON.stringify(updated));
+        } catch (e) {
+          console.error('Failed to persist company leads to localStorage', e);
+        }
+      }
+      return updated;
+    });
+  };
+
   // Modal: Add Contact Person to Corporate Lead
   const [isAddContactModalOpen, setIsAddContactModalOpen] = useState(false);
   const [contactFormData, setContactFormData] = useState({
@@ -182,10 +236,13 @@ export default function LeadsPage() {
     notepadMarkdown: '',
   });
 
-  // Automatically open modal when navigated from Quick Action (?action=new)
+  // Automatically open modal when navigated from Quick Action (?action=new or ?action=new-company)
   useEffect(() => {
     if (actionParam === 'new') {
       setIsCreateModalOpen(true);
+    } else if (actionParam === 'new-company') {
+      setViewMode('COMPANIES');
+      setIsCreateCompanyModalOpen(true);
     }
   }, [actionParam]);
 
@@ -350,7 +407,7 @@ export default function LeadsPage() {
       contacts: [...selectedCompany.contacts, newContact],
     };
 
-    setCompanyLeads(prev => prev.map(c => c.id === selectedCompany.id ? updatedCompany : c));
+    updateAndPersistCompanyLeads(prev => prev.map(c => c.id === selectedCompany.id ? updatedCompany : c));
     setSelectedCompany(updatedCompany);
     setIsAddContactModalOpen(false);
     setContactFormData({
@@ -410,7 +467,7 @@ export default function LeadsPage() {
       projects: [newProject, ...selectedCompany.projects],
     };
 
-    setCompanyLeads(prev => prev.map(c => c.id === selectedCompany.id ? updatedCompany : c));
+    updateAndPersistCompanyLeads(prev => prev.map(c => c.id === selectedCompany.id ? updatedCompany : c));
     setSelectedCompany(updatedCompany);
     setIsAddProjectModalOpen(false);
     setProjectFormData({
@@ -429,7 +486,7 @@ export default function LeadsPage() {
   };
 
   const handleUpdateCompanyProjectStage = (companyId: string, projectId: string, newStage: PipelineStage) => {
-    setCompanyLeads(prev => prev.map(c => {
+    updateAndPersistCompanyLeads(prev => prev.map(c => {
       if (c.id === companyId) {
         const updatedProjects = c.projects.map(p => p.id === projectId ? { ...p, stage: newStage } : p);
         const updated = { ...c, projects: updatedProjects };
@@ -448,7 +505,7 @@ export default function LeadsPage() {
   };
 
   const handleUpdateCompanyProjectCustomerPayment = (companyId: string, projectId: string, status: CustomerPaymentStatus) => {
-    setCompanyLeads(prev => prev.map(c => {
+    updateAndPersistCompanyLeads(prev => prev.map(c => {
       if (c.id === companyId) {
         const updatedProjects = c.projects.map(p => {
           if (p.id === projectId) {
@@ -473,7 +530,7 @@ export default function LeadsPage() {
   };
 
   const handleUpdateCompanyProjectEntityPayout = (companyId: string, projectId: string, status: EntityPayoutStatus) => {
-    setCompanyLeads(prev => prev.map(c => {
+    updateAndPersistCompanyLeads(prev => prev.map(c => {
       if (c.id === companyId) {
         const updatedProjects = c.projects.map(p => {
           if (p.id === projectId) {
@@ -494,7 +551,7 @@ export default function LeadsPage() {
   };
 
   const handleUpdateCompanyProjectDirectPayment = (companyId: string, projectId: string, status: 'PENDING' | 'RECEIVED') => {
-    setCompanyLeads(prev => prev.map(c => {
+    updateAndPersistCompanyLeads(prev => prev.map(c => {
       if (c.id === companyId) {
         const updatedProjects = c.projects.map(p => {
           if (p.id === projectId) {
@@ -511,6 +568,65 @@ export default function LeadsPage() {
       }
       return c;
     }));
+  };
+
+  // Handler: Register New Company Account (Customer, Supplier, Buyer, Vendor)
+  const handleCreateCompany = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCompanyData.companyName.trim()) {
+      alert('Please enter Company / Organization Name');
+      return;
+    }
+
+    const newComp: CompanyLead = {
+      id: `comp-${Date.now()}`,
+      companyCode: newCompanyData.companyCode,
+      companyName: newCompanyData.companyName.trim(),
+      industry: newCompanyData.industry.trim() || 'Corporate Enterprise',
+      clientType: newCompanyData.clientType,
+      priorityTemp: newCompanyData.priorityTemp,
+      country: newCompanyData.country.trim() || 'Bangladesh',
+      city: newCompanyData.city.trim() || undefined,
+      website: newCompanyData.website.trim() || undefined,
+      address: newCompanyData.address.trim() || undefined,
+      createdAt: new Date().toISOString().split('T')[0],
+      contacts: newCompanyData.initialContactName.trim() ? [
+        {
+          id: `cnt-${Date.now()}`,
+          name: newCompanyData.initialContactName.trim(),
+          designation: newCompanyData.initialContactDesignation.trim() || 'Key Representative',
+          department: 'Management / Procurement',
+          roleType: 'PRIMARY_DECISION_MAKER',
+          phone: newCompanyData.initialContactPhone.trim() || '+880',
+          email: newCompanyData.initialContactEmail.trim() || '',
+          whatsapp: (newCompanyData.initialContactPhone || '').replace(/[^0-9]/g, ''),
+          notes: newCompanyData.notes.trim() || 'Initial contact recorded at company registration',
+          isPrimary: true,
+        }
+      ] : [],
+      projects: [],
+    };
+
+    updateAndPersistCompanyLeads(prev => [newComp, ...prev]);
+    setSelectedCompany(newComp);
+    setViewMode('COMPANIES');
+    setIsCreateCompanyModalOpen(false);
+    setNewCompanyData({
+      companyName: '',
+      companyCode: (activeCompany === 'CONSOLIDATED' ? 'BIZMAN' : activeCompany) as 'ARIELMC' | 'BIZMAN' | 'LINDA',
+      clientType: 'Direct Brand',
+      industry: 'Telecommunications',
+      priorityTemp: 'WARM',
+      country: 'Bangladesh',
+      city: 'Dhaka',
+      website: '',
+      address: '',
+      notes: '',
+      initialContactName: '',
+      initialContactDesignation: '',
+      initialContactPhone: '',
+      initialContactEmail: '',
+    });
   };
 
   const handleOpenParallelProjectModal = (parentLead: LeadItem) => {
@@ -682,14 +798,25 @@ export default function LeadsPage() {
             </button>
           </div>
 
-          {/* Quick Action: Create New Lead Button */}
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="flex items-center gap-2 rounded-xl bg-[#1F3A2E] hover:bg-[#2C5240] text-[#C8A96A] px-4 py-2 text-xs font-bold border border-[#1F3A2E] shadow-sm transition-all"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Create New Lead</span>
-          </button>
+          {/* Quick Actions: Add Company Account + Create New Lead Button */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsCreateCompanyModalOpen(true)}
+              className="flex items-center gap-1.5 rounded-xl bg-white hover:bg-[#F4F6F4] text-[#1F3A2E] px-3.5 py-2 text-xs font-bold border border-[#1F3A2E] shadow-xs transition-all"
+              title="List a new corporate account, supplier, buyer or vendor without needing a campaign or contact person yet"
+            >
+              <Building2 className="h-4 w-4 text-[#C8A96A]" />
+              <span>+ Add Company Account</span>
+            </button>
+
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="flex items-center gap-1.5 rounded-xl bg-[#1F3A2E] hover:bg-[#2C5240] text-[#C8A96A] px-3.5 py-2 text-xs font-bold border border-[#1F3A2E] shadow-sm transition-all"
+            >
+              <Plus className="h-4 w-4" />
+              <span>Create New Lead</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -780,9 +907,16 @@ export default function LeadsPage() {
             <div className="space-y-1">
               <h2 className="text-base font-extrabold text-[#1F3A2E]">Corporate Client Database is Clean</h2>
               <p className="text-xs text-[#6B7269] max-w-md mx-auto">
-                No corporate accounts recorded yet. Click &quot;+ Create New Lead&quot; above to add your first real commercial client (e.g. Grameenphone, Unilever, Export Buyer).
+                No corporate accounts recorded yet. You can list a company account (e.g. Grameenphone, Robi, Unilever, or an export supplier/buyer) without needing a campaign or contact person upfront.
               </p>
             </div>
+            <button
+              onClick={() => setIsCreateCompanyModalOpen(true)}
+              className="inline-flex items-center gap-2 rounded-xl bg-[#1F3A2E] hover:bg-[#2C5240] text-[#C8A96A] px-4 py-2 text-xs font-black shadow-sm transition-all"
+            >
+              <Building2 className="h-4 w-4" />
+              <span>+ List New Company Account</span>
+            </button>
           </div>
         ) : (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -793,7 +927,14 @@ export default function LeadsPage() {
                 <Building2 className="h-3.5 w-3.5 text-[#C8A96A]" />
                 <span>Showing {filteredCompanyLeads.length} Corporate Accounts</span>
               </span>
-              <span className="text-[11px] text-[#8C6D2D] font-mono">Bizman Model</span>
+              <button
+                type="button"
+                onClick={() => setIsCreateCompanyModalOpen(true)}
+                className="flex items-center gap-1 text-[11px] font-extrabold text-[#1F3A2E] bg-white hover:bg-[#F4F6F4] border border-[#DDE3DD] rounded-lg px-2.5 py-1 transition-colors shadow-xs"
+              >
+                <Plus className="h-3 w-3 text-[#C8A96A]" />
+                <span>Add Company</span>
+              </button>
             </div>
 
             <div className="space-y-3 max-h-[calc(100vh-260px)] overflow-y-auto pr-1">
@@ -1004,97 +1145,117 @@ export default function LeadsPage() {
                 </div>
 
                 {/* Contacts Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
-                  {selectedCompany.contacts.map((cnt) => {
-                    const roleBadge = 
-                      cnt.roleType === 'PRIMARY_DECISION_MAKER' ? 'bg-[#EEF2FF] text-[#4338CA] border-[#C7D2FE]' :
-                      cnt.roleType === 'PROCUREMENT' ? 'bg-[#FEF3C7] text-[#B45309] border-[#FDE68A]' :
-                      cnt.roleType === 'MEDIA_BUYER' ? 'bg-[#ECFDF5] text-[#065F46] border-[#A7F3D0]' :
-                      cnt.roleType === 'FINANCE_ACCOUNTS' ? 'bg-[#E0F2FE] text-[#0369A1] border-[#BAE6FD]' :
-                      cnt.roleType === 'OPERATIONS' ? 'bg-[#F3E8FF] text-[#7E22CE] border-[#E9D5FF]' :
-                      'bg-[#F4F6F4] text-[#556055] border-[#DDE3DD]';
+                {selectedCompany.contacts.length === 0 ? (
+                  <div className="rounded-lg border border-dashed border-[#DDE3DD] bg-[#FAFAF8] p-5 text-center space-y-2">
+                    <div className="w-8 h-8 rounded-full bg-[#EEF2FF] text-[#4338CA] mx-auto flex items-center justify-center">
+                      <UserPlus className="h-4 w-4" />
+                    </div>
+                    <div className="text-xs font-bold text-[#1F3A2E]">No Contact Persons Added Yet</div>
+                    <p className="text-[11px] text-[#6B7269] max-w-sm mx-auto">
+                      This company was listed without an upfront contact. As business discussions start, click below to add key decision makers or procurement managers.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setIsAddContactModalOpen(true)}
+                      className="inline-flex items-center gap-1 text-xs font-bold text-[#4338CA] hover:underline pt-1"
+                    >
+                      <Plus className="h-3 w-3" />
+                      <span>+ Add First Contact Person</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                    {selectedCompany.contacts.map((cnt) => {
+                      const roleBadge = 
+                        cnt.roleType === 'PRIMARY_DECISION_MAKER' ? 'bg-[#EEF2FF] text-[#4338CA] border-[#C7D2FE]' :
+                        cnt.roleType === 'PROCUREMENT' ? 'bg-[#FEF3C7] text-[#B45309] border-[#FDE68A]' :
+                        cnt.roleType === 'MEDIA_BUYER' ? 'bg-[#ECFDF5] text-[#065F46] border-[#A7F3D0]' :
+                        cnt.roleType === 'FINANCE_ACCOUNTS' ? 'bg-[#E0F2FE] text-[#0369A1] border-[#BAE6FD]' :
+                        cnt.roleType === 'OPERATIONS' ? 'bg-[#F3E8FF] text-[#7E22CE] border-[#E9D5FF]' :
+                        'bg-[#F4F6F4] text-[#556055] border-[#DDE3DD]';
 
-                    const roleLabel = 
-                      cnt.roleType === 'PRIMARY_DECISION_MAKER' ? 'Primary Decision Maker' :
-                      cnt.roleType === 'PROCUREMENT' ? 'Procurement / RFP' :
-                      cnt.roleType === 'MEDIA_BUYER' ? 'Media Buyer / Planning' :
-                      cnt.roleType === 'FINANCE_ACCOUNTS' ? 'Finance & Invoicing' :
-                      cnt.roleType === 'OPERATIONS' ? 'Operations & Sourcing' :
-                      'Key Contact';
+                      const roleLabel = 
+                        cnt.roleType === 'PRIMARY_DECISION_MAKER' ? 'Primary Decision Maker' :
+                        cnt.roleType === 'PROCUREMENT' ? 'Procurement / RFP' :
+                        cnt.roleType === 'MEDIA_BUYER' ? 'Media Buyer / Planning' :
+                        cnt.roleType === 'FINANCE_ACCOUNTS' ? 'Finance & Invoicing' :
+                        cnt.roleType === 'OPERATIONS' ? 'Operations & Sourcing' :
+                        'Key Contact';
 
-                    return (
-                      <div 
-                        key={cnt.id} 
-                        className="rounded-lg border border-[#DDE3DD] bg-[#FAFAF8] p-3 space-y-2 hover:border-[#1F3A2E] transition-all"
-                      >
-                        <div className="flex items-start justify-between gap-1">
-                          <div>
-                            <div className="font-extrabold text-sm text-[#1F3A2E] flex items-center gap-1.5">
-                              <span>{cnt.name}</span>
-                              {cnt.isPrimary && (
-                                <span className="text-[9px] font-black uppercase bg-[#1F3A2E] text-[#C8A96A] px-1.5 py-0.2 rounded">
-                                  Primary
-                                </span>
+                      return (
+                        <div 
+                          key={cnt.id} 
+                          className="rounded-lg border border-[#DDE3DD] bg-[#FAFAF8] p-3 space-y-2 hover:border-[#1F3A2E] transition-all"
+                        >
+                          <div className="flex items-start justify-between gap-1">
+                            <div>
+                              <div className="font-extrabold text-sm text-[#1F3A2E] flex items-center gap-1.5">
+                                <span>{cnt.name}</span>
+                                {cnt.isPrimary && (
+                                  <span className="text-[9px] font-black uppercase bg-[#1F3A2E] text-[#C8A96A] px-1.5 py-0.2 rounded">
+                                    Primary
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-xs text-[#556055] font-semibold">{cnt.designation}</div>
+                              {cnt.department && (
+                                <div className="text-[10.5px] text-[#888]">{cnt.department}</div>
                               )}
                             </div>
-                            <div className="text-xs text-[#556055] font-semibold">{cnt.designation}</div>
-                            {cnt.department && (
-                              <div className="text-[10.5px] text-[#888]">{cnt.department}</div>
-                            )}
+
+                            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border shrink-0 ${roleBadge}`}>
+                              {roleLabel}
+                            </span>
                           </div>
 
-                          <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border shrink-0 ${roleBadge}`}>
-                            {roleLabel}
-                          </span>
+                          {/* Contact Channels */}
+                          <div className="pt-2 border-t border-[#DDE3DD] flex items-center justify-between gap-2 text-xs">
+                            <div className="text-[11px] font-mono text-[#333] space-y-0.5">
+                              <div>📞 {cnt.phone}</div>
+                              {cnt.pabxPhone && (
+                                <div className="text-[10px] text-[#666]">PABX: {cnt.pabxPhone}</div>
+                              )}
+                            </div>
+
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              <a
+                                href={`tel:${cnt.phone}`}
+                                title="Direct Phone Call"
+                                className="h-7 w-7 rounded-md bg-[#E0F2FE] hover:bg-[#0284C7] text-[#0369A1] hover:text-white border border-[#BAE6FD] flex items-center justify-center transition-colors shadow-xs"
+                              >
+                                <Phone className="h-3.5 w-3.5" />
+                              </a>
+
+                              <a
+                                href={`https://wa.me/${cnt.whatsapp || cnt.phone.replace(/[^0-9]/g, '')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title="Direct WhatsApp"
+                                className="h-7 w-7 rounded-md bg-[#25D366] hover:bg-[#20BA5A] text-white flex items-center justify-center transition-colors shadow-xs"
+                              >
+                                <MessageSquare className="h-3.5 w-3.5" />
+                              </a>
+
+                              <a
+                                href={`mailto:${cnt.email}`}
+                                title={`Email ${cnt.email}`}
+                                className="h-7 w-7 rounded-md bg-[#F4F6F4] hover:bg-[#1F3A2E] text-[#556055] hover:text-[#C8A96A] border border-[#DDE3DD] flex items-center justify-center transition-colors shadow-xs"
+                              >
+                                <Mail className="h-3.5 w-3.5" />
+                              </a>
+                            </div>
+                          </div>
+
+                          {cnt.notes && (
+                            <div className="text-[10.5px] text-[#666] italic bg-white p-1.5 rounded border border-[#EBEBEB]">
+                              &ldquo;{cnt.notes}&rdquo;
+                            </div>
+                          )}
                         </div>
-
-                        {/* Contact Channels */}
-                        <div className="pt-2 border-t border-[#DDE3DD] flex items-center justify-between gap-2 text-xs">
-                          <div className="text-[11px] font-mono text-[#333] space-y-0.5">
-                            <div>📞 {cnt.phone}</div>
-                            {cnt.pabxPhone && (
-                              <div className="text-[10px] text-[#666]">PABX: {cnt.pabxPhone}</div>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-1.5 shrink-0">
-                            <a
-                              href={`tel:${cnt.phone}`}
-                              title="Direct Phone Call"
-                              className="h-7 w-7 rounded-md bg-[#E0F2FE] hover:bg-[#0284C7] text-[#0369A1] hover:text-white border border-[#BAE6FD] flex items-center justify-center transition-colors shadow-xs"
-                            >
-                              <Phone className="h-3.5 w-3.5" />
-                            </a>
-
-                            <a
-                              href={`https://wa.me/${cnt.whatsapp || cnt.phone.replace(/[^0-9]/g, '')}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              title="Direct WhatsApp"
-                              className="h-7 w-7 rounded-md bg-[#25D366] hover:bg-[#20BA5A] text-white flex items-center justify-center transition-colors shadow-xs"
-                            >
-                              <MessageSquare className="h-3.5 w-3.5" />
-                            </a>
-
-                            <a
-                              href={`mailto:${cnt.email}`}
-                              title={`Email ${cnt.email}`}
-                              className="h-7 w-7 rounded-md bg-[#F4F6F4] hover:bg-[#1F3A2E] text-[#556055] hover:text-[#C8A96A] border border-[#DDE3DD] flex items-center justify-center transition-colors shadow-xs"
-                            >
-                              <Mail className="h-3.5 w-3.5" />
-                            </a>
-                          </div>
-                        </div>
-
-                        {cnt.notes && (
-                          <div className="text-[10.5px] text-[#666] italic bg-white p-1.5 rounded border border-[#EBEBEB]">
-                            &ldquo;{cnt.notes}&rdquo;
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* Card 3: Parallel Commercial Projects Under this Lead */}
@@ -1121,8 +1282,27 @@ export default function LeadsPage() {
                 </div>
 
                 {/* Projects List */}
-                <div className="space-y-3">
-                  {selectedCompany.projects.map((proj) => {
+                {selectedCompany.projects.length === 0 ? (
+                  <div className="rounded-xl border border-dashed border-[#DDE3DD] bg-[#FAFAF8] p-6 text-center space-y-2">
+                    <div className="w-8 h-8 rounded-full bg-[#F4F6F4] text-[#1F3A2E] mx-auto flex items-center justify-center border border-[#DDE3DD]">
+                      <Layers className="h-4 w-4 text-[#C8A96A]" />
+                    </div>
+                    <div className="text-xs font-bold text-[#1F3A2E]">No Active Campaigns or Deals Yet</div>
+                    <p className="text-[11px] text-[#6B7269] max-w-sm mx-auto">
+                      This company is registered in your corporate directory. Commercial campaigns, DOOH media slots, or export purchase orders can be launched step-by-step whenever inquiries arrive.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setIsAddProjectModalOpen(true)}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-[#1F3A2E] hover:bg-[#2C5240] text-[#C8A96A] px-3.5 py-1.5 text-xs font-extrabold transition-all shadow-xs mt-1"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      <span>Initiate First Project / Campaign</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {selectedCompany.projects.map((proj) => {
                     const stageCfg = STAGE_CONFIG[proj.stage] || STAGE_CONFIG.NEW_INQUIRY;
                     const curr = proj.currency === 'USD' ? '$' : '৳';
                     const commAmount = proj.commissionAmount || Math.round(proj.estimatedValue * (proj.commissionRate / 100));
@@ -1310,7 +1490,8 @@ export default function LeadsPage() {
                     );
                   })}
                 </div>
-              </div>
+              )}
+            </div>
 
               {/* Card 4: Corporate Account Executive Intelligence Notes */}
               <div className="rounded-xl border border-[#DDE3DD] bg-white p-5 shadow-sm space-y-3">
@@ -2953,6 +3134,286 @@ export default function LeadsPage() {
                 >
                   <Check className="h-4 w-4" />
                   <span>Launch Parallel Project</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* =================================================================== */}
+      {/* MODAL: LIST NEW COMPANY ACCOUNT (CUSTOMER, VENDOR, SUPPLIER, BUYER) */}
+      {/* Allows listing companies without upfront campaign or contact person */}
+      {/* =================================================================== */}
+      {isCreateCompanyModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
+          <div className="w-full max-w-2xl rounded-2xl border-2 border-[#1F3A2E] bg-white p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-[#DDE3DD] pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="h-9 w-9 rounded-xl bg-[#1F3A2E] text-[#C8A96A] flex items-center justify-center font-bold shadow-xs">
+                  <Building2 className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-[#1F3A2E]">List New Corporate / Company Account</h3>
+                  <p className="text-xs text-[#6B7269]">
+                    Register a client brand, customer, supplier, or buyer. Campaigns and contacts can be linked step-by-step later.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsCreateCompanyModalOpen(false)}
+                className="rounded-lg p-1 text-[#6B7269] hover:bg-[#F4F6F4] hover:text-[#1A1A1A] transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Zero-Pressure Clarification Banner */}
+            <div className="rounded-xl bg-[#F0FDF4] border border-[#BBF7D0] p-3 text-xs text-[#166534] flex items-start gap-2.5">
+              <Sparkles className="h-4 w-4 text-[#166534] shrink-0 mt-0.5" />
+              <div>
+                <strong className="font-extrabold">Clean Listing (No Campaign or Contact Required Upfront)</strong>
+                <p className="text-[11px] text-[#166534]/90 mt-0.5">
+                  You can register enterprise customers (e.g. Grameenphone, Robi, Unilever), media partners, vendors, or international buyers immediately. Contact persons and parallel deals can be added progressively as negotiations develop.
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={handleCreateCompany} className="space-y-4 text-xs">
+              {/* Company Name */}
+              <div>
+                <label className="block font-black text-[#1F3A2E] mb-1">
+                  Company / Organization Name <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Grameenphone Ltd., Robi Axiata, Unilever Bangladesh, Apex Tannery..."
+                  value={newCompanyData.companyName}
+                  onChange={(e) => setNewCompanyData({ ...newCompanyData, companyName: e.target.value })}
+                  className="w-full rounded-lg border border-[#DDE3DD] bg-white px-3 py-2 text-xs text-[#1A1A1A] font-semibold focus:outline-none focus:ring-2 focus:ring-[#1F3A2E]"
+                />
+              </div>
+
+              {/* Operating Entity & Client Category */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-extrabold text-[#1F3A2E] mb-1">Operating Business Entity</label>
+                  <select
+                    value={newCompanyData.companyCode}
+                    onChange={(e) => setNewCompanyData({ ...newCompanyData, companyCode: e.target.value as any })}
+                    className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2 text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
+                  >
+                    <option value="BIZMAN">Bizman Media (DOOH, Media & Advertising)</option>
+                    <option value="ARIELMC">ArielMC (Global Export, Jute, Commodities)</option>
+                    <option value="LINDA">Linda Resort Limited (Eco-Resort & Events)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-extrabold text-[#1F3A2E] mb-1">Account Category / Role</label>
+                  <select
+                    value={newCompanyData.clientType}
+                    onChange={(e) => setNewCompanyData({ ...newCompanyData, clientType: e.target.value })}
+                    className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2 text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
+                  >
+                    <option value="Direct Brand">Direct Brand (e.g. Grameenphone, Robi, Unilever)</option>
+                    <option value="Corporate Client">Corporate Client</option>
+                    <option value="Media Agency">Media Agency (e.g. Wavemaker, Asiatic, Mediacom)</option>
+                    <option value="Vendor / Supplier">Vendor / Screen Partner / Supplier</option>
+                    <option value="Raw Material Supplier">Raw Material Supplier (Jute, Leather, Steel)</option>
+                    <option value="International Buyer">International Buyer (Export Buyer)</option>
+                    <option value="Government / Institutional">Government / Institutional</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Industry & Priority Temperature */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-extrabold text-[#1F3A2E] mb-1">Industry / Sector</label>
+                  <input
+                    type="text"
+                    list="company-industry-suggestions"
+                    placeholder="e.g. Telecommunications, FMCG, Banking..."
+                    value={newCompanyData.industry}
+                    onChange={(e) => setNewCompanyData({ ...newCompanyData, industry: e.target.value })}
+                    className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2 text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
+                  />
+                  <datalist id="company-industry-suggestions">
+                    <option value="Telecommunications" />
+                    <option value="FMCG & Consumer Goods" />
+                    <option value="Banking & Financial Services" />
+                    <option value="Ready-Made Garments & Textiles" />
+                    <option value="Real Estate & Construction" />
+                    <option value="Pharmaceuticals & Healthcare" />
+                    <option value="E-commerce & Digital" />
+                    <option value="Food & Beverage" />
+                    <option value="Jute & Biodegradable Products" />
+                    <option value="Leather & Tannery" />
+                    <option value="Hospitality & Tourism" />
+                    <option value="Government & Semi-Government" />
+                  </datalist>
+                </div>
+
+                <div>
+                  <label className="block font-extrabold text-[#1F3A2E] mb-1">Priority Level / Lead Heat</label>
+                  <select
+                    value={newCompanyData.priorityTemp}
+                    onChange={(e) => setNewCompanyData({ ...newCompanyData, priorityTemp: e.target.value as any })}
+                    className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2 text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
+                  >
+                    <option value="HOT">🔥 HOT (Immediate discussions / High priority)</option>
+                    <option value="WARM">☀️ WARM (Active relationship / Recurring)</option>
+                    <option value="COLD">❄️ COLD (Target prospect / Listed vendor)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Geographic Coordinates & Website */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="block font-extrabold text-[#1F3A2E] mb-1">Country</label>
+                  <input
+                    type="text"
+                    placeholder="Bangladesh"
+                    value={newCompanyData.country}
+                    onChange={(e) => setNewCompanyData({ ...newCompanyData, country: e.target.value })}
+                    className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2 text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-extrabold text-[#1F3A2E] mb-1">City / Region</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Dhaka, Chittagong, London..."
+                    value={newCompanyData.city}
+                    onChange={(e) => setNewCompanyData({ ...newCompanyData, city: e.target.value })}
+                    className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2 text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-extrabold text-[#1F3A2E] mb-1">Corporate Website</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. grameenphone.com"
+                    value={newCompanyData.website}
+                    onChange={(e) => setNewCompanyData({ ...newCompanyData, website: e.target.value })}
+                    className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2 text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
+                  />
+                </div>
+              </div>
+
+              {/* Corporate Address */}
+              <div>
+                <label className="block font-extrabold text-[#1F3A2E] mb-1">Headquarters / Physical Address (Optional)</label>
+                <input
+                  type="text"
+                  placeholder="e.g. GP House, Bashundhara R/A, Dhaka-1229 or Gulshan-1, Dhaka"
+                  value={newCompanyData.address}
+                  onChange={(e) => setNewCompanyData({ ...newCompanyData, address: e.target.value })}
+                  className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2 text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
+                />
+              </div>
+
+              {/* Optional Initial Contact Toggle */}
+              <div className="pt-2 border-t border-[#DDE3DD]">
+                <button
+                  type="button"
+                  onClick={() => setShowOptionalContactInCompanyModal(!showOptionalContactInCompanyModal)}
+                  className="flex items-center gap-2 text-xs font-bold text-[#1F3A2E] hover:underline"
+                >
+                  <UserPlus className="h-3.5 w-3.5 text-[#C8A96A]" />
+                  <span>
+                    {showOptionalContactInCompanyModal ? 'Hide Initial Contact Person Form' : '+ Add an initial contact person now? (Optional)'}
+                  </span>
+                </button>
+
+                {showOptionalContactInCompanyModal && (
+                  <div className="mt-3 p-3.5 rounded-xl bg-[#F8FAF8] border border-[#DDE3DD] space-y-3">
+                    <div className="text-[11px] font-bold text-[#6B7269]">
+                      Key Contact Details (Can also be added later anytime):
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block font-semibold text-[#1A1A1A] mb-1">Contact Person Name</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Sajjad Hossain / Head of Marketing"
+                          value={newCompanyData.initialContactName}
+                          onChange={(e) => setNewCompanyData({ ...newCompanyData, initialContactName: e.target.value })}
+                          className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2 text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-semibold text-[#1A1A1A] mb-1">Designation</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Head of Media / Procurement Manager"
+                          value={newCompanyData.initialContactDesignation}
+                          onChange={(e) => setNewCompanyData({ ...newCompanyData, initialContactDesignation: e.target.value })}
+                          className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2 text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-semibold text-[#1A1A1A] mb-1">Direct Phone / Mobile</label>
+                        <input
+                          type="text"
+                          placeholder="+880 1711..."
+                          value={newCompanyData.initialContactPhone}
+                          onChange={(e) => setNewCompanyData({ ...newCompanyData, initialContactPhone: e.target.value })}
+                          className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2 text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-semibold text-[#1A1A1A] mb-1">Email Address</label>
+                        <input
+                          type="email"
+                          placeholder="contact@company.com"
+                          value={newCompanyData.initialContactEmail}
+                          onChange={(e) => setNewCompanyData({ ...newCompanyData, initialContactEmail: e.target.value })}
+                          className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2 text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Account Notes */}
+              <div>
+                <label className="block font-extrabold text-[#1F3A2E] mb-1">Account Intelligence / Executive Notes</label>
+                <textarea
+                  rows={2}
+                  placeholder="Record strategic context, brand agency affiliations, preferred screen locations, or business notes..."
+                  value={newCompanyData.notes}
+                  onChange={(e) => setNewCompanyData({ ...newCompanyData, notes: e.target.value })}
+                  className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2 text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#DDE3DD]">
+                <button
+                  type="button"
+                  onClick={() => setIsCreateCompanyModalOpen(false)}
+                  className="rounded-lg border border-[#DDE3DD] bg-white px-4 py-2 text-xs font-bold text-[#556055] hover:bg-[#F4F6F4] transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex items-center gap-1.5 rounded-lg bg-[#1F3A2E] hover:bg-[#2C5240] text-[#C8A96A] px-5 py-2 text-xs font-black border border-[#1F3A2E] shadow-sm transition-all"
+                >
+                  <Building2 className="h-4 w-4" />
+                  <span>List Company Account</span>
                 </button>
               </div>
             </form>

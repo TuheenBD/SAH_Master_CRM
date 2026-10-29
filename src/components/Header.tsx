@@ -376,12 +376,21 @@ export default function Header() {
                 />
                 <div className="absolute right-0 mt-2 w-56 rounded-xl border border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] text-white p-1.5 shadow-2xl z-40 text-xs">
                   <Link
+                    href={`/leads?company=${activeCompany}&action=new-company`}
+                    onClick={() => setQuickActionOpen(false)}
+                    className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-white transition-colors"
+                  >
+                    <Building2 className="h-4 w-4 text-[var(--sidebar-active-text)]" />
+                    <span>List New Company Account</span>
+                  </Link>
+
+                  <Link
                     href={`/leads?company=${activeCompany}&action=new`}
                     onClick={() => setQuickActionOpen(false)}
                     className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-white transition-colors"
                   >
                     <Users className="h-4 w-4 text-[var(--sidebar-active-text)]" />
-                    <span>Create New Lead</span>
+                    <span>Create New Lead / Deal</span>
                   </Link>
 
                   <Link

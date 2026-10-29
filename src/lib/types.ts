@@ -142,9 +142,9 @@ export interface ParallelProject {
 export interface CompanyLead {
   id: string;
   companyCode: 'BIZMAN' | 'LINDA' | 'ARIELMC';
-  companyName: string; // The Lead Company Account (e.g. Grameenphone Ltd., Unilever Bangladesh, EcoLiving UK)
+  companyName: string; // The Lead Company Account (e.g. Grameenphone Ltd., Robi Axiata, Unilever Bangladesh, EcoLiving UK)
   industry: string;
-  clientType: 'Direct Brand' | 'Media Agency' | 'Government / Institutional' | 'International Buyer' | 'Corporate Client';
+  clientType: 'Direct Brand' | 'Media Agency' | 'Government / Institutional' | 'International Buyer' | 'Corporate Client' | 'Vendor / Supplier' | 'Raw Material Supplier' | string;
   priorityTemp: 'HOT' | 'WARM' | 'COLD';
   country: string;
   city?: string;
