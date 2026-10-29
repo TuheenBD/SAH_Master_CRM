@@ -14,6 +14,7 @@ import {
   FileText, 
   Receipt, 
   Users, 
+  UserPlus,
   Wallet,
   ChevronDown,
   Sparkles,
@@ -374,29 +375,43 @@ export default function Header() {
                   onClick={() => setQuickActionOpen(false)}
                   className="fixed inset-0 z-30"
                 />
-                <div className="absolute right-0 mt-2 w-56 rounded-xl border border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] text-white p-1.5 shadow-2xl z-40 text-xs">
+                <div className="absolute right-0 mt-2 w-60 rounded-xl border border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] text-white p-1.5 shadow-2xl z-40 text-xs">
+                  {/* Lead Journey 3 Steps */}
+                  <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wider text-[var(--header-accent)] border-b border-[var(--sidebar-border)]/60 mb-1">
+                    Commercial Lead Journey
+                  </div>
+
                   <Link
                     href={`/leads?company=${activeCompany}&action=new-company`}
                     onClick={() => setQuickActionOpen(false)}
-                    className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-white transition-colors"
+                    className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-white transition-colors"
                   >
                     <Building2 className="h-4 w-4 text-[var(--sidebar-active-text)]" />
-                    <span>List New Company Account</span>
+                    <span>1st. List Company Account</span>
+                  </Link>
+
+                  <Link
+                    href={`/leads?company=${activeCompany}&action=new-contact`}
+                    onClick={() => setQuickActionOpen(false)}
+                    className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-white transition-colors"
+                  >
+                    <UserPlus className="h-4 w-4 text-[#88BDF2]" />
+                    <span>2nd. List Contact Person</span>
                   </Link>
 
                   <Link
                     href={`/leads?company=${activeCompany}&action=new`}
                     onClick={() => setQuickActionOpen(false)}
-                    className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-white transition-colors"
+                    className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-white transition-colors border-b border-[var(--sidebar-border)]/60 pb-2 mb-1"
                   >
-                    <Users className="h-4 w-4 text-[var(--sidebar-active-text)]" />
-                    <span>Create New Lead / Deal</span>
+                    <Plus className="h-4 w-4 text-[var(--sidebar-active-text)]" />
+                    <span>3rd. Create Lead (Campaign)</span>
                   </Link>
 
                   <Link
                     href={`/expenses?company=${activeCompany}&action=new`}
                     onClick={() => setQuickActionOpen(false)}
-                    className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-white transition-colors"
+                    className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-white transition-colors"
                   >
                     <Receipt className="h-4 w-4 text-rose-400" />
                     <span>Record Deal Expense</span>

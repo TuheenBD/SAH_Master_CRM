@@ -217,6 +217,7 @@ export default function LeadsPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isCustomOrg, setIsCustomOrg] = useState(false);
   const [isCustomContact, setIsCustomContact] = useState(false);
+  const [targetCompanyIdForContact, setTargetCompanyIdForContact] = useState<string>('');
   const [formData, setFormData] = useState({
     companyCode: (activeCompany === 'CONSOLIDATED' ? 'BIZMAN' : activeCompany) as 'ARIELMC' | 'BIZMAN' | 'LINDA',
     title: '',
@@ -386,15 +387,18 @@ export default function LeadsPage() {
     }
   };
 
-  // Automatically open modal when navigated from Quick Action (?action=new or ?action=new-company)
+  // Automatically open modal when navigated from Quick Action (?action=new, ?action=new-company, ?action=new-contact)
   useEffect(() => {
     if (actionParam === 'new') {
       setIsCreateModalOpen(true);
     } else if (actionParam === 'new-company') {
       setViewMode('COMPANIES');
       setIsCreateCompanyModalOpen(true);
+    } else if (actionParam === 'new-contact') {
+      setTargetCompanyIdForContact(selectedCompany?.id || companyLeads[0]?.id || '');
+      setIsAddContactModalOpen(true);
     }
-  }, [actionParam]);
+  }, [actionParam, companyLeads, selectedCompany]);
 
   // Filter leads based on company context and search query
   const filteredLeads = leads
@@ -532,7 +536,8 @@ export default function LeadsPage() {
 
   const handleAddContactToCompany = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedCompany) return;
+    const targetComp = companyLeads.find(c => c.id === targetCompanyIdForContact) || selectedCompany || companyLeads[0];
+    if (!targetComp) return;
     if (!contactFormData.name.trim() || !contactFormData.phone.trim()) {
       alert('Please enter Contact Person Name and Phone.');
       return;
@@ -540,26 +545,42 @@ export default function LeadsPage() {
 
     const newContact: LeadContact = {
       id: `cnt-${Date.now()}`,
-      name: contactFormData.name,
-      designation: contactFormData.designation,
-      department: contactFormData.department,
+      name: contactFormData.name.trim(),
+      designation: contactFormData.designation.trim() || 'Key Contact',
+      department: contactFormData.department.trim(),
       roleType: contactFormData.roleType,
-      phone: contactFormData.phone,
-      pabxPhone: contactFormData.pabxPhone,
-      email: contactFormData.email,
-      whatsapp: contactFormData.whatsapp || contactFormData.phone.replace(/[^0-9]/g, ''),
-      notes: contactFormData.notes,
+      phone: contactFormData.phone.trim(),
+      pabxPhone: contactFormData.pabxPhone.trim(),
+      email: contactFormData.email.trim(),
+      whatsapp: contactFormData.whatsapp.trim() || contactFormData.phone.replace(/[^0-9]/g, ''),
+      notes: contactFormData.notes.trim(),
       isPrimary: contactFormData.isPrimary,
     };
 
     const updatedCompany: CompanyLead = {
-      ...selectedCompany,
-      contacts: [...selectedCompany.contacts, newContact],
+      ...targetComp,
+      contacts: [...targetComp.contacts, newContact],
     };
 
-    updateAndPersistCompanyLeads(prev => prev.map(c => c.id === selectedCompany.id ? updatedCompany : c));
+    updateAndPersistCompanyLeads(prev => prev.map(c => c.id === targetComp.id ? updatedCompany : c));
     setSelectedCompany(updatedCompany);
     setIsAddContactModalOpen(false);
+
+    // Pre-populate formData for Step 3 (Launch Pipeline Deal)
+    setFormData(prev => ({
+      ...prev,
+      customerName: targetComp.companyName,
+      companyCode: targetComp.companyCode,
+      country: targetComp.country,
+      currency: targetComp.companyCode === 'ARIELMC' ? 'USD' : 'BDT',
+      contactPerson: `${newContact.name}${newContact.designation ? ` (${newContact.designation})` : ''}`,
+      phone: newContact.phone || '',
+      whatsapp: newContact.whatsapp || '',
+      email: newContact.email || '',
+    }));
+    setIsCustomOrg(false);
+    setIsCustomContact(false);
+
     setContactFormData({
       name: '',
       designation: '',
@@ -948,23 +969,119 @@ export default function LeadsPage() {
             </button>
           </div>
 
-          {/* Quick Actions: Add Company Account + Create New Lead Button */}
-          <div className="flex items-center gap-2">
+          {/* Quick Actions: The 3-Step Lead Journey Action Buttons */}
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
             <button
               onClick={() => setIsCreateCompanyModalOpen(true)}
-              className="flex items-center gap-1.5 rounded-xl bg-white hover:bg-[#F4F6F4] text-[#1F3A2E] px-3.5 py-2 text-xs font-bold border border-[#1F3A2E] shadow-xs transition-all"
-              title="List a new corporate account, supplier, buyer or vendor without needing a campaign or contact person yet"
+              className="flex items-center gap-1.5 rounded-xl bg-white hover:bg-[#F4F6F4] text-[#1F3A2E] px-3 py-2 text-xs font-bold border border-[#1F3A2E] shadow-xs transition-all"
+              title="1st: List Company Account (Customer, Supplier, Buyer, Vendor)"
             >
               <Building2 className="h-4 w-4 text-[#C8A96A]" />
-              <span>+ Add Company Account</span>
+              <span>1st. List Company</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setTargetCompanyIdForContact(selectedCompany?.id || companyLeads[0]?.id || '');
+                setIsAddContactModalOpen(true);
+              }}
+              className="flex items-center gap-1.5 rounded-xl bg-white hover:bg-[#EEF2FF] text-[#4338CA] px-3 py-2 text-xs font-bold border border-[#C7D2FE] shadow-xs transition-all"
+              title="2nd: List Contact Person (Assign decision maker to company)"
+            >
+              <UserPlus className="h-4 w-4 text-[#4338CA]" />
+              <span>2nd. List Contact</span>
             </button>
 
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="flex items-center gap-1.5 rounded-xl bg-[#1F3A2E] hover:bg-[#2C5240] text-[#C8A96A] px-3.5 py-2 text-xs font-bold border border-[#1F3A2E] shadow-sm transition-all"
+              className="flex items-center gap-1.5 rounded-xl bg-[#1F3A2E] hover:bg-[#2C5240] text-[#C8A96A] px-3.5 py-2 text-xs font-extrabold border border-[#1F3A2E] shadow-sm transition-all"
+              title="3rd: Create New Pipeline Lead / Campaign"
             >
               <Plus className="h-4 w-4" />
-              <span>Create New Lead</span>
+              <span>3rd. Create Lead</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* =================================================================== */}
+      {/* 3-STEP COMMERCIAL LEAD JOURNEY WORKFLOW */}
+      {/* 1st. List Company -> 2nd. List Contact Person -> 3rd. Create New Pipeline Lead */}
+      {/* =================================================================== */}
+      <div className="rounded-2xl border-2 border-[#C8A96A]/60 bg-gradient-to-r from-[#FBF9F4] via-white to-[#F0FDF4] p-4 shadow-xs">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-[#1F3A2E] text-[#C8A96A] flex items-center justify-center font-black shadow-xs shrink-0">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-sm font-black text-[#1F3A2E] tracking-tight">The 3-Step Commercial Lead Journey</span>
+                <span className="text-[10px] bg-[#1F3A2E] text-[#C8A96A] px-2 py-0.5 rounded font-black uppercase tracking-wider">
+                  Lead Journey
+                </span>
+              </div>
+              <p className="text-xs text-[#556055] mt-0.5">
+                Standard Business Lifecycle: Register organization &rarr; Assign decision makers &rarr; Launch revenue campaigns.
+              </p>
+            </div>
+          </div>
+
+          {/* 3-Step Action Buttons */}
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+            {/* Step 1 */}
+            <button
+              type="button"
+              onClick={() => setIsCreateCompanyModalOpen(true)}
+              className="flex-1 sm:flex-initial flex items-center gap-2 rounded-xl bg-white hover:bg-[#F4F6F4] text-[#1F3A2E] px-3.5 py-2 text-xs font-bold border border-[#DDE3DD] hover:border-[#1F3A2E] shadow-xs transition-all text-left"
+            >
+              <span className="h-5 w-5 rounded-full bg-[#1F3A2E] text-[#C8A96A] text-[10px] font-black flex items-center justify-center shrink-0">1</span>
+              <div>
+                <div className="font-extrabold flex items-center gap-1">
+                  <Building2 className="h-3.5 w-3.5 text-[#C8A96A]" />
+                  <span>1st. List Company</span>
+                </div>
+                <div className="text-[9.5px] text-[#6B7269] font-normal">Customer, Supplier, Buyer</div>
+              </div>
+            </button>
+
+            <span className="text-[#8C6D2D] font-black text-sm hidden sm:inline">&rarr;</span>
+
+            {/* Step 2 */}
+            <button
+              type="button"
+              onClick={() => {
+                setTargetCompanyIdForContact(selectedCompany?.id || companyLeads[0]?.id || '');
+                setIsAddContactModalOpen(true);
+              }}
+              className="flex-1 sm:flex-initial flex items-center gap-2 rounded-xl bg-white hover:bg-[#EEF2FF] text-[#4338CA] px-3.5 py-2 text-xs font-bold border border-[#C7D2FE] hover:border-[#4338CA] shadow-xs transition-all text-left"
+            >
+              <span className="h-5 w-5 rounded-full bg-[#4338CA] text-white text-[10px] font-black flex items-center justify-center shrink-0">2</span>
+              <div>
+                <div className="font-extrabold flex items-center gap-1">
+                  <UserPlus className="h-3.5 w-3.5 text-[#4338CA]" />
+                  <span>2nd. List Contact Person</span>
+                </div>
+                <div className="text-[9.5px] text-[#6B7269] font-normal">Decision Maker, Media Buyer</div>
+              </div>
+            </button>
+
+            <span className="text-[#8C6D2D] font-black text-sm hidden sm:inline">&rarr;</span>
+
+            {/* Step 3 */}
+            <button
+              type="button"
+              onClick={() => setIsCreateModalOpen(true)}
+              className="flex-1 sm:flex-initial flex items-center gap-2 rounded-xl bg-[#1F3A2E] hover:bg-[#2C5240] text-[#C8A96A] px-3.5 py-2 text-xs font-extrabold border border-[#1F3A2E] shadow-sm transition-all text-left"
+            >
+              <span className="h-5 w-5 rounded-full bg-[#C8A96A] text-[#1F3A2E] text-[10px] font-black flex items-center justify-center shrink-0">3</span>
+              <div>
+                <div className="font-black flex items-center gap-1 text-white">
+                  <Plus className="h-3.5 w-3.5 text-[#C8A96A]" />
+                  <span>3rd. Create Lead (Campaign)</span>
+                </div>
+                <div className="text-[9.5px] text-[#C8A96A]/80 font-normal">Launch Deal & Commission</div>
+              </div>
             </button>
           </div>
         </div>
@@ -2986,33 +3103,62 @@ export default function LeadsPage() {
         </div>
       )}
       {/* =================================================================== */}
-      {/* BIZMAN CRM MODAL 1: ADD CONTACT PERSON TO CORPORATE LEAD */}
+      {/* BIZMAN CRM MODAL 1: ADD CONTACT PERSON TO CORPORATE LEAD (STEP 2) */}
       {/* =================================================================== */}
-      {isAddContactModalOpen && selectedCompany && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="w-full max-w-lg rounded-2xl border-2 border-[#1F3A2E] bg-white p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-[#DDE3DD] pb-3">
-              <div className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-lg bg-[#EEF2FF] text-[#4338CA] flex items-center justify-center font-bold">
-                  <UserPlus className="h-4 w-4" />
-                </div>
-                <div>
-                  <h3 className="font-extrabold text-[#1F3A2E] text-base">Add Contact Person</h3>
-                  <div className="text-xs text-[#6B7269]">
-                    To Lead Account: <strong className="text-[#1A1A1A]">{selectedCompany.companyName}</strong>
+      {isAddContactModalOpen && (() => {
+        const activeTargetComp = companyLeads.find(c => c.id === targetCompanyIdForContact) || selectedCompany || companyLeads[0];
+        if (!activeTargetComp) return null;
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+            <div className="w-full max-w-lg rounded-2xl border-2 border-[#1F3A2E] bg-white p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between border-b border-[#DDE3DD] pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-lg bg-[#EEF2FF] text-[#4338CA] flex items-center justify-center font-bold">
+                    <UserPlus className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] font-black bg-[#4338CA] text-white px-1.5 py-0.2 rounded">Step 2</span>
+                      <h3 className="font-extrabold text-[#1F3A2E] text-base">2nd. List Contact Person</h3>
+                    </div>
+                    <div className="text-xs text-[#6B7269]">
+                      Assign decision maker or representative to company account
+                    </div>
                   </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setIsAddContactModalOpen(false)}
+                  className="rounded-lg p-1 text-[#888] hover:bg-[#F4F6F4] hover:text-[#1A1A1A]"
+                >
+                  <X className="h-5 w-5" />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setIsAddContactModalOpen(false)}
-                className="rounded-lg p-1 text-[#888] hover:bg-[#F4F6F4] hover:text-[#1A1A1A]"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
 
-            <form onSubmit={handleAddContactToCompany} className="space-y-3.5 text-xs">
+              {/* Target Company Account Selector */}
+              <div className="rounded-xl bg-[#EEF2FF] border border-[#C7D2FE] p-2.5 space-y-1">
+                <label className="block text-[11px] font-black text-[#4338CA]">
+                  Target Company Account (Step 1 Organization):
+                </label>
+                <select
+                  value={activeTargetComp.id}
+                  onChange={(e) => {
+                    setTargetCompanyIdForContact(e.target.value);
+                    const chosen = companyLeads.find(c => c.id === e.target.value);
+                    if (chosen) setSelectedCompany(chosen);
+                  }}
+                  className="w-full rounded-lg border border-[#C7D2FE] bg-white p-2 text-xs font-bold text-[#1F3A2E] focus:outline-none focus:ring-1 focus:ring-[#4338CA]"
+                >
+                  {companyLeads.map(c => (
+                    <option key={c.id} value={c.id}>
+                      {c.companyName} ({c.companyCode} &bull; {c.clientType})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <form onSubmit={handleAddContactToCompany} className="space-y-3.5 text-xs">
               {/* Full Name & Designation */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
@@ -3162,7 +3308,8 @@ export default function LeadsPage() {
             </form>
           </div>
         </div>
-      )}
+      );
+    })()}
 
       {/* =================================================================== */}
       {/* BIZMAN CRM MODAL 2: ADD PARALLEL PROJECT UNDER CORPORATE LEAD */}
