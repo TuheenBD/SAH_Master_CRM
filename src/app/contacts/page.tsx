@@ -483,9 +483,9 @@ export default function ContactsPage() {
                     <a
                       href={`tel:${contact.primaryPhone}`}
                       title={`Call ${contact.fullName}`}
-                      className="rounded p-1.5 bg-[#F4F6F4] hover:bg-[#E4F3E9] text-[#1F3A2E] border border-[#DDE3DD] transition-colors"
+                      className="rounded p-1.5 bg-[#E0F2FE] text-[#0369A1] hover:bg-[#0284C7] hover:text-white border border-[#BAE6FD] hover:border-[#0284C7] transition-all shadow-xs group"
                     >
-                      <PhoneCall className="h-3.5 w-3.5 text-[#1E6B3A]" />
+                      <PhoneCall className="h-3.5 w-3.5 text-[#0369A1] group-hover:text-white transition-colors" />
                     </a>
 
                     <a

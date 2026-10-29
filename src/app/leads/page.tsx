@@ -391,9 +391,19 @@ export default function LeadsPage() {
                       <span className={`rounded px-2 py-0.5 text-[10px] ${stageCfg.badge}`}>
                         {stageCfg.label}
                       </span>
-                      <span className="font-mono text-[#6B7269] text-xs font-semibold">
-                        Target: {lead.expectedCloseDate}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={`tel:${lead.phone}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="p-1 rounded-md bg-[#E0F2FE] text-[#0369A1] hover:bg-[#0284C7] hover:text-white border border-[#BAE6FD] hover:border-[#0284C7] transition-all shadow-xs group"
+                          title={`Call ${lead.contactPerson} (${lead.phone})`}
+                        >
+                          <PhoneCall className="h-3 w-3 text-[#0369A1] group-hover:text-white transition-colors" />
+                        </a>
+                        <span className="font-mono text-[#6B7269] text-xs font-semibold">
+                          Target: {lead.expectedCloseDate}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 );
@@ -424,9 +434,9 @@ export default function LeadsPage() {
                   <div className="flex items-center gap-2">
                     <a
                       href={`tel:${selectedLead.phone}`}
-                      className="flex items-center gap-1.5 rounded-lg bg-[#F4F6F4] hover:bg-[#E4F3E9] text-[#1E6B3A] border border-[#DDE3DD] px-3 py-1.5 text-xs font-bold transition-colors"
+                      className="flex items-center gap-1.5 rounded-lg bg-[#E0F2FE] hover:bg-[#0284C7] text-[#0369A1] hover:text-white border border-[#BAE6FD] hover:border-[#0284C7] px-3 py-1.5 text-xs font-bold transition-all shadow-xs group"
                     >
-                      <PhoneCall className="h-3.5 w-3.5" />
+                      <PhoneCall className="h-3.5 w-3.5 text-[#0369A1] group-hover:text-white transition-colors" />
                       <span>Call ({selectedLead.phone})</span>
                     </a>
 
@@ -617,13 +627,13 @@ export default function LeadsPage() {
                       {/* Actions */}
                       <td className="py-3.5 px-4 text-right font-sans">
                         <div className="flex items-center justify-end gap-2">
-                          {/* Call Button */}
+                          {/* Call Button (Telephony Blue with Crisp White onMouseOver) */}
                           <a
                             href={`tel:${lead.phone}`}
-                            className="p-1.5 rounded-lg bg-[#E4F3E9] text-[#1E6B3A] hover:bg-[#1E6B3A] hover:text-white border border-[#B6E2C5] transition-all shadow-xs"
+                            className="p-1.5 rounded-lg bg-[#E0F2FE] text-[#0369A1] hover:bg-[#0284C7] hover:text-white border border-[#BAE6FD] hover:border-[#0284C7] transition-all shadow-xs group"
                             title={`Call ${lead.contactPerson} (${lead.phone})`}
                           >
-                            <PhoneCall className="h-3.5 w-3.5" />
+                            <PhoneCall className="h-3.5 w-3.5 text-[#0369A1] group-hover:text-white transition-colors" />
                           </a>
 
                           {/* WhatsApp Chat Button */}
@@ -728,17 +738,32 @@ export default function LeadsPage() {
                           <div className="flex items-center justify-between border-t border-[#DDE3DD] pt-2 text-[10px]">
                             <span className="text-[#888] font-mono">{lead.expectedCloseDate}</span>
                             
-                            {/* Advance Stage Shortcut */}
-                            {stgKey !== 'WON' && (
-                              <button
-                                onClick={() => handleAdvanceStage(lead.id, lead.stage)}
-                                className="flex items-center gap-1 rounded-lg bg-[#E4F3E9] hover:bg-[#1F3A2E] text-[#1E6B3A] hover:text-[#C8A96A] border border-[#B6E2C5] px-2 py-0.5 font-bold text-[10px] transition-all shadow-xs"
-                                title="Advance to next pipeline stage"
+                            <div className="flex items-center gap-1.5">
+                              {/* Quick Call */}
+                              <a
+                                href={`tel:${lead.phone}`}
+                                onClick={(e) => e.stopPropagation()}
+                                className="p-1 rounded bg-[#E0F2FE] text-[#0369A1] hover:bg-[#0284C7] hover:text-white border border-[#BAE6FD] hover:border-[#0284C7] transition-all shadow-xs group"
+                                title={`Call ${lead.contactPerson} (${lead.phone})`}
                               >
-                                <span>Advance</span>
-                                <ArrowRight className="h-3 w-3" />
-                              </button>
-                            )}
+                                <PhoneCall className="h-3 w-3 text-[#0369A1] group-hover:text-white transition-colors" />
+                              </a>
+
+                              {/* Advance Stage Shortcut */}
+                              {stgKey !== 'WON' && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleAdvanceStage(lead.id, lead.stage);
+                                  }}
+                                  className="flex items-center gap-1 rounded-lg bg-[#E8F5E9] text-[#166534] hover:bg-[#166534] hover:text-white border border-[#A7F3D0] hover:border-[#166534] px-2 py-0.5 font-bold text-[10px] transition-all shadow-xs group cursor-pointer"
+                                  title="Advance to next pipeline stage"
+                                >
+                                  <span>Advance</span>
+                                  <ArrowRight className="h-3 w-3 text-[#166534] group-hover:text-white transition-transform group-hover:translate-x-0.5" />
+                                </button>
+                              )}
+                            </div>
                           </div>
                         </div>
                       ))}

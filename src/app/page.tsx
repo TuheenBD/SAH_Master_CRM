@@ -279,9 +279,9 @@ export default function MasterDashboard() {
                       <a
                         href={`tel:${lead.phone}`}
                         title={`Call ${lead.contactPerson}`}
-                        className="flex items-center gap-1 rounded bg-[#F4F6F4] hover:bg-[#E4F3E9] text-[#1A1A1A] hover:text-[#1E6B3A] px-2.5 py-1 text-xs border border-[#DDE3DD] transition-colors"
+                        className="flex items-center gap-1 rounded bg-[#E0F2FE] text-[#0369A1] hover:bg-[#0284C7] hover:text-white border border-[#BAE6FD] hover:border-[#0284C7] px-2.5 py-1 text-xs transition-all shadow-xs group"
                       >
-                        <PhoneCall className="h-3 w-3 text-[#1E6B3A]" />
+                        <PhoneCall className="h-3 w-3 text-[#0369A1] group-hover:text-white transition-colors" />
                         <span className="font-mono text-[11px] font-semibold">{lead.phone}</span>
                       </a>
 
