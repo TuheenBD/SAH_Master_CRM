@@ -18,13 +18,9 @@ import {
   Contact,
   Wallet,
   FileSpreadsheet,
-  ChevronDown,
   Menu,
   X,
-  Sparkles,
-  ShieldCheck,
-  CheckCircle2,
-  ExternalLink
+  Sparkles
 } from 'lucide-react';
 import { CompanyCode, COMPANIES } from '@/lib/types';
 
@@ -34,12 +30,6 @@ export default function Sidebar() {
   const searchParams = useSearchParams();
   const activeCompany = (searchParams.get('company') as CompanyCode) || 'CONSOLIDATED';
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  const switchCompany = (code: CompanyCode) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('company', code);
-    router.push(`${pathname}?${params.toString()}`);
-  };
 
   const currentMeta = COMPANIES[activeCompany] || COMPANIES.CONSOLIDATED;
 
@@ -74,17 +64,19 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile Top Navbar with Hamburger Toggle */}
-      <div className="lg:hidden sticky top-0 z-50 flex items-center justify-between border-b border-slate-800 bg-slate-950 px-4 py-3">
+      {/* Mobile Top Navbar */}
+      <div className="lg:hidden sticky top-0 z-50 flex items-center justify-between border-b border-[#2C5240] bg-[#1F3A2E] px-4 py-3 text-white">
         <div className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="font-extrabold text-white text-sm">MASTER_CRM</span>
-          <span className="text-[10px] rounded bg-slate-800 text-slate-400 px-1.5 py-0.5 font-mono">v2.4</span>
+          <span className="h-2.5 w-2.5 rounded-full bg-[#C8A96A] animate-pulse" />
+          <span className="font-extrabold text-sm tracking-wide">
+            MASTER_<span style={{ color: '#C8A96A' }}>CRM</span>
+          </span>
+          <span className="text-[10px] rounded bg-[#2C5240] text-[#CFE0D5] px-1.5 py-0.5 font-mono">v2.4</span>
         </div>
 
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="rounded-lg p-2 text-slate-400 hover:bg-slate-900 hover:text-white"
+          className="rounded-lg p-2 text-[#CFE0D5] hover:bg-[#2C5240] hover:text-white"
         >
           {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
@@ -98,53 +90,53 @@ export default function Sidebar() {
         />
       )}
 
-      {/* Persistent Left Sidebar */}
+      {/* Persistent Left Sidebar: Dark Forest Pine (#1F3A2E) */}
       <aside className={`
-        fixed inset-y-0 left-0 z-50 w-64 border-r border-slate-800/80 bg-slate-950 flex flex-col justify-between transition-transform duration-200 ease-in-out
+        fixed inset-y-0 left-0 z-50 w-64 border-r border-[#2C5240] bg-[#1F3A2E] text-white flex flex-col justify-between transition-transform duration-200 ease-in-out shadow-xl
         ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="flex flex-col h-full overflow-y-auto">
           {/* Brand Header */}
-          <div className="p-4 border-b border-slate-800/80">
+          <div className="p-4 border-b border-[#2C5240]">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center font-black text-white shadow-md shadow-indigo-600/30">
+              <div className="flex items-center gap-2.5">
+                <div className="h-8 w-8 rounded-lg bg-[#C8A96A] flex items-center justify-center font-black text-[#1F3A2E] shadow-md">
                   M
                 </div>
                 <div>
                   <div className="font-extrabold text-sm text-white tracking-tight flex items-center gap-1.5">
-                    <span>MASTER_CRM</span>
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                    <span>MASTER_</span>
+                    <span style={{ color: '#C8A96A' }}>CRM</span>
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#C8A96A]" />
                   </div>
-                  <div className="text-[10px] text-slate-400 font-mono">EXECUTIVE OS</div>
+                  <div className="text-[10px] text-[#CFE0D5] font-mono tracking-wider">EXECUTIVE OS</div>
                 </div>
               </div>
 
-              <span className="rounded bg-slate-900 border border-slate-800 px-1.5 py-0.5 text-[9px] font-mono text-slate-400">
-                PRO
+              <span className="rounded bg-[#2C5240] px-1.5 py-0.5 text-[9px] font-mono text-[#C8A96A] font-bold">
+                ERP
               </span>
             </div>
 
-            {/* Active Company Status Box */}
-            <div className="mt-4 rounded-xl bg-slate-900/80 border border-slate-800 p-2.5 space-y-1">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
-                <span>Selected Entity</span>
-                <span className={`h-2 w-2 rounded-full ${
-                  activeCompany === 'BIZMAN' ? 'bg-blue-500' :
-                  activeCompany === 'ADPRO' ? 'bg-orange-500' :
-                  activeCompany === 'ARIELMC' ? 'bg-emerald-500' : 'bg-indigo-500'
-                }`} />
+            {/* Selected Active Entity Box */}
+            <div className="mt-4 rounded-xl bg-[#162B22] border border-[#2C5240] p-2.5 space-y-1">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-[#CFE0D5] flex items-center justify-between">
+                <span>Active Context</span>
+                <span className="h-2 w-2 rounded-full bg-[#C8A96A]" />
               </div>
               <div className="font-bold text-xs text-white truncate">{currentMeta.name}</div>
-              <div className="text-[10px] text-slate-400 truncate">{currentMeta.role}</div>
+              <div className="text-[10px] text-[#CFE0D5] truncate flex items-center justify-between">
+                <span>{currentMeta.role}</span>
+                <span className="font-mono font-bold text-[#C8A96A]">{currentMeta.currency}</span>
+              </div>
             </div>
           </div>
 
-          {/* Navigation Links Grouped by Section */}
-          <div className="flex-1 px-3 py-4 space-y-6">
+          {/* Navigation Links */}
+          <div className="flex-1 px-3 py-4 space-y-5">
             {menuSections.map((section, sIdx) => (
               <div key={sIdx} className="space-y-1">
-                <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-[#8FA899] mb-1.5">
                   {section.title}
                 </div>
 
@@ -157,13 +149,13 @@ export default function Sidebar() {
                         key={item.href}
                         href={fullHref}
                         onClick={() => setMobileOpen(false)}
-                        className={`flex items-center gap-3 rounded-lg px-3 py-2 text-xs font-medium transition-all ${
+                        className={`flex items-center gap-3 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
                           isActive
-                            ? 'bg-indigo-600/15 text-indigo-400 font-semibold border border-indigo-500/30 shadow-sm'
-                            : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                            ? 'bg-[#27493A] text-[#C8A96A] border-l-4 border-l-[#C8A96A] shadow-inner'
+                            : 'text-[#CFE0D5] hover:bg-[#2C5240] hover:text-white'
                         }`}
                       >
-                        <item.icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-indigo-400' : 'text-slate-500'}`} />
+                        <item.icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-[#C8A96A]' : 'text-[#8FA899]'}`} />
                         <span className="truncate">{item.label}</span>
                       </Link>
                     );
@@ -174,15 +166,15 @@ export default function Sidebar() {
           </div>
 
           {/* User Profile Footer */}
-          <div className="p-3 border-t border-slate-800/80 bg-slate-950/80">
-            <div className="flex items-center gap-2.5 rounded-lg bg-slate-900/70 p-2 border border-slate-800/70">
-              <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center font-bold text-xs text-white shrink-0">
+          <div className="p-3 border-t border-[#2C5240] bg-[#162B22]">
+            <div className="flex items-center gap-2.5 rounded-lg p-2 bg-[#1F3A2E] border border-[#2C5240]">
+              <div className="h-8 w-8 rounded-full bg-[#C8A96A] flex items-center justify-center font-bold text-xs text-[#1F3A2E] shrink-0">
                 SH
               </div>
               <div className="min-w-0 flex-1">
                 <div className="text-xs font-bold text-white truncate">Syed Akramul Hassan</div>
-                <div className="text-[10px] text-emerald-400 truncate flex items-center gap-1">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 inline-block" />
+                <div className="text-[10px] text-[#C8A96A] truncate flex items-center gap-1 font-semibold">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#C8A96A] inline-block" />
                   <span>Owner & Director</span>
                 </div>
               </div>
@@ -193,4 +185,3 @@ export default function Sidebar() {
     </>
   );
 }
-

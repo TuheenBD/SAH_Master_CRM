@@ -2,180 +2,237 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Default ArielMC ERP Signature Palette */
+/* ==============================================================================
+   ARIELMC ERP AUTHENTIC HYBRID THEME
+   - Dark Forest Pine (#1F3A2E) Side Panel & Top Header
+   - Crisp Light (#F4F6F4) Main Content Window with White (#FFFFFF) Cards
+   - Imperial Gold (#C8A96A) Accents & Brand Highlights
+   ============================================================================== */
+
 :root,
 [data-theme="arielmc-erp"] {
-  --theme-bg: #0c1611;
-  --theme-sidebar: #08100c;
-  --theme-card: #14241b;
-  --theme-card-sub: #0f1c15;
-  --theme-border: #1F3A2E;
-  --theme-text: #F4F6F4;
-  --theme-muted: #8fa899;
-  --theme-accent: #C8A96A;
-  --theme-accent-hover: #dbae64;
-  --theme-highlight: #C8A96A;
-}
+  --header-bg: #1F3A2E;
+  --header-border: #2C5240;
+  --header-text: #FFFFFF;
+  --header-sub: #CFE0D5;
+  --header-accent: #C8A96A;
 
-/* Executive Dark Slate */
-[data-theme="executive-dark"] {
-  --theme-bg: #0b0f19;
-  --theme-sidebar: #070a12;
-  --theme-card: #111827;
-  --theme-card-sub: #0f172a;
-  --theme-border: #1e293b;
-  --theme-text: #f8fafc;
-  --theme-muted: #94a3b8;
-  --theme-accent: #6366f1;
-  --theme-accent-hover: #4f46e5;
-  --theme-highlight: #10b981;
-}
+  --sidebar-bg: #1F3A2E;
+  --sidebar-border: #2C5240;
+  --sidebar-text: #FFFFFF;
+  --sidebar-muted: #CFE0D5;
+  --sidebar-hover: #2C5240;
+  --sidebar-active-bg: #27493A;
+  --sidebar-active-text: #C8A96A;
 
-/* 1. Ink Wash (#4A4A4A, #CBCBCB, #FFFFE3, #6D8196) */
-[data-theme="ink-wash"] {
-  --theme-bg: #1e2124;
-  --theme-sidebar: #17191b;
-  --theme-card: #282c30;
-  --theme-card-sub: #1f2225;
-  --theme-border: #4A4A4A;
-  --theme-text: #FFFFE3;
-  --theme-muted: #CBCBCB;
-  --theme-accent: #6D8196;
-  --theme-accent-hover: #586a7d;
-  --theme-highlight: #FFFFE3;
-}
-
-/* 2. Fresh Peach (#FFD3AC, #FFB5AB, #E39A7B, #DBB06B) */
-[data-theme="fresh-peach"] {
-  --theme-bg: #1c1412;
-  --theme-sidebar: #140e0c;
-  --theme-card: #2a1c18;
-  --theme-card-sub: #211613;
-  --theme-border: #52372f;
-  --theme-text: #FFF3EB;
-  --theme-muted: #FFB5AB;
-  --theme-accent: #E39A7B;
-  --theme-accent-hover: #cb8467;
-  --theme-highlight: #DBB06B;
-}
-
-/* 3. Stormy Morning (#6A89A7, #BDDDFC, #88BDF2, #384959) */
-[data-theme="stormy-morning"] {
-  --theme-bg: #131b22;
-  --theme-sidebar: #0e141a;
-  --theme-card: #1c2732;
-  --theme-card-sub: #16202a;
-  --theme-border: #384959;
-  --theme-text: #f0f7ff;
-  --theme-muted: #BDDDFC;
-  --theme-accent: #88BDF2;
-  --theme-accent-hover: #6ea7de;
-  --theme-highlight: #6A89A7;
-}
-
-/* 4. California Beaches (#FFC067, #66F4FF, #66C4FF, #7D99AA) */
-[data-theme="california-beaches"] {
-  --theme-bg: #0d1b22;
-  --theme-sidebar: #09141a;
-  --theme-card: #142833;
-  --theme-card-sub: #10212a;
-  --theme-border: #29495a;
-  --theme-text: #f0fcff;
-  --theme-muted: #9ccad8;
-  --theme-accent: #66C4FF;
-  --theme-accent-hover: #48b5f9;
-  --theme-highlight: #FFC067;
-}
-
-/* 5. Mossy Hollow (#636B2F, #BAC095, #D4DE95, #3D4127) */
-[data-theme="mossy-hollow"] {
-  --theme-bg: #14180e;
-  --theme-sidebar: #0e120a;
-  --theme-card: #1f2516;
-  --theme-card-sub: #181d11;
-  --theme-border: #3D4127;
-  --theme-text: #f5f8ed;
-  --theme-muted: #BAC095;
-  --theme-accent: #636B2F;
-  --theme-accent-hover: #505725;
-  --theme-highlight: #D4DE95;
+  --main-bg: #F4F6F4;
+  --main-card: #FFFFFF;
+  --main-card-sub: #F9FAF9;
+  --main-border: #DDE3DD;
+  --main-text: #1A1A1A;
+  --main-muted: #6B7269;
+  --main-brand-green: #1F3A2E;
+  --main-brand-gold: #C8A96A;
 }
 
 body {
-  background-color: var(--theme-bg);
-  color: var(--theme-text);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: var(--main-bg);
+  color: var(--main-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   overflow-x: hidden;
-  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* Global Dynamic Theme Overrides for Core Tailwind Surface Classes */
-[data-theme] .bg-slate-950 {
-  background-color: var(--theme-bg) !important;
+/* ------------------------------------------------------------------------------
+   SIDEBAR (DARK FOREST PINE #1F3A2E)
+   ------------------------------------------------------------------------------ */
+aside {
+  background-color: var(--sidebar-bg) !important;
+  border-color: var(--sidebar-border) !important;
+  color: var(--sidebar-text) !important;
 }
 
-[data-theme] aside.bg-slate-950 {
-  background-color: var(--theme-sidebar) !important;
+aside .border-slate-800,
+aside .border-slate-800\/80,
+aside .border-slate-800\/70 {
+  border-color: var(--sidebar-border) !important;
 }
 
-[data-theme] .bg-slate-900,
-[data-theme] .bg-slate-900\/60,
-[data-theme] .bg-slate-900\/70,
-[data-theme] .bg-slate-900\/80,
-[data-theme] .bg-slate-900\/90 {
-  background-color: var(--theme-card) !important;
+aside .text-slate-400,
+aside .text-slate-500 {
+  color: var(--sidebar-muted) !important;
 }
 
-[data-theme] .bg-slate-950\/50,
-[data-theme] .bg-slate-950\/60,
-[data-theme] .bg-slate-950\/70,
-[data-theme] .bg-slate-950\/80 {
-  background-color: var(--theme-card-sub) !important;
+aside .text-white {
+  color: #FFFFFF !important;
 }
 
-[data-theme] .border-slate-800,
-[data-theme] .border-slate-800\/60,
-[data-theme] .border-slate-800\/80,
-[data-theme] .border-slate-700 {
-  border-color: var(--theme-border) !important;
+aside .bg-slate-900,
+aside .bg-slate-900\/70,
+aside .bg-slate-900\/80,
+aside .bg-slate-900\/90 {
+  background-color: #162B22 !important;
+  border-color: var(--sidebar-border) !important;
 }
 
-[data-theme] .text-slate-100,
-[data-theme] .text-slate-200 {
-  color: var(--theme-text) !important;
+aside a:hover {
+  background-color: var(--sidebar-hover) !important;
+  color: #FFFFFF !important;
 }
 
-[data-theme] .text-slate-400,
-[data-theme] .text-slate-500 {
-  color: var(--theme-muted) !important;
+aside a[class*="bg-indigo-600"] {
+  background-color: var(--sidebar-active-bg) !important;
+  color: var(--sidebar-active-text) !important;
+  border-color: var(--sidebar-active-text) !important;
 }
 
-[data-theme] .bg-indigo-600 {
-  background-color: var(--theme-accent) !important;
-  color: #0c1611 !important;
+/* ------------------------------------------------------------------------------
+   HEADER (DARK FOREST PINE #1F3A2E)
+   ------------------------------------------------------------------------------ */
+header {
+  background-color: var(--header-bg) !important;
+  border-color: var(--header-border) !important;
+  color: var(--header-text) !important;
 }
 
-[data-theme] .hover\:bg-indigo-500:hover {
-  background-color: var(--theme-accent-hover) !important;
+header .text-white {
+  color: #FFFFFF !important;
 }
 
-[data-theme] .text-indigo-400,
-[data-theme] .text-indigo-300 {
-  color: var(--theme-highlight) !important;
+header .text-slate-400,
+header .text-slate-500 {
+  color: var(--header-sub) !important;
 }
 
-/* Custom scrollbars */
+header .text-indigo-400 {
+  color: var(--header-accent) !important;
+}
+
+header .bg-slate-900,
+header .bg-slate-900\/90,
+header .bg-slate-900\/70 {
+  background-color: #162B22 !important;
+  border-color: var(--header-border) !important;
+}
+
+header .border-slate-800,
+header .border-slate-800\/80 {
+  border-color: var(--header-border) !important;
+}
+
+/* ------------------------------------------------------------------------------
+   MAIN CONTENT WINDOW (LIGHT #F4F6F4 + CARDS #FFFFFF)
+   ------------------------------------------------------------------------------ */
+main {
+  background-color: var(--main-bg);
+  color: var(--main-text);
+}
+
+/* Cards & Surface Containers */
+main .bg-slate-900,
+main .bg-slate-900\/40,
+main .bg-slate-900\/50,
+main .bg-slate-900\/60,
+main .bg-slate-900\/70,
+main .bg-slate-900\/80,
+main .bg-slate-900\/90 {
+  background-color: var(--main-card) !important;
+  border-color: var(--main-border) !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* Sub-containers, inner widgets & scratchpads */
+main .bg-slate-950,
+main .bg-slate-950\/40,
+main .bg-slate-950\/50,
+main .bg-slate-950\/60,
+main .bg-slate-950\/70,
+main .bg-slate-950\/80 {
+  background-color: var(--main-card-sub) !important;
+  border-color: var(--main-border) !important;
+}
+
+/* Borders */
+main .border-slate-800,
+main .border-slate-800\/40,
+main .border-slate-800\/50,
+main .border-slate-800\/60,
+main .border-slate-800\/80,
+main .border-slate-700 {
+  border-color: var(--main-border) !important;
+}
+
+/* Text Overrides for High Contrast Light Canvas */
+main .text-white,
+main .text-slate-100,
+main .text-slate-200 {
+  color: var(--main-text) !important;
+}
+
+main .text-slate-300,
+main .text-slate-400,
+main .text-slate-500 {
+  color: var(--main-muted) !important;
+}
+
+main h1,
+main h2,
+main h3 {
+  color: var(--main-brand-green) !important;
+}
+
+/* Tables in Light Canvas */
+main table thead {
+  background-color: #EDF1ED !important;
+  color: var(--main-brand-green) !important;
+  border-bottom: 2px solid var(--main-border) !important;
+}
+
+main table thead th {
+  color: var(--main-brand-green) !important;
+}
+
+main table tbody tr:hover {
+  background-color: #F8FAF8 !important;
+}
+
+/* Primary Action Buttons */
+main .bg-indigo-600 {
+  background-color: var(--main-brand-green) !important;
+  color: #FFFFFF !important;
+}
+
+main .bg-indigo-600:hover {
+  background-color: #2C5240 !important;
+}
+
+/* Inputs, Textareas & Selects in Light Canvas */
+main input,
+main textarea,
+main select {
+  background-color: #FFFFFF !important;
+  border-color: var(--main-border) !important;
+  color: var(--main-text) !important;
+}
+
+main input:focus,
+main textarea:focus,
+main select:focus {
+  outline: 2px solid #CFE0D5 !important;
+  border-color: #2C5240 !important;
+}
+
+/* Custom Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--theme-bg);
+  background: var(--main-bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--theme-border);
+  background: #C4CFC4;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--theme-accent);
+  background: #A0B2A0;
 }
