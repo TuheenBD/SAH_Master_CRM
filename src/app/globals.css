@@ -464,14 +464,37 @@ main .text-amber-400 {
 }
 
 /* Ensure buttons and badges with dark backgrounds keep white or gold text */
-main button.text-white,
-main button[class*="text-white"],
-main a.text-white,
-main a[class*="text-white"],
+main button.text-white:not([class*="text-[#"]):not([class*="text-emerald"]):not([class*="text-sky"]):not([class*="text-blue"]),
+main a.text-white:not([class*="text-[#"]):not([class*="text-emerald"]):not([class*="text-sky"]):not([class*="text-blue"]),
 main button.bg-indigo-600,
 main button[class*="bg-indigo-600"],
-main button[class*="bg-emerald"],
 main button[class*="bg-[#1F3A2E]"] {
+  color: #FFFFFF !important;
+}
+
+/* Phone / Telephony Quick Action Buttons: Blue text on default (offMouse), White on hover (onMouseOver) */
+main a[href^="tel:"]:not(:hover),
+main a[href^="tel:"]:not(:hover) span,
+main a[href^="tel:"]:not(:hover) svg {
+  color: #0369A1 !important;
+}
+
+main a[href^="tel:"]:hover,
+main a[href^="tel:"]:hover span,
+main a[href^="tel:"]:hover svg {
+  color: #FFFFFF !important;
+}
+
+/* Kanban Advance Button: Green text on default (offMouse), White on hover (onMouseOver) */
+main button[title*="Advance"]:not(:hover),
+main button[title*="Advance"]:not(:hover) span,
+main button[title*="Advance"]:not(:hover) svg {
+  color: #166534 !important;
+}
+
+main button[title*="Advance"]:hover,
+main button[title*="Advance"]:hover span,
+main button[title*="Advance"]:hover svg {
   color: #FFFFFF !important;
 }
 

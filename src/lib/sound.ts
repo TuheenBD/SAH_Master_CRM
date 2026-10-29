@@ -123,3 +123,4 @@ export function playMildSound(type: 'button' | 'card' = 'button', target?: Event
     // Ignore audio errors gracefully
   }
 }
+

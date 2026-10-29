@@ -173,11 +173,12 @@ export default function Sidebar() {
           </div>
 
           {/* Navigation Links */}
-          <div className="flex-1 px-3 py-4 space-y-5">
+          <div className="flex-1 px-3 py-4 space-y-6">
             {menuSections.map((section, sIdx) => (
-              <div key={sIdx} className="space-y-1">
-                <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-[var(--sidebar-muted)]/70 mb-1.5">
-                  {section.title}
+              <div key={sIdx} className="space-y-1.5">
+                <div className="px-3 text-[11px] font-black uppercase tracking-widest text-[#C8A96A] mb-2 flex items-center gap-2">
+                  <span className="h-1 w-2 rounded-full bg-[#C8A96A] shrink-0 opacity-80" />
+                  <span>{section.title}</span>
                 </div>
 
                 <div className="space-y-0.5">
