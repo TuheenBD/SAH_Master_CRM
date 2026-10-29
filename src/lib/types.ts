@@ -1,4 +1,4 @@
-export type CompanyCode = 'CONSOLIDATED' | 'BIZMAN' | 'LINDA' | 'ARIELMC';
+export type CompanyCode = 'CONSOLIDATED' | 'ARIELMC' | 'BIZMAN' | 'LINDA';
 
 export interface CompanyMeta {
   code: CompanyCode;
@@ -20,7 +20,7 @@ export const COMPANIES: Record<CompanyCode, CompanyMeta> = {
     code: 'CONSOLIDATED',
     name: 'Consolidated Executive Master View',
     role: 'Group Executive Overview',
-    industry: 'Media DOOH, Luxury Eco-Resort Hospitality & Global Export Trade',
+    industry: 'Global Export Trade, Media DOOH & Luxury Eco-Resort Hospitality',
     website: 'Executive OS',
     currency: 'USD/BDT',
     paletteDescription: 'Royal Green, Bottle Green, Imperial Gold & Ivory White',
@@ -29,6 +29,21 @@ export const COMPANIES: Record<CompanyCode, CompanyMeta> = {
       { label: 'Operating Entities', value: '3 Companies' },
       { label: 'Consolidated Active Deals', value: '42 Deals' },
       { label: 'Consolidated YTD Revenue', value: '৳ 5.40 Cr / $198K' },
+    ],
+  },
+  ARIELMC: {
+    code: 'ARIELMC',
+    name: 'Ariel Marketing & Communications Limited',
+    role: 'Managing Director',
+    industry: 'Global B2B/B2C Export (UK, EU, AU, US): Jute, Leather, Ceramics, Pottery & Home Textiles',
+    website: 'www.arielmc.com',
+    currency: 'USD',
+    paletteDescription: 'Royal Green (#1F3A2E), Imperial Gold (#C8A96A) & Ivory White',
+    logoUrl: '/logos/arielmc-logo.png',
+    stats: [
+      { label: 'Export Markets', value: 'UK, EU, US, Australia' },
+      { label: 'Active Shipments', value: '7 In Transit' },
+      { label: 'Core Categories', value: 'Jute, Leather, Ceramics' },
     ],
   },
   BIZMAN: {
@@ -59,21 +74,6 @@ export const COMPANIES: Record<CompanyCode, CompanyMeta> = {
       { label: 'Private Pool Villas', value: 'Couple & Family Villas' },
       { label: 'Corporate Retreats', value: 'Banquet & Day-Out Hub' },
       { label: 'Investor Timeshare', value: 'Active Share Sales' },
-    ],
-  },
-  ARIELMC: {
-    code: 'ARIELMC',
-    name: 'Ariel Marketing & Communications Limited',
-    role: 'Managing Director',
-    industry: 'Global B2B/B2C Export (UK, EU, AU, US): Jute, Leather, Ceramics, Pottery & Home Textiles',
-    website: 'www.arielmc.com',
-    currency: 'USD',
-    paletteDescription: 'Royal Green (#1F3A2E), Imperial Gold (#C8A96A) & Ivory White',
-    logoUrl: '/logos/arielmc-logo.png',
-    stats: [
-      { label: 'Export Markets', value: 'UK, EU, US, Australia' },
-      { label: 'Active Shipments', value: '7 In Transit' },
-      { label: 'Core Categories', value: 'Jute, Leather, Ceramics' },
     ],
   },
 };

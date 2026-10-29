@@ -147,14 +147,14 @@ export default function Sidebar() {
 
                 {activeCompany === 'CONSOLIDATED' && (
                   <div className="flex items-center -space-x-1.5 shrink-0">
+                    <div className="h-7 w-7 rounded-md overflow-hidden border border-[#2C5240] bg-white p-0.5 shadow">
+                      <img src="/logos/arielmc-logo.png" alt="ArielMC" className="h-full w-full object-contain" />
+                    </div>
                     <div className="h-7 w-7 rounded-md overflow-hidden border border-[#2C5240] bg-[#0D3B29] p-0.5 shadow">
                       <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-full w-full object-contain" />
                     </div>
                     <div className="h-7 w-7 rounded-md overflow-hidden border border-[#2C5240] bg-black p-0.5 shadow">
                       <img src="/logos/linda-logo.png" alt="Linda" className="h-full w-full object-contain" />
-                    </div>
-                    <div className="h-7 w-7 rounded-md overflow-hidden border border-[#2C5240] bg-white p-0.5 shadow">
-                      <img src="/logos/arielmc-logo.png" alt="ArielMC" className="h-full w-full object-contain" />
                     </div>
                   </div>
                 )}

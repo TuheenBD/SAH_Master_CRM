@@ -773,9 +773,9 @@ export default function ContactsPage() {
                     onChange={(e) => setFormData({ ...formData, companyAffiliation: e.target.value as any })}
                     className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-slate-200 focus:outline-none focus:border-indigo-500"
                   >
+                    <option value="ARIELMC">Ariel Marketing & Communications</option>
                     <option value="BIZMAN">Bizman Media Limited</option>
                     <option value="LINDA">Linda Resort Limited</option>
-                    <option value="ARIELMC">Ariel Marketing & Communications</option>
                     <option value="PERSONAL">Personal / Family</option>
                     <option value="GROUP">Group / All Companies</option>
                   </select>
@@ -866,9 +866,9 @@ export default function ContactsPage() {
                     onChange={(e) => setTargetCompany(e.target.value as any)}
                     className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-slate-200 focus:outline-none focus:border-indigo-500"
                   >
+                    <option value="ARIELMC">Ariel Marketing & Communications (Global Export)</option>
                     <option value="BIZMAN">Bizman Media Limited (DOOH / Static / Events)</option>
                     <option value="LINDA">Linda Resort Limited (Luxury Eco-Resort / Villas)</option>
-                    <option value="ARIELMC">Ariel Marketing & Communications (Global Export)</option>
                   </select>
                 </div>
 

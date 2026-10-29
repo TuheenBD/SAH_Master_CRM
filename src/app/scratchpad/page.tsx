@@ -15,25 +15,25 @@ import {
 import { CompanyCode } from '@/lib/types';
 
 const DEFAULT_SCRATCHPAD = `# Executive Master Scratchpad
-**Active Entities:** Bizman Media Limited | Linda Resort Limited | Ariel Marketing & Communications
+**Active Entities:** Ariel Marketing & Communications | Bizman Media Limited | Linda Resort Limited
 
 ---
 
-## 1. Bizman Media Action Notes
+## 1. ArielMC Export Pipeline (Managing Director)
+- [ ] EcoLiving UK: 25,000 Pcs Jute Tote Bags order pending T/T advance.
+- [ ] Munich Living Germany: Terracotta Pottery & Ceramic dinnerware safety tests (EU 84/500/EEC).
+- [ ] Melbourne Artisan Goods: Vegetable-tanned leather duffel samples approval.
+
+## 2. Bizman Media Action Notes (Director & CEO)
 - [ ] Review revenue share on 50+ partner vendor screens in Chittagong & Sylhet.
 - [ ] Dhanmondi 27 LED screen P6 outdoor power supply module replaced.
 - [ ] Finalize Grameenphone Ramadan bundle pricing (negotiate 10% wholesale vendor discount).
 
-## 2. Linda Resort Limited Checklist (Executive Director)
+## 3. Linda Resort Limited Checklist (Executive Director)
 - [ ] Fast-Track 9-Month Execution Plan: Review Couple Private Pool Villa foundation milestones.
 - [ ] Finalize Grand Banquet Hall audiovisual specs for SCB Corporate Leadership Retreat.
 - [ ] High-Net-Worth Investor Timeshare pitch: Send shareholder agreement deed to Dr. Tariqul Islam.
 - [ ] German pool filtration pump and underwater LED lighting inspection with AquaPure team.
-
-## 3. ArielMC Export Pipeline
-- [ ] EcoLiving UK: 25,000 Pcs Jute Tote Bags order pending T/T advance.
-- [ ] Munich Living Germany: Terracotta Pottery & Ceramic dinnerware safety tests (EU 84/500/EEC).
-- [ ] Melbourne Artisan Goods: Vegetable-tanned leather duffel samples approval.
 `;
 
 export default function ScratchpadPage() {

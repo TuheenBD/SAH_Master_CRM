@@ -7,7 +7,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Master CRM - Personal Executive OS',
-  description: 'Multi-Company CRM & Double-Entry Financial Engine for Bizman Media Limited, Linda Resort Limited, and Ariel Marketing & Communications',
+  description: 'Multi-Company CRM & Double-Entry Financial Engine for Ariel Marketing & Communications, Bizman Media Limited, and Linda Resort Limited',
 };
 
 export default function RootLayout({

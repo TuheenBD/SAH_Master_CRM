@@ -220,9 +220,9 @@ export default function InventoryPage() {
     },
   ];
 
+  const showProducts = activeCompany === 'CONSOLIDATED' || activeCompany === 'ARIELMC';
   const showBillboards = activeCompany === 'CONSOLIDATED' || activeCompany === 'BIZMAN';
   const showResort = activeCompany === 'CONSOLIDATED' || activeCompany === 'LINDA';
-  const showProducts = activeCompany === 'CONSOLIDATED' || activeCompany === 'ARIELMC';
 
   return (
     <div className="space-y-6">
@@ -236,14 +236,142 @@ export default function InventoryPage() {
             Asset Inventory & Catalogs
           </h1>
           <p className="text-xs text-slate-400">
-            Bizman Media DOOH fleet (20 Own + 50+ Vendor), Linda Resort Eco-Hospitality (Pool Villas & Banquets), and ArielMC Global Export lines
+            ArielMC Global Export lines, Bizman Media DOOH fleet (20 Own + 50+ Vendor), and Linda Resort Eco-Hospitality (Pool Villas & Banquets)
           </p>
         </div>
       </div>
 
-      {/* Linda Resort Hospitality Section */}
-      {showResort && (
+      {/* 1. Export Product Catalog (ArielMC) */}
+      {showProducts && (
         <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="h-7 w-10 rounded overflow-hidden border border-slate-700 bg-white p-0.5 shadow flex items-center justify-center shrink-0">
+                <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-5 w-auto object-contain" />
+              </div>
+              <h2 className="text-base font-bold text-white">
+                Ariel Marketing & Communications - Export Product Catalog
+              </h2>
+            </div>
+            <span className="text-xs text-slate-400">
+              International B2B/B2C Portfolios: UK, EU, Australia & US
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {exportProducts.map((p) => (
+              <div key={p.id} className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 space-y-3">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-950 text-emerald-400 border border-emerald-800">
+                    ARIELMC
+                  </span>
+                  <span className="font-mono text-slate-400 text-[11px]">{p.sku}</span>
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-bold text-white line-clamp-2">{p.name}</h3>
+                  <div className="text-xs text-indigo-400 mt-1 font-semibold">{p.category}</div>
+                </div>
+
+                <div className="rounded-lg bg-slate-950/70 p-2.5 text-xs space-y-1.5 border border-slate-800/60 font-mono">
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Procurement Cost:</span>
+                    <span className="text-slate-200">৳ {p.costBDT}</span>
+                  </div>
+                  <div className="flex justify-between font-bold">
+                    <span className="text-slate-400">Export FOB (USD):</span>
+                    <span className="text-emerald-400">${p.fobUSD.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Export FOB (GBP):</span>
+                    <span className="text-slate-300">£{p.fobGBP.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-[11px]">
+                    <span className="text-slate-500">MOQ / Lead:</span>
+                    <span className="text-slate-300">{p.moq} / {p.leadDays}d</span>
+                  </div>
+                </div>
+
+                <div className="text-[11px] text-slate-400">
+                  Target Markets: <strong className="text-slate-200">{p.markets}</strong>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 2. Outdoor Media Section (Bizman Media) */}
+      {showBillboards && (
+        <div className="space-y-4 pt-6 border-t border-slate-800">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="h-7 w-7 rounded overflow-hidden border border-slate-700 bg-[#0D3B29] p-0.5 shadow flex items-center justify-center shrink-0">
+                <img src="/logos/bizman-logo.jpg" alt="Bizman Media" className="h-full w-full object-contain" />
+              </div>
+              <h2 className="text-base font-bold text-white">
+                Bizman Media DOOH LED Screens & Static Billboards
+              </h2>
+            </div>
+            <span className="text-xs text-slate-400">
+              Own Screens & Partner Vendor Network (20 Own Displays / 50+ Nationwide)
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {billboards
+              .filter(b => activeCompany === 'CONSOLIDATED' || b.company === activeCompany)
+              .map((b) => (
+                <div key={b.id} className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 space-y-3">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-blue-950 text-blue-400 border border-blue-800">
+                      {b.company}
+                    </span>
+                    <span className="font-mono text-slate-400 text-[11px]">{b.code}</span>
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm font-bold text-white">{b.name}</h3>
+                    <div className="flex items-center gap-1 text-xs text-slate-400 mt-1">
+                      <MapPin className="h-3.5 w-3.5 text-rose-400 shrink-0" />
+                      <span className="truncate">{b.location}</span>
+                    </div>
+                  </div>
+
+                  <div className="rounded-lg bg-slate-950/70 p-2.5 text-xs grid grid-cols-2 gap-2 border border-slate-800/60">
+                    <div>
+                      <span className="text-slate-500 text-[10px] block">Dimensions:</span>
+                      <span className="text-slate-200 font-medium">{b.dimensions}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 text-[10px] block">Daily Traffic:</span>
+                      <span className="text-slate-200 font-medium font-mono">{b.dailyImpressions.toLocaleString()} views</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 text-[10px] block">Slot Availability:</span>
+                      <span className="text-emerald-400 font-bold">{b.availableSlots} of {b.totalSlots} Slots Free</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 text-[10px] block">Rate / Month:</span>
+                      <span className="text-indigo-400 font-bold font-mono">৳ {b.monthlyRate.toLocaleString()}</span>
+                    </div>
+                  </div>
+
+                  <div className="text-[11px] text-slate-400 flex items-center justify-between pt-1">
+                    <span className="rounded bg-slate-800 px-2 py-0.5 text-slate-300 font-mono text-[10px]">
+                      {b.type}
+                    </span>
+                    <span className="text-emerald-400 font-semibold">{b.status}</span>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
+      {/* 3. Linda Resort Hospitality Section */}
+      {showResort && (
+        <div className="space-y-4 pt-6 border-t border-slate-800">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="h-7 w-20 rounded overflow-hidden border border-[#C8A96A]/40 bg-black px-1 shadow flex items-center justify-center shrink-0">
@@ -306,136 +434,6 @@ export default function InventoryPage() {
                     <CheckCircle2 className="h-3 w-3" />
                     <span>Active In Fleet</span>
                   </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Outdoor Media Section (Bizman Media) */}
-      {showBillboards && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="h-7 w-7 rounded overflow-hidden border border-slate-700 bg-[#0D3B29] p-0.5 shadow flex items-center justify-center shrink-0">
-                <img src="/logos/bizman-logo.jpg" alt="Bizman Media" className="h-full w-full object-contain" />
-              </div>
-              <h2 className="text-base font-bold text-white">
-                Bizman Media DOOH LED Screens & Static Billboards
-              </h2>
-            </div>
-            <span className="text-xs text-slate-400">
-              Own Screens & Partner Vendor Network (20 Own Displays / 50+ Nationwide)
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {billboards
-              .filter(b => activeCompany === 'CONSOLIDATED' || b.company === activeCompany)
-              .map((b) => (
-                <div key={b.id} className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 space-y-3">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className={`px-2 py-0.5 text-[10px] font-bold rounded ${
-                      b.company === 'BIZMAN' ? 'bg-blue-950 text-blue-400 border border-blue-800' : 'bg-orange-950 text-orange-400 border border-orange-800'
-                    }`}>
-                      {b.company}
-                    </span>
-                    <span className="font-mono text-slate-400 text-[11px]">{b.code}</span>
-                  </div>
-
-                  <div>
-                    <h3 className="text-sm font-bold text-white">{b.name}</h3>
-                    <div className="flex items-center gap-1 text-xs text-slate-400 mt-1">
-                      <MapPin className="h-3.5 w-3.5 text-rose-400 shrink-0" />
-                      <span className="truncate">{b.location}</span>
-                    </div>
-                  </div>
-
-                  <div className="rounded-lg bg-slate-950/70 p-2.5 text-xs grid grid-cols-2 gap-2 border border-slate-800/60">
-                    <div>
-                      <span className="text-slate-500 text-[10px] block">Dimensions:</span>
-                      <span className="text-slate-200 font-medium">{b.dimensions}</span>
-                    </div>
-                    <div>
-                      <span className="text-slate-500 text-[10px] block">Daily Traffic:</span>
-                      <span className="text-slate-200 font-medium font-mono">{b.dailyImpressions.toLocaleString()} views</span>
-                    </div>
-                    <div>
-                      <span className="text-slate-500 text-[10px] block">Slot Availability:</span>
-                      <span className="text-emerald-400 font-bold">{b.availableSlots} of {b.totalSlots} Slots Free</span>
-                    </div>
-                    <div>
-                      <span className="text-slate-500 text-[10px] block">Rate / Month:</span>
-                      <span className="text-indigo-400 font-bold font-mono">৳ {b.monthlyRate.toLocaleString()}</span>
-                    </div>
-                  </div>
-
-                  <div className="text-[11px] text-slate-400 flex items-center justify-between pt-1">
-                    <span className="rounded bg-slate-800 px-2 py-0.5 text-slate-300 font-mono text-[10px]">
-                      {b.type}
-                    </span>
-                    <span className="text-emerald-400 font-semibold">{b.status}</span>
-                  </div>
-                </div>
-              ))}
-          </div>
-        </div>
-      )}
-
-      {/* Export Product Catalog (ArielMC) */}
-      {showProducts && (
-        <div className="space-y-4 pt-6 border-t border-slate-800">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="h-7 w-10 rounded overflow-hidden border border-slate-700 bg-white p-0.5 shadow flex items-center justify-center shrink-0">
-                <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-5 w-auto object-contain" />
-              </div>
-              <h2 className="text-base font-bold text-white">
-                Ariel Marketing & Communications - Export Product Catalog
-              </h2>
-            </div>
-            <span className="text-xs text-slate-400">
-              International B2B/B2C Portfolios: UK, EU, Australia & US
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {exportProducts.map((p) => (
-              <div key={p.id} className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 space-y-3">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-950 text-emerald-400 border border-emerald-800">
-                    ARIELMC
-                  </span>
-                  <span className="font-mono text-slate-400 text-[11px]">{p.sku}</span>
-                </div>
-
-                <div>
-                  <h3 className="text-sm font-bold text-white line-clamp-2">{p.name}</h3>
-                  <div className="text-xs text-indigo-400 mt-1 font-semibold">{p.category}</div>
-                </div>
-
-                <div className="rounded-lg bg-slate-950/70 p-2.5 text-xs space-y-1.5 border border-slate-800/60 font-mono">
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Procurement Cost:</span>
-                    <span className="text-slate-200">৳ {p.costBDT}</span>
-                  </div>
-                  <div className="flex justify-between font-bold">
-                    <span className="text-slate-400">Export FOB (USD):</span>
-                    <span className="text-emerald-400">${p.fobUSD.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Export FOB (GBP):</span>
-                    <span className="text-slate-300">£{p.fobGBP.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-[11px]">
-                    <span className="text-slate-500">MOQ / Lead:</span>
-                    <span className="text-slate-300">{p.moq} / {p.leadDays}d</span>
-                  </div>
-                </div>
-
-                <div className="text-[11px] text-slate-400">
-                  Target Markets: <strong className="text-slate-200">{p.markets}</strong>
                 </div>
               </div>
             ))}

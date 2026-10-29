@@ -53,7 +53,7 @@ export default function FinancePage() {
             Ledger, P&L & Balance Sheet
           </h1>
           <p className="text-xs text-slate-400">
-            Strict double-entry bookkeeping: ΣDebits == ΣCredits across Bizman, Linda Resort, and ArielMC
+            Strict double-entry bookkeeping: ΣDebits == ΣCredits across ArielMC, Bizman Media, and Linda Resort
           </p>
         </div>
 

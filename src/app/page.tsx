@@ -99,14 +99,14 @@ export default function MasterDashboard() {
             )}
             {activeCompany === 'CONSOLIDATED' && (
               <div className="flex items-center -space-x-2 shrink-0 pt-1">
+                <div className="h-12 w-12 rounded-xl overflow-hidden border border-[#DDE3DD] bg-white p-1 shadow-sm">
+                  <img src="/logos/arielmc-logo.png" alt="ArielMC" className="h-full w-full object-contain" />
+                </div>
                 <div className="h-12 w-12 rounded-xl overflow-hidden border border-[#DDE3DD] bg-[#0D3B29] p-1 shadow-sm">
                   <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-full w-full object-contain" />
                 </div>
                 <div className="h-12 w-12 rounded-xl overflow-hidden border border-[#DDE3DD] bg-black p-1 shadow-sm">
                   <img src="/logos/linda-logo.png" alt="Linda" className="h-full w-full object-contain" />
-                </div>
-                <div className="h-12 w-12 rounded-xl overflow-hidden border border-[#DDE3DD] bg-white p-1 shadow-sm">
-                  <img src="/logos/arielmc-logo.png" alt="ArielMC" className="h-full w-full object-contain" />
                 </div>
               </div>
             )}
