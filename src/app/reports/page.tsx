@@ -297,8 +297,8 @@ ${specificContent}
                   <img src="/logos/bizman-logo.jpg" alt="Bizman Media" className="h-full w-full object-contain" />
                 </div>
                 {/* 3. Linda Resort */}
-                <div className="h-11 w-28 rounded-lg overflow-hidden border border-[#DDE3DD] bg-black px-2 flex items-center justify-center shadow-xs" title="Linda Resort Limited">
-                  <img src="/logos/linda-logo.png" alt="Linda Resort Limited" className="max-h-8.5 w-auto object-contain" />
+                <div className="h-11 w-22 rounded-lg overflow-hidden border border-[#DDE3DD] bg-black px-1.5 py-0.5 flex items-center justify-center shadow-xs" title="Linda Resort Limited">
+                  <img src="/logos/linda-logo.png" alt="Linda Resort Limited" className="w-full h-auto object-contain scale-110" />
                 </div>
               </div>
 

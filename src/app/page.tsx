@@ -88,8 +88,8 @@ export default function MasterDashboard() {
               </div>
             )}
             {activeCompany === 'LINDA' && (
-              <div className="h-16 w-44 rounded-xl overflow-hidden border border-[#DDE3DD] bg-black p-2.5 shadow-sm flex items-center justify-center shrink-0">
-                <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-full w-auto object-contain" />
+              <div className="h-16 w-36 rounded-xl overflow-hidden border border-[#DDE3DD] bg-black px-2.5 py-1 shadow-sm flex items-center justify-center shrink-0">
+                <img src="/logos/linda-logo.png" alt="Linda Resort" className="w-full h-auto object-contain scale-110" />
               </div>
             )}
             {activeCompany === 'ARIELMC' && (
@@ -109,8 +109,8 @@ export default function MasterDashboard() {
                   <div className="h-12 w-12 rounded-xl overflow-hidden border border-[#DDE3DD] bg-[#0D3B29] p-1 shadow-sm flex items-center justify-center">
                     <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-full w-full object-contain" />
                   </div>
-                  <div className="h-12 w-24 rounded-xl overflow-hidden border border-[#DDE3DD] bg-black p-1.5 shadow-sm flex items-center justify-center">
-                    <img src="/logos/linda-logo.png" alt="Linda" className="max-h-9 w-auto object-contain" />
+                  <div className="h-12 w-18 rounded-xl overflow-hidden border border-[#DDE3DD] bg-black px-1.5 py-1 shadow-sm flex items-center justify-center">
+                    <img src="/logos/linda-logo.png" alt="Linda" className="w-full h-auto object-contain scale-110" />
                   </div>
                 </div>
               </div>
