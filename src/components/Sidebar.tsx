@@ -121,52 +121,58 @@ export default function Sidebar() {
             </div>
 
             {/* Selected Active Entity Box with Official Brand Logo */}
-            <div className="mt-4 rounded-xl bg-[var(--sidebar-box-bg)] border border-[var(--sidebar-border)] p-2.5 space-y-2">
+            <div className="mt-4 rounded-xl bg-[var(--sidebar-box-bg)] border border-[var(--sidebar-border)] p-2.5 space-y-2.5">
               <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-[var(--sidebar-muted)]">
                 <span>Active Context</span>
                 <span className="h-2 w-2 rounded-full bg-[var(--sidebar-active-text)]" />
               </div>
 
-              {/* Brand Logo Display */}
-              <div className="flex items-center gap-2.5 pt-0.5">
+              {/* Line 1: Brand Logos Row */}
+              <div className="flex items-center justify-between pt-0.5">
                 {activeCompany === 'ARIELMC' && (
-                  <div className="h-9 w-12 rounded-lg overflow-hidden border border-[var(--sidebar-border)] bg-white shrink-0 p-0.5 flex items-center justify-center shadow">
+                  <div className="h-9 w-14 rounded-lg overflow-hidden border border-[var(--sidebar-border)] bg-white p-0.5 flex items-center justify-center shadow">
                     <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-8 w-auto object-contain" />
                   </div>
                 )}
 
                 {activeCompany === 'BIZMAN' && (
-                  <div className="h-9 w-9 rounded-lg overflow-hidden border border-[var(--sidebar-border)] bg-[#0D3B29] shrink-0 p-0.5 flex items-center justify-center shadow">
+                  <div className="h-9 w-9 rounded-lg overflow-hidden border border-[var(--sidebar-border)] bg-[#0D3B29] p-0.5 flex items-center justify-center shadow">
                     <img src="/logos/bizman-logo.jpg" alt="Bizman Media" className="h-full w-full object-contain" />
                   </div>
                 )}
 
                 {activeCompany === 'LINDA' && (
-                  <div className="h-9 px-2.5 rounded-lg overflow-hidden border border-[var(--sidebar-border)] bg-[#112717] shrink-0 flex items-center justify-center shadow">
+                  <div className="h-9 px-3 rounded-lg overflow-hidden border border-[var(--sidebar-border)] bg-[#112717] flex items-center justify-center shadow">
                     <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-7 w-auto object-contain" />
                   </div>
                 )}
 
                 {activeCompany === 'CONSOLIDATED' && (
-                  <div className="flex items-center -space-x-1 shrink-0">
-                    <div className="h-7 w-8 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-white p-0.5 shadow flex items-center justify-center">
-                      <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-6 w-auto object-contain" />
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-11 rounded-lg overflow-hidden border border-[var(--sidebar-border)] bg-white p-0.5 shadow flex items-center justify-center">
+                      <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-7 w-auto object-contain" />
                     </div>
-                    <div className="h-7 w-7 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-[#0D3B29] p-0.5 shadow flex items-center justify-center">
+                    <div className="h-8 w-8 rounded-lg overflow-hidden border border-[var(--sidebar-border)] bg-[#0D3B29] p-0.5 shadow flex items-center justify-center">
                       <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-full w-full object-contain" />
                     </div>
-                    <div className="h-7 px-1.5 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-[#112717] shadow flex items-center justify-center shrink-0">
-                      <img src="/logos/linda-logo.png" alt="Linda" className="h-5 w-auto object-contain" />
+                    <div className="h-8 px-2 rounded-lg overflow-hidden border border-[var(--sidebar-border)] bg-[#112717] shadow flex items-center justify-center">
+                      <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-6 w-auto object-contain" />
                     </div>
                   </div>
                 )}
 
-                <div className="min-w-0 flex-1">
-                  <div className="font-bold text-xs text-white truncate">{currentMeta.name}</div>
-                  <div className="text-[10px] text-[var(--sidebar-muted)] truncate flex items-center justify-between">
-                    <span>{currentMeta.role}</span>
-                    <span className="font-mono font-bold text-[var(--sidebar-active-text)]">{currentMeta.currency}</span>
-                  </div>
+                <span className="font-mono text-[9px] font-bold text-[var(--sidebar-active-text)] bg-[var(--sidebar-hover)] px-1.5 py-0.5 rounded border border-[var(--sidebar-border)]">
+                  {currentMeta.currency}
+                </span>
+              </div>
+
+              {/* Line 2 (Under the Logos): Title & Designation */}
+              <div className="border-t border-[var(--sidebar-border)]/60 pt-2 space-y-0.5">
+                <div className="font-extrabold text-xs text-white tracking-tight">
+                  {currentMeta.name}
+                </div>
+                <div className="text-[10px] text-[var(--sidebar-muted)] font-medium">
+                  {currentMeta.role}
                 </div>
               </div>
             </div>
