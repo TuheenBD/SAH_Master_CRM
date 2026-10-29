@@ -91,7 +91,7 @@ export default function Navigation() {
                 {code === 'BIZMAN' && <Tv2 className="h-3 w-3" />}
                 {code === 'LINDA' && <Building2 className="h-3 w-3" />}
                 {code === 'ARIELMC' && <Globe2 className="h-3 w-3" />}
-                <span>{code}</span>
+                <span>{code === 'CONSOLIDATED' ? 'ALL ENTITIES' : code === 'ARIELMC' ? 'ArielMC' : code === 'LINDA' ? 'LINDA RESORT' : code}</span>
               </button>
             );
           })}

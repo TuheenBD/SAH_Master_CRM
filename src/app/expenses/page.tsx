@@ -158,7 +158,7 @@ export default function ExpensesPage() {
                       exp.companyCode === 'LINDA' ? 'bg-[#FFF3D6] text-[#8A5A00] border border-[#FBE0A8]' :
                       'bg-emerald-950 text-emerald-400 border border-emerald-800'
                     }`}>
-                      {exp.companyCode}
+                      {exp.companyCode === 'ARIELMC' ? 'ArielMC' : exp.companyCode}
                     </span>
                   </td>
                   <td className="py-3.5 px-4 font-mono text-slate-400 whitespace-nowrap">
@@ -217,7 +217,7 @@ export default function ExpensesPage() {
                     onChange={(e) => setTargetCompany(e.target.value as any)}
                     className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-slate-200 focus:outline-none focus:border-indigo-500"
                   >
-                    <option value="ARIELMC">Ariel Marketing & Communications</option>
+                    <option value="ARIELMC">ArielMC (Ariel Marketing & Communications)</option>
                     <option value="BIZMAN">Bizman Media Limited</option>
                     <option value="LINDA">Linda Resort Limited</option>
                   </select>

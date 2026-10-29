@@ -125,7 +125,7 @@ export default function LeadsPage() {
                       lead.companyCode === 'LINDA' ? 'bg-[#FFF3D6] text-[#8A5A00] border border-[#FBE0A8]' :
                       'bg-emerald-950 text-emerald-400 border border-emerald-800'
                     }`}>
-                      {lead.companyCode}
+                      {lead.companyCode === 'ARIELMC' ? 'ArielMC' : lead.companyCode === 'LINDA' ? 'LINDA RESORT' : lead.companyCode}
                     </span>
                     <span className="font-mono text-emerald-400 font-semibold">
                       {lead.currency === 'USD' ? '$' : '৳'}{lead.estimatedValue.toLocaleString()}
@@ -159,7 +159,7 @@ export default function LeadsPage() {
                     selectedLead.companyCode === 'LINDA' ? 'bg-[#FFF3D6] text-[#8A5A00] border border-[#FBE0A8]' :
                     'bg-emerald-950 text-emerald-400 border border-emerald-800'
                   }`}>
-                    {selectedLead.companyCode}
+                    {selectedLead.companyCode === 'ARIELMC' ? 'ArielMC' : selectedLead.companyCode === 'LINDA' ? 'LINDA RESORT' : selectedLead.companyCode}
                   </span>
                   <span className="text-xs font-mono text-slate-400">{selectedLead.pipelineType}</span>
                 </div>

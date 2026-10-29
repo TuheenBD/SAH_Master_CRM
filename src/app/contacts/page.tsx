@@ -558,7 +558,7 @@ export default function ContactsPage() {
 
                       {/* Affiliation */}
                       <td className="py-3 px-4 whitespace-nowrap font-mono text-[11px] text-slate-300">
-                        {contact.companyAffiliation}
+                        {contact.companyAffiliation === 'ARIELMC' ? 'ArielMC' : contact.companyAffiliation === 'LINDA' ? 'Linda Resort' : contact.companyAffiliation === 'BIZMAN' ? 'Bizman' : contact.companyAffiliation}
                       </td>
 
                       {/* Phone & WhatsApp Quick Communication */}
@@ -773,7 +773,7 @@ export default function ContactsPage() {
                     onChange={(e) => setFormData({ ...formData, companyAffiliation: e.target.value as any })}
                     className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-slate-200 focus:outline-none focus:border-indigo-500"
                   >
-                    <option value="ARIELMC">Ariel Marketing & Communications</option>
+                    <option value="ARIELMC">ArielMC (Ariel Marketing & Communications)</option>
                     <option value="BIZMAN">Bizman Media Limited</option>
                     <option value="LINDA">Linda Resort Limited</option>
                     <option value="PERSONAL">Personal / Family</option>
@@ -866,7 +866,7 @@ export default function ContactsPage() {
                     onChange={(e) => setTargetCompany(e.target.value as any)}
                     className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-slate-200 focus:outline-none focus:border-indigo-500"
                   >
-                    <option value="ARIELMC">Ariel Marketing & Communications (Global Export)</option>
+                    <option value="ARIELMC">ArielMC (Ariel Marketing & Communications - Global Export)</option>
                     <option value="BIZMAN">Bizman Media Limited (DOOH / Static / Events)</option>
                     <option value="LINDA">Linda Resort Limited (Luxury Eco-Resort / Villas)</option>
                   </select>

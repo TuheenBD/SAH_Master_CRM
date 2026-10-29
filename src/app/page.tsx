@@ -265,7 +265,7 @@ export default function MasterDashboard() {
                         badgeCompany === 'LINDA' ? 'bg-[#FFF3D6] text-[#8A5A00] border border-[#FBE0A8]' :
                         'bg-[#E4F3E9] text-[#1E6B3A] border border-[#B6E2C5]'
                       }`}>
-                        {lead.companyCode}
+                        {lead.companyCode === 'ARIELMC' ? 'ArielMC' : lead.companyCode === 'LINDA' ? 'Linda Resort' : lead.companyCode}
                       </span>
                       <span className="text-xs text-[#6B7269] font-mono">{lead.pipelineType}</span>
                     </div>

@@ -133,7 +133,7 @@ export default function ReportsPage() {
               </div>
               <div className="text-xs uppercase tracking-widest text-indigo-400 font-bold">Standard Management Framework &bull; Report 01</div>
               <h2 className="text-xl font-extrabold text-white mt-1 print:text-black">Consolidated Group Financial & Operating Brief</h2>
-              <p className="text-xs text-slate-400">Ariel Marketing & Communications Limited &bull; Bizman Media Limited &bull; Linda Resort Limited</p>
+              <p className="text-xs text-slate-400">ArielMC &bull; Bizman Media Limited &bull; Linda Resort Limited</p>
             </div>
             <div className="text-right text-xs font-mono text-slate-400">
               <div>Period: YTD 2026</div>
@@ -301,7 +301,7 @@ export default function ReportsPage() {
         <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-6 space-y-6 shadow-xl print:border-none print:bg-white print:text-black">
           <div className="border-b border-slate-800 pb-4">
             <div className="text-xs uppercase tracking-widest text-emerald-400 font-bold">Standard Management Framework &bull; Report 04</div>
-            <h2 className="text-xl font-extrabold text-white mt-1">Ariel Marketing & Communications — Export Consignments</h2>
+            <h2 className="text-xl font-extrabold text-white mt-1">ArielMC (Ariel Marketing & Communications Limited) — Export Consignments</h2>
             <p className="text-xs text-slate-400">Container shipments, Incoterms, customs status, and payment realizations for UK, EU, US, and Australia</p>
           </div>
 

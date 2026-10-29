@@ -127,7 +127,7 @@ export default function AutomationsPage() {
                   seq.company === 'LINDA' ? 'bg-[#FFF3D6] text-[#8A5A00] border border-[#FBE0A8]' :
                   'bg-emerald-950 text-emerald-400 border border-emerald-800'
                 }`}>
-                  {seq.company}
+                  {seq.company === 'ARIELMC' ? 'ArielMC' : seq.company === 'LINDA' ? 'Linda Resort' : seq.company}
                 </span>
                 <h3 className="text-sm font-bold text-white">{seq.name}</h3>
               </div>

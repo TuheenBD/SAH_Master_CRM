@@ -143,7 +143,7 @@ export default function CalendarPage() {
                         t.company === 'LINDA' ? 'bg-[#FFF3D6] text-[#8A5A00] border border-[#FBE0A8]' :
                         'bg-emerald-950 text-emerald-400 border border-emerald-800'
                       }`}>
-                        {t.company}
+                        {t.company === 'ARIELMC' ? 'ArielMC' : t.company === 'LINDA' ? 'Linda Resort' : t.company}
                       </span>
 
                       <div className="flex items-center gap-2 text-xs">

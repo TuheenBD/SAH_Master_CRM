@@ -33,7 +33,7 @@ export const COMPANIES: Record<CompanyCode, CompanyMeta> = {
   },
   ARIELMC: {
     code: 'ARIELMC',
-    name: 'Ariel Marketing & Communications Limited',
+    name: 'ArielMC (Ariel Marketing & Communications Limited)',
     role: 'Managing Director',
     industry: 'Global B2B/B2C Export (UK, EU, AU, US): Jute, Leather, Ceramics, Pottery & Home Textiles',
     website: 'www.arielmc.com',

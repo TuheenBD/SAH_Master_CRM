@@ -596,7 +596,7 @@ export const INITIAL_CONTACTS: MasterContact[] = [
   {
     id: 'cnt-9',
     fullName: 'Sabrina Sultana',
-    organization: 'Ariel Marketing & Communications',
+    organization: 'ArielMC',
     designation: 'Senior Merchandiser (Exports)',
     category: 'CO_WORKER',
     primaryPhone: '+8801819112233',

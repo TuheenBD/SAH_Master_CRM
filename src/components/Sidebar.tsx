@@ -65,7 +65,7 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile Top Navbar */}
-      <div className="lg:hidden sticky top-0 z-50 flex items-center justify-between border-b border-[#2C5240] bg-[#1F3A2E] px-4 py-3 text-white">
+      <div className="lg:hidden sticky top-0 z-50 flex items-center justify-between border-b border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] px-4 py-3 text-white">
         <div className="flex items-center gap-2">
           <span className="h-2.5 w-2.5 rounded-full bg-[var(--sidebar-active-text)] animate-pulse" />
           <span className="font-extrabold text-sm tracking-wide">
@@ -76,7 +76,7 @@ export default function Sidebar() {
 
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="rounded-lg p-2 text-[#CFE0D5] hover:bg-[#2C5240] hover:text-white"
+          className="rounded-lg p-2 text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-white"
         >
           {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
@@ -90,17 +90,17 @@ export default function Sidebar() {
         />
       )}
 
-      {/* Persistent Left Sidebar: Dark Forest Pine (#1F3A2E) */}
+      {/* Persistent Left Sidebar: Dark Themed */}
       <aside className={`
-        fixed inset-y-0 left-0 z-50 w-64 border-r border-[#2C5240] bg-[#1F3A2E] text-white flex flex-col justify-between transition-transform duration-200 ease-in-out shadow-xl
+        fixed inset-y-0 left-0 z-50 w-64 border-r border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] text-white flex flex-col justify-between transition-transform duration-200 ease-in-out shadow-xl
         ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="flex flex-col h-full overflow-y-auto">
           {/* Brand Header */}
-          <div className="p-4 border-b border-[#2C5240]">
+          <div className="p-4 border-b border-[var(--sidebar-border)]">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="h-8 w-8 rounded-lg bg-[#C8A96A] flex items-center justify-center font-black text-[#1F3A2E] shadow-md">
+                <div className="h-8 w-8 rounded-lg bg-[var(--sidebar-active-text)] flex items-center justify-center font-black text-[var(--sidebar-bg)] shadow-md">
                   M
                 </div>
                 <div>
@@ -109,51 +109,51 @@ export default function Sidebar() {
                     <span className="text-[var(--sidebar-active-text)] font-extrabold">CRM</span>
                     <span className="h-1.5 w-1.5 rounded-full bg-[var(--sidebar-active-text)]" />
                   </div>
-                  <div className="text-[10px] text-[#CFE0D5] font-mono tracking-wider">EXECUTIVE OS</div>
+                  <div className="text-[10px] text-[var(--sidebar-muted)] font-mono tracking-wider">EXECUTIVE OS</div>
                 </div>
               </div>
 
-              <span className="rounded bg-[#2C5240] px-1.5 py-0.5 text-[9px] font-mono text-[#C8A96A] font-bold">
+              <span className="rounded bg-[var(--sidebar-border)] px-1.5 py-0.5 text-[9px] font-mono text-[var(--sidebar-active-text)] font-bold">
                 ERP
               </span>
             </div>
 
             {/* Selected Active Entity Box with Official Brand Logo */}
-            <div className="mt-4 rounded-xl bg-[#162B22] border border-[#2C5240] p-2.5 space-y-2">
-              <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-[#CFE0D5]">
+            <div className="mt-4 rounded-xl bg-[var(--sidebar-box-bg)] border border-[var(--sidebar-border)] p-2.5 space-y-2">
+              <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-[var(--sidebar-muted)]">
                 <span>Active Context</span>
                 <span className="h-2 w-2 rounded-full bg-[var(--sidebar-active-text)]" />
               </div>
 
               {/* Brand Logo Display */}
               <div className="flex items-center gap-2.5 pt-0.5">
+                {activeCompany === 'ARIELMC' && (
+                  <div className="h-9 w-12 rounded-lg overflow-hidden border border-[var(--sidebar-border)] bg-white shrink-0 p-0.5 flex items-center justify-center shadow">
+                    <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-8 w-auto object-contain" />
+                  </div>
+                )}
+
                 {activeCompany === 'BIZMAN' && (
-                  <div className="h-9 w-9 rounded-lg overflow-hidden border border-[#2C5240] bg-[#0D3B29] shrink-0 p-0.5 flex items-center justify-center shadow">
+                  <div className="h-9 w-9 rounded-lg overflow-hidden border border-[var(--sidebar-border)] bg-[#0D3B29] shrink-0 p-0.5 flex items-center justify-center shadow">
                     <img src="/logos/bizman-logo.jpg" alt="Bizman Media" className="h-full w-full object-contain" />
                   </div>
                 )}
 
                 {activeCompany === 'LINDA' && (
-                  <div className="h-9 w-20 rounded-lg overflow-hidden border border-[#2C5240] bg-black shrink-0 px-1 flex items-center justify-center shadow">
+                  <div className="h-9 w-20 rounded-lg overflow-hidden border border-[var(--sidebar-border)] bg-black shrink-0 px-1 flex items-center justify-center shadow">
                     <img src="/logos/linda-logo.png" alt="Linda Resort" className="max-h-7 w-auto object-contain" />
-                  </div>
-                )}
-
-                {activeCompany === 'ARIELMC' && (
-                  <div className="h-9 w-12 rounded-lg overflow-hidden border border-[#2C5240] bg-white shrink-0 p-0.5 flex items-center justify-center shadow">
-                    <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-8 w-auto object-contain" />
                   </div>
                 )}
 
                 {activeCompany === 'CONSOLIDATED' && (
                   <div className="flex items-center -space-x-1.5 shrink-0">
-                    <div className="h-7 w-7 rounded-md overflow-hidden border border-[#2C5240] bg-white p-0.5 shadow">
+                    <div className="h-7 w-7 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-white p-0.5 shadow">
                       <img src="/logos/arielmc-logo.png" alt="ArielMC" className="h-full w-full object-contain" />
                     </div>
-                    <div className="h-7 w-7 rounded-md overflow-hidden border border-[#2C5240] bg-[#0D3B29] p-0.5 shadow">
+                    <div className="h-7 w-7 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-[#0D3B29] p-0.5 shadow">
                       <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-full w-full object-contain" />
                     </div>
-                    <div className="h-7 w-7 rounded-md overflow-hidden border border-[#2C5240] bg-black p-0.5 shadow">
+                    <div className="h-7 w-7 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-black p-0.5 shadow">
                       <img src="/logos/linda-logo.png" alt="Linda" className="h-full w-full object-contain" />
                     </div>
                   </div>
@@ -161,7 +161,7 @@ export default function Sidebar() {
 
                 <div className="min-w-0 flex-1">
                   <div className="font-bold text-xs text-white truncate">{currentMeta.name}</div>
-                  <div className="text-[10px] text-[#CFE0D5] truncate flex items-center justify-between">
+                  <div className="text-[10px] text-[var(--sidebar-muted)] truncate flex items-center justify-between">
                     <span>{currentMeta.role}</span>
                     <span className="font-mono font-bold text-[var(--sidebar-active-text)]">{currentMeta.currency}</span>
                   </div>
@@ -174,7 +174,7 @@ export default function Sidebar() {
           <div className="flex-1 px-3 py-4 space-y-5">
             {menuSections.map((section, sIdx) => (
               <div key={sIdx} className="space-y-1">
-                <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-[#8FA899] mb-1.5">
+                <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-[var(--sidebar-muted)]/70 mb-1.5">
                   {section.title}
                 </div>
 
@@ -189,11 +189,11 @@ export default function Sidebar() {
                         onClick={() => setMobileOpen(false)}
                         className={`flex items-center gap-3 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
                           isActive
-                            ? 'bg-[#27493A] text-[#C8A96A] border-l-4 border-l-[#C8A96A] shadow-inner'
-                            : 'text-[#CFE0D5] hover:bg-[#2C5240] hover:text-white'
+                            ? 'bg-[var(--sidebar-hover)] text-[var(--sidebar-active-text)] border-l-4 border-l-[var(--sidebar-active-text)] shadow-inner'
+                            : 'text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-white'
                         }`}
                       >
-                        <item.icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-[#C8A96A]' : 'text-[#8FA899]'}`} />
+                        <item.icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-[var(--sidebar-active-text)]' : 'text-[var(--sidebar-muted)]'}`} />
                         <span className="truncate">{item.label}</span>
                       </Link>
                     );
@@ -204,15 +204,15 @@ export default function Sidebar() {
           </div>
 
           {/* User Profile Footer */}
-          <div className="p-3 border-t border-[#2C5240] bg-[#162B22]">
-            <div className="flex items-center gap-2.5 rounded-lg p-2 bg-[#1F3A2E] border border-[#2C5240]">
-              <div className="h-8 w-8 rounded-full bg-[#C8A96A] flex items-center justify-center font-bold text-xs text-[#1F3A2E] shrink-0">
+          <div className="p-3 border-t border-[var(--sidebar-border)] bg-[var(--sidebar-box-bg)]">
+            <div className="flex items-center gap-2.5 rounded-lg p-2 bg-[var(--sidebar-bg)] border border-[var(--sidebar-border)]">
+              <div className="h-8 w-8 rounded-full bg-[var(--sidebar-active-text)] flex items-center justify-center font-bold text-xs text-[var(--sidebar-bg)] shrink-0">
                 SH
               </div>
               <div className="min-w-0 flex-1">
                 <div className="text-xs font-bold text-white truncate">Syed Akramul Hassan</div>
-                <div className="text-[10px] text-[#C8A96A] truncate flex items-center gap-1 font-semibold">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#C8A96A] inline-block" />
+                <div className="text-[10px] text-[var(--sidebar-active-text)] truncate flex items-center gap-1 font-semibold">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--sidebar-active-text)] inline-block" />
                   <span>Owner & Director</span>
                 </div>
               </div>

@@ -250,7 +250,7 @@ export default function InventoryPage() {
                 <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-5 w-auto object-contain" />
               </div>
               <h2 className="text-base font-bold text-white">
-                Ariel Marketing & Communications - Export Product Catalog
+                ArielMC - Export Product Catalog
               </h2>
             </div>
             <span className="text-xs text-slate-400">
@@ -263,7 +263,7 @@ export default function InventoryPage() {
               <div key={p.id} className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 space-y-3">
                 <div className="flex items-center justify-between text-xs">
                   <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-950 text-emerald-400 border border-emerald-800">
-                    ARIELMC
+                    ArielMC
                   </span>
                   <span className="font-mono text-slate-400 text-[11px]">{p.sku}</span>
                 </div>
