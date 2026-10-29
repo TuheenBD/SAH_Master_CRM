@@ -145,3 +145,85 @@ export interface AccountBalance {
   currency: string;
   balance: number;
 }
+
+// ------------------------------------------------------------------------------
+// MASTER CONTACT DATABASE TYPES
+// ------------------------------------------------------------------------------
+
+export type ContactCategory = 
+  | 'LEAD_PROSPECT'
+  | 'BUYER_CLIENT'
+  | 'SUPPLIER_RAW_MATERIAL'
+  | 'VENDOR_BILLBOARD'
+  | 'CO_WORKER'
+  | 'FRIEND_FAMILY'
+  | 'GOVERNMENT_REGULATOR';
+
+export interface MasterContact {
+  id: string;
+  fullName: string;
+  organization: string;
+  designation: string;
+  category: ContactCategory;
+  primaryPhone: string;
+  whatsappNumber: string;
+  email: string;
+  city: string;
+  country: string;
+  companyAffiliation: 'BIZMAN' | 'ADPRO' | 'ARIELMC' | 'PERSONAL' | 'GROUP';
+  relationshipNotes: string;
+  isConvertibleToLead: boolean;
+  convertedLeadId?: string;
+  tags: string[];
+  createdAt: string;
+}
+
+// ------------------------------------------------------------------------------
+// PERSONAL FINANCE TYPES
+// ------------------------------------------------------------------------------
+
+export type PersonalAccountType = 'BANK_SAVINGS' | 'BANK_CURRENT' | 'CREDIT_CARD' | 'MFS_BKASH_NAGAD' | 'DPS_SAVINGS_SCHEME' | 'FDR_TERM_DEPOSIT' | 'CASH_WALLET';
+
+export interface PersonalAccount {
+  id: string;
+  accountName: string;
+  institution: string;
+  accountType: PersonalAccountType;
+  currency: 'BDT' | 'USD';
+  currentBalance: number;
+  accountNumberMasked: string;
+  isLiability?: boolean; // e.g. Credit Card balance due
+}
+
+export type PersonalTxCategory = 
+  // Inflow (Income)
+  | 'SALARY_BIZMAN'
+  | 'SALARY_ADPRO'
+  | 'DIRECTOR_DIVIDEND_ARIELMC'
+  | 'CONSULTING_FEE'
+  | 'INVESTMENT_INTEREST'
+  // Outflow (Expenses)
+  | 'HOUSING_RENT'
+  | 'FAMILY_LIVING'
+  | 'GROCERIES_FOOD'
+  | 'CHILDREN_EDUCATION'
+  | 'VEHICLE_FUEL_MAINTENANCE'
+  | 'HEALTHCARE_MEDICAL'
+  | 'ENTERTAINMENT_DINING'
+  | 'PERSONAL_SAVINGS_DPS'
+  | 'UTILITIES_BILLS';
+
+export interface PersonalTransaction {
+  id: string;
+  date: string;
+  type: 'INCOME' | 'EXPENSE' | 'TRANSFER';
+  amount: number;
+  currency: 'BDT' | 'USD';
+  category: PersonalTxCategory;
+  description: string;
+  accountId: string;
+  accountName: string;
+  notes?: string;
+}
+
+

@@ -109,3 +109,4 @@ export function validateJournalEntry(lines: { debit: number; credit: number }[])
     diff,
   };
 }
+

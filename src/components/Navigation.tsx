@@ -17,7 +17,10 @@ import {
   BarChart3,
   Flame,
   ShieldCheck,
-  ChevronDown
+  ChevronDown,
+  Contact,
+  Wallet,
+  FileSpreadsheet
 } from 'lucide-react';
 import { CompanyCode, COMPANIES } from '@/lib/types';
 
@@ -34,13 +37,16 @@ export default function Navigation() {
   };
 
   const navItems = [
-    { label: 'Executive Master', href: '/', icon: BarChart3 },
+    { label: 'Master View', href: '/', icon: BarChart3 },
+    { label: 'Master Contacts', href: '/contacts', icon: Contact },
     { label: 'Leads & Pipeline', href: '/leads', icon: Users },
     { label: 'Inventory & Catalog', href: '/inventory', icon: Tv2 },
-    { label: 'Daily Expenses', href: '/expenses', icon: DollarSign },
-    { label: 'Accounting & P&L', href: '/finance', icon: BookOpenCheck },
+    { label: 'Deal Expenses', href: '/expenses', icon: DollarSign },
+    { label: 'Corporate Accounting', href: '/finance', icon: BookOpenCheck },
+    { label: 'Personal Finance', href: '/personal-finance', icon: Wallet },
+    { label: 'Executive Reports', href: '/reports', icon: FileSpreadsheet },
     { label: 'Email Drips', href: '/automations', icon: Send },
-    { label: 'Calendar & Tasks', href: '/calendar', icon: CalendarDays },
+    { label: 'Calendar', href: '/calendar', icon: CalendarDays },
     { label: 'Scratchpad', href: '/scratchpad', icon: FileEdit },
   ];
 
@@ -129,3 +135,4 @@ export default function Navigation() {
     </header>
   );
 }
+

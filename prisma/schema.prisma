@@ -793,7 +793,100 @@ model QuickNotePad {
   @@index([userId, isPinned])
 }
 
+// ------------------------------------------------------------------------------
+// 9. MASTER CONTACT DATABASE (LEADS, BUYERS, SUPPLIERS, VENDORS, CO-WORKERS, FAMILY)
+// ------------------------------------------------------------------------------
+
+enum ContactCategory {
+  LEAD_PROSPECT
+  BUYER_CLIENT
+  SUPPLIER_RAW_MATERIAL
+  VENDOR_BILLBOARD
+  CO_WORKER
+  FRIEND_FAMILY
+  GOVERNMENT_REGULATOR
+}
+
+model Contact {
+  id                  String          @id @default(uuid())
+  fullName            String
+  organization        String
+  designation         String?
+  category            ContactCategory @default(BUYER_CLIENT)
+  primaryPhone        String
+  whatsappNumber      String?
+  email               String?
+  city                String?
+  country             String          @default("Bangladesh")
+  companyAffiliation  String          @default("GROUP") // "BIZMAN", "ADPRO", "ARIELMC", "PERSONAL", "GROUP"
+  relationshipNotes   String?         @db.Text
+  isConvertibleToLead Boolean         @default(true)
+  convertedLeadId     String?
+  tags                String[]
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+
+  @@index([category])
+  @@index([companyAffiliation])
+}
+
+// ------------------------------------------------------------------------------
+// 10. PERSONAL FINANCE MANAGEMENT (SEPARATE FROM CORPORATE BOOKS)
+// ------------------------------------------------------------------------------
+
+enum PersonalAccountType {
+  BANK_SAVINGS
+  BANK_CURRENT
+  CREDIT_CARD
+  MFS_BKASH_NAGAD
+  DPS_SAVINGS_SCHEME
+  FDR_TERM_DEPOSIT
+  CASH_WALLET
+}
+
+model PersonalAccount {
+  id                  String              @id @default(uuid())
+  userId              String
+  accountName         String
+  institution         String
+  accountType         PersonalAccountType
+  currency            String              @default("BDT")
+  currentBalance      Decimal             @db.Decimal(14, 2)
+  accountNumberMasked String?
+  isLiability         Boolean             @default(false)
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  transactions        PersonalTransaction[]
+
+  @@index([userId])
+}
+
+enum PersonalTxType {
+  INCOME
+  EXPENSE
+  TRANSFER
+}
+
+model PersonalTransaction {
+  id                String          @id @default(uuid())
+  personalAccountId String
+  date              DateTime        @default(now())
+  type              PersonalTxType
+  amount            Decimal         @db.Decimal(14, 2)
+  currency          String          @default("BDT")
+  category          String          // "SALARY_BIZMAN", "HOUSING_RENT", "FAMILY_LIVING", etc.
+  description       String
+  notes             String?
+  createdAt         DateTime        @default(now())
+
+  account           PersonalAccount @relation(fields: [personalAccountId], references: [id], onDelete: Cascade)
+
+  @@index([personalAccountId, date])
+}
+
 model AuditLog {
+
   id          String   @id @default(uuid())
   userId      String?
   action      String   // "CREATE_EXPENSE", "POST_JOURNAL", "STAGE_UPDATE"

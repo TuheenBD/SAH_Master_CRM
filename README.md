@@ -138,3 +138,4 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 3. Connect a PostgreSQL database from **Supabase** or **Neon**.
 4. Set `DATABASE_URL` in Vercel environment settings.
 5. Deploy!
+
