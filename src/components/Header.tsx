@@ -63,7 +63,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-[#2C5240] bg-[#1F3A2E] text-white shadow-md">
-      <div className="flex flex-col md:flex-row md:h-16 md:items-center justify-between px-4 sm:px-6 lg:px-8 py-2 md:py-0 gap-3">
+      <div className="flex flex-col md:flex-row md:min-h-16 md:items-center justify-between px-4 sm:px-6 lg:px-8 py-2 gap-3">
         {/* Left: Breadcrumb / Page Title with Active Entity Logo */}
         <div className="flex items-center gap-3 shrink-0">
           {activeCompany === 'BIZMAN' && (
@@ -99,41 +99,46 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Center: ACTIVE ENTITY VIEW with Brand Logos */}
-        <div className="flex flex-wrap items-center gap-1.5 bg-[#162B22] p-1 rounded-xl border border-[#2C5240]">
-          {(Object.keys(COMPANIES) as CompanyCode[]).map((code) => {
-            const isSelected = activeCompany === code;
-            let activeStyle = "text-[#CFE0D5] hover:text-white hover:bg-[#2C5240]";
+        {/* Center: ACTIVE ENTITY VIEW with Brand Logos & Centered Designation */}
+        <div className="flex flex-col items-center justify-center gap-1.5 bg-[#162B22] px-3 py-1.5 rounded-xl border border-[#2C5240] shadow-sm">
+          {/* Top Row: Entity Switcher Pills */}
+          <div className="flex items-center gap-1.5 overflow-x-auto max-w-full justify-center">
+            {(Object.keys(COMPANIES) as CompanyCode[]).map((code) => {
+              const isSelected = activeCompany === code;
+              let activeStyle = "text-[#CFE0D5] hover:text-white hover:bg-[#2C5240]";
 
-            if (isSelected) {
-              activeStyle = "bg-[#C8A96A] text-[#1F3A2E] font-extrabold shadow-md";
-            }
+              if (isSelected) {
+                activeStyle = "bg-[#C8A96A] text-[#1F3A2E] font-extrabold shadow-md";
+              }
 
-            return (
-              <button
-                key={code}
-                onClick={() => switchCompany(code)}
-                className={`rounded-lg px-2.5 sm:px-3 py-1.5 text-xs transition-all whitespace-nowrap flex items-center gap-1.5 ${activeStyle}`}
-              >
-                {code === 'CONSOLIDATED' && <Layers className="h-3.5 w-3.5 shrink-0" />}
-                {code === 'BIZMAN' && (
-                  <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-3.5 w-3.5 rounded object-contain shrink-0" />
-                )}
-                {code === 'LINDA' && (
-                  <img src="/logos/linda-logo.png" alt="Linda" className="h-3 w-auto object-contain shrink-0 max-w-[28px] bg-black px-0.5 rounded" />
-                )}
-                {code === 'ARIELMC' && (
-                  <img src="/logos/arielmc-logo.png" alt="ArielMC" className="h-3.5 w-auto object-contain shrink-0 bg-white px-0.5 rounded" />
-                )}
-                <span>{code === 'CONSOLIDATED' ? 'ALL ENTITIES' : code === 'LINDA' ? 'LINDA RESORT' : code}</span>
-              </button>
-            );
-          })}
+              return (
+                <button
+                  key={code}
+                  onClick={() => switchCompany(code)}
+                  className={`rounded-lg px-2.5 sm:px-3 py-1 text-xs transition-all whitespace-nowrap flex items-center gap-1.5 ${activeStyle}`}
+                >
+                  {code === 'CONSOLIDATED' && <Layers className="h-3.5 w-3.5 shrink-0" />}
+                  {code === 'BIZMAN' && (
+                    <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-3.5 w-3.5 rounded object-contain shrink-0" />
+                  )}
+                  {code === 'LINDA' && (
+                    <img src="/logos/linda-logo.png" alt="Linda" className="h-3 w-auto object-contain shrink-0 max-w-[28px] bg-black px-0.5 rounded" />
+                  )}
+                  {code === 'ARIELMC' && (
+                    <img src="/logos/arielmc-logo.png" alt="ArielMC" className="h-3.5 w-auto object-contain shrink-0 bg-white px-0.5 rounded" />
+                  )}
+                  <span>{code === 'CONSOLIDATED' ? 'ALL ENTITIES' : code === 'LINDA' ? 'LINDA RESORT' : code}</span>
+                </button>
+              );
+            })}
+          </div>
 
-          {/* Active Role & Currency Badge */}
-          <div className="hidden xl:flex items-center gap-2 border-l border-[#2C5240] pl-2.5 pr-1.5 text-[11px]">
-            <span className="text-[#CFE0D5] font-medium truncate max-w-[140px]">{meta.role}</span>
-            <span className="rounded bg-[#2C5240] px-1.5 py-0.5 font-mono font-bold text-[#C8A96A] text-[10px]">
+          {/* Bottom Row: Active Designation in Dead Center */}
+          <div className="flex items-center justify-center gap-2 text-[11px] pt-1 border-t border-[#2C5240]/60 w-full text-center">
+            <span className="text-[#CFE0D5]/70 text-[10px] uppercase tracking-wider font-semibold">Designation:</span>
+            <span className="text-white font-extrabold tracking-wide">{meta.role}</span>
+            <span className="h-1 w-1 rounded-full bg-[var(--header-accent)] opacity-80" />
+            <span className="rounded bg-[#2C5240] px-1.5 py-0.5 font-mono font-bold text-[var(--header-accent)] text-[10px]">
               {meta.currency}
             </span>
           </div>
