@@ -88,7 +88,7 @@ export default function MasterDashboard() {
               </div>
             )}
             {activeCompany === 'LINDA' && (
-              <div className="h-16 w-32 rounded-xl overflow-hidden border border-[#DDE3DD] bg-black p-2 shadow-sm flex items-center justify-center shrink-0">
+              <div className="h-16 w-40 rounded-xl overflow-hidden border border-[#DDE3DD] bg-black p-2 shadow-sm flex items-center justify-center shrink-0">
                 <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-full w-auto object-contain" />
               </div>
             )}
@@ -109,8 +109,8 @@ export default function MasterDashboard() {
                   <div className="h-12 w-12 rounded-xl overflow-hidden border border-[#DDE3DD] bg-[#0D3B29] p-1 shadow-sm flex items-center justify-center">
                     <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-full w-full object-contain" />
                   </div>
-                  <div className="h-12 w-14 rounded-xl overflow-hidden border border-[#DDE3DD] bg-black p-1 shadow-sm flex items-center justify-center shrink-0">
-                    <img src="/logos/linda-logo.png" alt="Linda" className="h-full w-auto object-contain" />
+                  <div className="h-12 w-12 rounded-xl overflow-hidden border border-[#DDE3DD] bg-black shadow-sm flex items-center justify-center shrink-0">
+                    <img src="/logos/linda-icon.png" alt="Linda" className="h-full w-full object-contain" />
                   </div>
                 </div>
               </div>
@@ -169,62 +169,62 @@ export default function MasterDashboard() {
       {/* Financial Health & P&L Metric Cards (ArielMC ERP KPI Style) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Revenue Card */}
-        <div className="rounded-xl border border-[#DDE3DD] bg-white p-5 shadow-sm hover:border-[#C8A96A] transition-all">
-          <div className="flex items-center justify-between">
+        <div className="rounded-xl border border-[#DDE3DD] bg-white p-5 shadow-sm hover:border-[#C8A96A] transition-all flex flex-col justify-between text-center">
+          <div className="flex items-center justify-between text-left">
             <span className="text-xs font-bold text-[#6B7269] uppercase tracking-wider">Recognized Revenue (YTD)</span>
             <div className="rounded-lg bg-[#E8F0FA] p-2 text-[#1F5FA8]">
               <DollarSign className="h-5 w-5" />
             </div>
           </div>
-          <div className="mt-3 text-2xl font-extrabold text-[#1F3A2E] font-mono tracking-tight">{totalRevenueDisplay}</div>
-          <div className="mt-2 flex items-center text-xs text-[#1E6B3A] font-semibold">
+          <div className="my-3 text-2xl font-extrabold text-[#1F3A2E] font-mono tracking-tight text-center">{totalRevenueDisplay}</div>
+          <div className="flex items-center justify-center text-xs text-[#1E6B3A] font-semibold">
             <ArrowUpRight className="h-4 w-4 mr-0.5" />
             <span>Audited General Ledger</span>
           </div>
         </div>
 
         {/* Gross Profit Card */}
-        <div className="rounded-xl border border-[#DDE3DD] bg-white p-5 shadow-sm hover:border-[#C8A96A] transition-all">
-          <div className="flex items-center justify-between">
+        <div className="rounded-xl border border-[#DDE3DD] bg-white p-5 shadow-sm hover:border-[#C8A96A] transition-all flex flex-col justify-between text-center">
+          <div className="flex items-center justify-between text-left">
             <span className="text-xs font-bold text-[#6B7269] uppercase tracking-wider">Gross Profit (Post-COGS)</span>
             <div className="rounded-lg bg-[#E4F3E9] p-2 text-[#1E6B3A]">
               <TrendingUp className="h-5 w-5" />
             </div>
           </div>
-          <div className="mt-3 text-2xl font-extrabold text-[#1F3A2E] font-mono tracking-tight">{grossProfitDisplay}</div>
-          <div className="mt-2 text-xs text-[#6B7269]">
+          <div className="my-3 text-2xl font-extrabold text-[#1F3A2E] font-mono tracking-tight text-center">{grossProfitDisplay}</div>
+          <div className="text-xs text-[#6B7269] text-center">
             Deducts 50+/70+ vendor screen payouts & materials
           </div>
         </div>
 
         {/* Net Profit & Margin Card */}
-        <div className="rounded-xl border border-[#DDE3DD] bg-white p-5 shadow-sm hover:border-[#C8A96A] transition-all">
-          <div className="flex items-center justify-between">
+        <div className="rounded-xl border border-[#DDE3DD] bg-white p-5 shadow-sm hover:border-[#C8A96A] transition-all flex flex-col justify-between text-center">
+          <div className="flex items-center justify-between text-left">
             <span className="text-xs font-bold text-[#6B7269] uppercase tracking-wider">Net Operating Profit</span>
             <div className="rounded-lg bg-[#FFF3D6] p-2 text-[#8A5A00]">
               <BarChart3 className="h-5 w-5" />
             </div>
           </div>
-          <div className="mt-3 text-2xl font-extrabold text-[#1F3A2E] font-mono tracking-tight">{netProfitDisplay}</div>
-          <div className="mt-2 flex items-center text-xs text-[#1E6B3A] font-bold">
+          <div className="my-3 text-2xl font-extrabold text-[#1F3A2E] font-mono tracking-tight text-center">{netProfitDisplay}</div>
+          <div className="flex items-center justify-center text-xs text-[#1E6B3A] font-bold">
             <span>Net Margin: {netMarginDisplay}</span>
           </div>
         </div>
 
         {/* Active Pipeline Card */}
-        <div className="rounded-xl border border-[#DDE3DD] bg-white p-5 shadow-sm hover:border-[#C8A96A] transition-all">
-          <div className="flex items-center justify-between">
+        <div className="rounded-xl border border-[#DDE3DD] bg-white p-5 shadow-sm hover:border-[#C8A96A] transition-all flex flex-col justify-between text-center">
+          <div className="flex items-center justify-between text-left">
             <span className="text-xs font-bold text-[#6B7269] uppercase tracking-wider">Weighted Deal Pipeline</span>
             <div className="rounded-lg bg-[#F4F6F4] p-2 text-[#1F3A2E]">
               <Users className="h-5 w-5" />
             </div>
           </div>
-          <div className="mt-3 text-xl font-extrabold text-[#1F3A2E] font-mono tracking-tight">
+          <div className="my-3 text-xl font-extrabold text-[#1F3A2E] font-mono tracking-tight text-center">
             {totalPipelineValueBDT > 0 && `৳ ${(totalPipelineValueBDT).toLocaleString()}`}
             {totalPipelineValueBDT > 0 && totalPipelineValueUSD > 0 && ' + '}
             {totalPipelineValueUSD > 0 && `$${(totalPipelineValueUSD).toLocaleString()}`}
           </div>
-          <div className="mt-2 text-xs text-[#6B7269]">
+          <div className="text-xs text-[#6B7269] text-center">
             Across {filteredLeads.length} active opportunities
           </div>
         </div>

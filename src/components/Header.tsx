@@ -81,7 +81,7 @@ export default function Header() {
           )}
           {activeCompany === 'LINDA' && (
             <div className="h-9 px-2.5 rounded-lg overflow-hidden border border-[var(--header-border)] bg-black shadow flex items-center justify-center shrink-0">
-              <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-6 w-auto object-contain" />
+              <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-7 w-auto object-contain" />
             </div>
           )}
           {activeCompany === 'CONSOLIDATED' && (
@@ -130,7 +130,7 @@ export default function Header() {
                     <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-4 w-4 rounded object-contain shrink-0 shadow-xs" />
                   )}
                   {code === 'LINDA' && (
-                    <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-4 w-auto object-contain shrink-0 bg-black px-1 rounded border border-white/20 shadow-xs" />
+                    <img src="/logos/linda-icon.png" alt="Linda Resort" className="h-4 w-4 rounded object-contain shrink-0 shadow-xs" />
                   )}
                   <span>{code === 'CONSOLIDATED' ? 'ALL ENTITIES' : code === 'ARIELMC' ? 'ArielMC' : code === 'BIZMAN' ? 'Bizman' : 'Linda Resort'}</span>
                 </button>

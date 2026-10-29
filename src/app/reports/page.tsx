@@ -510,68 +510,99 @@ ${specificContent}
       </div>
 
       {/* =================================================================== */}
-      {/* REPORT SELECTION TABS (Hidden in Print) */}
+      {/* REPORT SELECTION TABS (Placed in 2 Clean Balanced Lines) */}
       {/* =================================================================== */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs print:hidden">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs print:hidden">
+        {/* Line 1: Corporate Core & Accounts Suite */}
         <button
           onClick={() => setSelectedReport('CONSOLIDATED_EXECUTIVE')}
-          className={`rounded-lg px-3.5 py-2 font-bold whitespace-nowrap transition-all border ${
+          className={`rounded-xl px-4 py-3 font-bold transition-all border text-left flex items-center justify-between shadow-xs ${
             selectedReport === 'CONSOLIDATED_EXECUTIVE'
-              ? 'bg-[#1F3A2E] text-[#C8A96A] border-[#1F3A2E] shadow'
-              : 'bg-white border-[#DDE3DD] text-[#556055] hover:text-[#1F3A2E] hover:bg-[#F4F6F4]'
+              ? 'bg-[#1F3A2E] text-[#C8A96A] border-[#1F3A2E] shadow-sm'
+              : 'bg-white border-[#DDE3DD] text-[#1F3A2E] hover:border-[#1F3A2E] hover:bg-[#F4F6F4]'
           }`}
         >
-          1. Consolidated Group Executive Brief
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs opacity-75">1.</span>
+            <span>Consolidated Group Brief</span>
+          </div>
+          <span className="text-[10px] font-mono opacity-80 bg-black/10 px-1.5 py-0.5 rounded">Matrix P&L</span>
         </button>
+
         <button
           onClick={() => setSelectedReport('CORPORATE_ACCOUNTS')}
-          className={`rounded-lg px-3.5 py-2 font-bold whitespace-nowrap transition-all border ${
+          className={`rounded-xl px-4 py-3 font-bold transition-all border text-left flex items-center justify-between shadow-xs ${
             selectedReport === 'CORPORATE_ACCOUNTS'
-              ? 'bg-[#1F3A2E] text-[#C8A96A] border-[#1F3A2E] shadow'
-              : 'bg-white border-[#DDE3DD] text-[#556055] hover:text-[#1F3A2E] hover:bg-[#F4F6F4]'
+              ? 'bg-[#1F3A2E] text-[#C8A96A] border-[#1F3A2E] shadow-sm'
+              : 'bg-white border-[#DDE3DD] text-[#1F3A2E] hover:border-[#1F3A2E] hover:bg-[#F4F6F4]'
           }`}
         >
-          2. Corporate Accounts & P&L Statement
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs opacity-75">2.</span>
+            <span>Corporate Accounts & P&L</span>
+          </div>
+          <span className="text-[10px] font-mono opacity-80 bg-black/10 px-1.5 py-0.5 rounded">Full CoA</span>
         </button>
+
         <button
           onClick={() => setSelectedReport('DEAL_PROFITABILITY')}
-          className={`rounded-lg px-3.5 py-2 font-bold whitespace-nowrap transition-all border ${
+          className={`rounded-xl px-4 py-3 font-bold transition-all border text-left flex items-center justify-between shadow-xs ${
             selectedReport === 'DEAL_PROFITABILITY'
-              ? 'bg-[#1F3A2E] text-[#C8A96A] border-[#1F3A2E] shadow'
-              : 'bg-white border-[#DDE3DD] text-[#556055] hover:text-[#1F3A2E] hover:bg-[#F4F6F4]'
+              ? 'bg-[#1F3A2E] text-[#C8A96A] border-[#1F3A2E] shadow-sm'
+              : 'bg-white border-[#DDE3DD] text-[#1F3A2E] hover:border-[#1F3A2E] hover:bg-[#F4F6F4]'
           }`}
         >
-          3. Deal Margin & Client Profitability
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs opacity-75">3.</span>
+            <span>Deal Margin & Profitability</span>
+          </div>
+          <span className="text-[10px] font-mono opacity-80 bg-black/10 px-1.5 py-0.5 rounded">Micro-P&L</span>
         </button>
+
+        {/* Line 2: Operations, Global Export & Personal Accounts */}
         <button
           onClick={() => setSelectedReport('DOOH_OCCUPANCY')}
-          className={`rounded-lg px-3.5 py-2 font-bold whitespace-nowrap transition-all border ${
+          className={`rounded-xl px-4 py-3 font-bold transition-all border text-left flex items-center justify-between shadow-xs ${
             selectedReport === 'DOOH_OCCUPANCY'
-              ? 'bg-[#1F3A2E] text-[#C8A96A] border-[#1F3A2E] shadow'
-              : 'bg-white border-[#DDE3DD] text-[#556055] hover:text-[#1F3A2E] hover:bg-[#F4F6F4]'
+              ? 'bg-[#1F3A2E] text-[#C8A96A] border-[#1F3A2E] shadow-sm'
+              : 'bg-white border-[#DDE3DD] text-[#1F3A2E] hover:border-[#1F3A2E] hover:bg-[#F4F6F4]'
           }`}
         >
-          4. DOOH Screen Occupancy & Vendor Risk
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs opacity-75">4.</span>
+            <span>DOOH Screen Network Audit</span>
+          </div>
+          <span className="text-[10px] font-mono opacity-80 bg-black/10 px-1.5 py-0.5 rounded">Bizman 70+</span>
         </button>
+
         <button
           onClick={() => setSelectedReport('EXPORT_CONSIGNMENT')}
-          className={`rounded-lg px-3.5 py-2 font-bold whitespace-nowrap transition-all border ${
+          className={`rounded-xl px-4 py-3 font-bold transition-all border text-left flex items-center justify-between shadow-xs ${
             selectedReport === 'EXPORT_CONSIGNMENT'
-              ? 'bg-[#1F3A2E] text-[#C8A96A] border-[#1F3A2E] shadow'
-              : 'bg-white border-[#DDE3DD] text-[#556055] hover:text-[#1F3A2E] hover:bg-[#F4F6F4]'
+              ? 'bg-[#1F3A2E] text-[#C8A96A] border-[#1F3A2E] shadow-sm'
+              : 'bg-white border-[#DDE3DD] text-[#1F3A2E] hover:border-[#1F3A2E] hover:bg-[#F4F6F4]'
           }`}
         >
-          5. ArielMC Export Consignment Ledger
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs opacity-75">5.</span>
+            <span>ArielMC Export Consignments</span>
+          </div>
+          <span className="text-[10px] font-mono opacity-80 bg-black/10 px-1.5 py-0.5 rounded">UK & EU</span>
         </button>
+
         <button
           onClick={() => setSelectedReport('PERSONAL_FINANCIAL_STATEMENT')}
-          className={`rounded-lg px-3.5 py-2 font-bold whitespace-nowrap transition-all border ${
+          className={`rounded-xl px-4 py-3 font-bold transition-all border text-left flex items-center justify-between shadow-xs ${
             selectedReport === 'PERSONAL_FINANCIAL_STATEMENT'
-              ? 'bg-[#1F3A2E] text-[#C8A96A] border-[#1F3A2E] shadow'
-              : 'bg-white border-[#DDE3DD] text-[#556055] hover:text-[#1F3A2E] hover:bg-[#F4F6F4]'
+              ? 'bg-[#1F3A2E] text-[#C8A96A] border-[#1F3A2E] shadow-sm'
+              : 'bg-white border-[#DDE3DD] text-[#1F3A2E] hover:border-[#1F3A2E] hover:bg-[#F4F6F4]'
           }`}
         >
-          6. Personal Accounts Report (Without Letterhead)
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs opacity-75">6.</span>
+            <span>Personal Accounts Report</span>
+          </div>
+          <span className="text-[10px] font-mono opacity-80 bg-black/10 px-1.5 py-0.5 rounded">No Letterhead</span>
         </button>
       </div>
 
