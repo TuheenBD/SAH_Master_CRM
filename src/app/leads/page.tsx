@@ -616,24 +616,38 @@ export default function LeadsPage() {
 
                       {/* Actions */}
                       <td className="py-3.5 px-4 text-right font-sans">
-                        <div className="flex items-center justify-end gap-1.5">
+                        <div className="flex items-center justify-end gap-2">
+                          {/* Call Button */}
+                          <a
+                            href={`tel:${lead.phone}`}
+                            className="p-1.5 rounded-lg bg-[#E4F3E9] text-[#1E6B3A] hover:bg-[#1E6B3A] hover:text-white border border-[#B6E2C5] transition-all shadow-xs"
+                            title={`Call ${lead.contactPerson} (${lead.phone})`}
+                          >
+                            <PhoneCall className="h-3.5 w-3.5" />
+                          </a>
+
+                          {/* WhatsApp Chat Button */}
                           <a
                             href={`https://wa.me/${lead.whatsapp}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-1.5 rounded bg-[#25D366] text-white hover:bg-[#20BA5A] transition-colors shadow-xs"
+                            className="p-1.5 rounded-lg bg-[#25D366] hover:bg-[#20BA5A] text-white transition-all shadow-xs border border-[#1EBE5D]"
                             title="WhatsApp Chat"
                           >
                             <MessageSquare className="h-3.5 w-3.5" />
                           </a>
+
+                          {/* Primary Inspect & Manage Deal Button */}
                           <button
                             onClick={() => {
                               setSelectedLead(lead);
                               setViewMode('GRID');
                             }}
-                            className="px-2.5 py-1 rounded bg-[#F4F6F4] text-[#1F3A2E] hover:bg-[#1F3A2E] hover:text-[#C8A96A] border border-[#DDE3DD] text-[11px] font-bold transition-all"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1F3A2E] hover:bg-[#2C5240] text-[#C8A96A] border border-[#1F3A2E] text-xs font-bold transition-all shadow-sm"
+                            title="Inspect Deal, Stages & Notepad"
                           >
-                            Inspect
+                            <FileEdit className="h-3.5 w-3.5 text-[#C8A96A]" />
+                            <span>Inspect</span>
                           </button>
                         </div>
                       </td>
@@ -718,7 +732,7 @@ export default function LeadsPage() {
                             {stgKey !== 'WON' && (
                               <button
                                 onClick={() => handleAdvanceStage(lead.id, lead.stage)}
-                                className="flex items-center gap-1 rounded bg-[#F4F6F4] hover:bg-[#1F3A2E] text-[#556055] hover:text-[#C8A96A] border border-[#DDE3DD] px-1.5 py-0.5 font-bold transition-all"
+                                className="flex items-center gap-1 rounded-lg bg-[#E4F3E9] hover:bg-[#1F3A2E] text-[#1E6B3A] hover:text-[#C8A96A] border border-[#B6E2C5] px-2 py-0.5 font-bold text-[10px] transition-all shadow-xs"
                                 title="Advance to next pipeline stage"
                               >
                                 <span>Advance</span>
