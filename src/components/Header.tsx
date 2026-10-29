@@ -16,9 +16,12 @@ import {
   Users, 
   Wallet,
   ChevronDown,
-  Sparkles
+  Sparkles,
+  Palette,
+  Check
 } from 'lucide-react';
 import { CompanyCode, COMPANIES } from '@/lib/types';
+import { useTheme, THEMES, ThemeId } from '@/lib/theme';
 
 export default function Header() {
   const pathname = usePathname();
@@ -27,7 +30,10 @@ export default function Header() {
   const activeCompany = (searchParams.get('company') as CompanyCode) || 'CONSOLIDATED';
   const meta = COMPANIES[activeCompany] || COMPANIES.CONSOLIDATED;
 
+  const { currentTheme, setTheme } = useTheme();
+
   const [quickActionOpen, setQuickActionOpen] = useState(false);
+  const [themeDropdownOpen, setThemeDropdownOpen] = useState(false);
 
   const switchCompany = (code: CompanyCode) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -53,6 +59,8 @@ export default function Header() {
     }
   };
 
+  const activeThemeMeta = THEMES.find(t => t.id === currentTheme) || THEMES[0];
+
   return (
     <header className="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/85 backdrop-blur-md">
       <div className="flex flex-col md:flex-row md:h-16 md:items-center justify-between px-4 sm:px-6 lg:px-8 py-2 md:py-0 gap-3">
@@ -70,7 +78,7 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Center: ACTIVE ENTITY VIEW (Placed directly in Header) */}
+        {/* Center: ACTIVE ENTITY VIEW */}
         <div className="flex flex-wrap items-center gap-1.5 bg-slate-900/90 p-1 rounded-xl border border-slate-800 shadow-inner">
           {(Object.keys(COMPANIES) as CompanyCode[]).map((code) => {
             const isSelected = activeCompany === code;
@@ -107,8 +115,89 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Right: Quick Action Dropdown & Reminders */}
+        {/* Right: Theme Switcher, Quick Action & Notifications */}
         <div className="flex items-center gap-2 shrink-0 self-end md:self-auto">
+          {/* THEME SWITCHER DROPDOWN */}
+          <div className="relative">
+            <button
+              onClick={() => setThemeDropdownOpen(!themeDropdownOpen)}
+              title="Change Color Theme"
+              className="flex items-center gap-1.5 rounded-lg border border-slate-800 bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white px-2.5 py-1.5 text-xs font-medium transition-all shadow-sm"
+            >
+              <Palette className="h-3.5 w-3.5 text-indigo-400" />
+              <div className="flex items-center gap-1">
+                <div className="flex -space-x-1">
+                  {activeThemeMeta.palette.slice(0, 3).map((col, idx) => (
+                    <span 
+                      key={idx} 
+                      className="h-2.5 w-2.5 rounded-full ring-1 ring-slate-900 inline-block"
+                      style={{ backgroundColor: col }}
+                    />
+                  ))}
+                </div>
+                <span className="hidden lg:inline text-[11px] font-semibold">{activeThemeMeta.name.split(' ')[0]}</span>
+              </div>
+              <ChevronDown className="h-3 w-3 opacity-60" />
+            </button>
+
+            {themeDropdownOpen && (
+              <>
+                <div 
+                  onClick={() => setThemeDropdownOpen(false)}
+                  className="fixed inset-0 z-30"
+                />
+                <div className="absolute right-0 mt-2 w-72 rounded-2xl border border-slate-800 bg-slate-900 p-2 shadow-2xl z-40 text-xs space-y-1">
+                  <div className="px-2.5 py-1.5 border-b border-slate-800/80 flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Select Visual Palette</span>
+                    <span className="text-[9px] text-slate-500 font-mono">6 Curated Styles</span>
+                  </div>
+
+                  <div className="py-1 space-y-1 max-h-[360px] overflow-y-auto">
+                    {THEMES.map((t) => {
+                      const isSelected = currentTheme === t.id;
+                      return (
+                        <button
+                          key={t.id}
+                          onClick={() => {
+                            setTheme(t.id);
+                            setThemeDropdownOpen(false);
+                          }}
+                          className={`w-full rounded-xl p-2.5 text-left transition-all flex items-center justify-between ${
+                            isSelected 
+                              ? 'bg-indigo-950/70 border border-indigo-500/50 shadow-sm' 
+                              : 'hover:bg-slate-800/60 border border-transparent'
+                          }`}
+                        >
+                          <div className="space-y-1 min-w-0 pr-2">
+                            <div className="flex items-center gap-1.5">
+                              <span className={`font-semibold text-xs ${isSelected ? 'text-white' : 'text-slate-200'}`}>
+                                {t.name}
+                              </span>
+                              {isSelected && <Check className="h-3.5 w-3.5 text-indigo-400" />}
+                            </div>
+                            <div className="text-[10px] text-slate-400 line-clamp-1">{t.description}</div>
+                          </div>
+
+                          {/* 4 Swatch Circles from Uploaded Images */}
+                          <div className="flex items-center -space-x-1 shrink-0 pl-1">
+                            {t.palette.map((col, cIdx) => (
+                              <span
+                                key={cIdx}
+                                className="h-4 w-4 rounded-full ring-2 ring-slate-900 shadow-sm inline-block"
+                                style={{ backgroundColor: col }}
+                                title={col}
+                              />
+                            ))}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
           {/* Quick Action Dropdown */}
           <div className="relative">
             <button
@@ -116,7 +205,7 @@ export default function Header() {
               className="flex items-center gap-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 text-xs font-semibold shadow-md shadow-indigo-600/20 transition-all"
             >
               <Plus className="h-3.5 w-3.5" />
-              <span>Quick Action</span>
+              <span className="hidden sm:inline">Quick Action</span>
               <ChevronDown className="h-3 w-3 opacity-80" />
             </button>
 

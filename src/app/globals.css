@@ -2,19 +2,150 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Default Executive Obsidian */
 :root {
-  --background: #0b0f19;
-  --foreground: #f8fafc;
-  --border: #1e293b;
-  --card-bg: #111827;
-  --card-border: #1f2937;
+  --theme-bg: #0b0f19;
+  --theme-sidebar: #070a12;
+  --theme-card: #111827;
+  --theme-card-sub: #0f172a;
+  --theme-border: #1e293b;
+  --theme-text: #f8fafc;
+  --theme-muted: #94a3b8;
+  --theme-accent: #6366f1;
+  --theme-accent-hover: #4f46e5;
+  --theme-highlight: #10b981;
+}
+
+/* 1. Ink Wash (#4A4A4A, #CBCBCB, #FFFFE3, #6D8196) */
+[data-theme="ink-wash"] {
+  --theme-bg: #1e2124;
+  --theme-sidebar: #17191b;
+  --theme-card: #282c30;
+  --theme-card-sub: #1f2225;
+  --theme-border: #4A4A4A;
+  --theme-text: #FFFFE3;
+  --theme-muted: #CBCBCB;
+  --theme-accent: #6D8196;
+  --theme-accent-hover: #586a7d;
+  --theme-highlight: #FFFFE3;
+}
+
+/* 2. Fresh Peach (#FFD3AC, #FFB5AB, #E39A7B, #DBB06B) */
+[data-theme="fresh-peach"] {
+  --theme-bg: #1c1412;
+  --theme-sidebar: #140e0c;
+  --theme-card: #2a1c18;
+  --theme-card-sub: #211613;
+  --theme-border: #52372f;
+  --theme-text: #FFF3EB;
+  --theme-muted: #FFB5AB;
+  --theme-accent: #E39A7B;
+  --theme-accent-hover: #cb8467;
+  --theme-highlight: #DBB06B;
+}
+
+/* 3. Stormy Morning (#6A89A7, #BDDDFC, #88BDF2, #384959) */
+[data-theme="stormy-morning"] {
+  --theme-bg: #131b22;
+  --theme-sidebar: #0e141a;
+  --theme-card: #1c2732;
+  --theme-card-sub: #16202a;
+  --theme-border: #384959;
+  --theme-text: #f0f7ff;
+  --theme-muted: #BDDDFC;
+  --theme-accent: #88BDF2;
+  --theme-accent-hover: #6ea7de;
+  --theme-highlight: #6A89A7;
+}
+
+/* 4. California Beaches (#FFC067, #66F4FF, #66C4FF, #7D99AA) */
+[data-theme="california-beaches"] {
+  --theme-bg: #0d1b22;
+  --theme-sidebar: #09141a;
+  --theme-card: #142833;
+  --theme-card-sub: #10212a;
+  --theme-border: #29495a;
+  --theme-text: #f0fcff;
+  --theme-muted: #9ccad8;
+  --theme-accent: #66C4FF;
+  --theme-accent-hover: #48b5f9;
+  --theme-highlight: #FFC067;
+}
+
+/* 5. Mossy Hollow (#636B2F, #BAC095, #D4DE95, #3D4127) */
+[data-theme="mossy-hollow"] {
+  --theme-bg: #14180e;
+  --theme-sidebar: #0e120a;
+  --theme-card: #1f2516;
+  --theme-card-sub: #181d11;
+  --theme-border: #3D4127;
+  --theme-text: #f5f8ed;
+  --theme-muted: #BAC095;
+  --theme-accent: #636B2F;
+  --theme-accent-hover: #505725;
+  --theme-highlight: #D4DE95;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
+  background-color: var(--theme-bg);
+  color: var(--theme-text);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   overflow-x: hidden;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Global Dynamic Theme Overrides for Core Tailwind Surface Classes */
+[data-theme] .bg-slate-950 {
+  background-color: var(--theme-bg) !important;
+}
+
+[data-theme] aside.bg-slate-950 {
+  background-color: var(--theme-sidebar) !important;
+}
+
+[data-theme] .bg-slate-900,
+[data-theme] .bg-slate-900\/60,
+[data-theme] .bg-slate-900\/70,
+[data-theme] .bg-slate-900\/80,
+[data-theme] .bg-slate-900\/90 {
+  background-color: var(--theme-card) !important;
+}
+
+[data-theme] .bg-slate-950\/50,
+[data-theme] .bg-slate-950\/60,
+[data-theme] .bg-slate-950\/70,
+[data-theme] .bg-slate-950\/80 {
+  background-color: var(--theme-card-sub) !important;
+}
+
+[data-theme] .border-slate-800,
+[data-theme] .border-slate-800\/60,
+[data-theme] .border-slate-800\/80,
+[data-theme] .border-slate-700 {
+  border-color: var(--theme-border) !important;
+}
+
+[data-theme] .text-slate-100,
+[data-theme] .text-slate-200 {
+  color: var(--theme-text) !important;
+}
+
+[data-theme] .text-slate-400,
+[data-theme] .text-slate-500 {
+  color: var(--theme-muted) !important;
+}
+
+[data-theme] .bg-indigo-600 {
+  background-color: var(--theme-accent) !important;
+}
+
+[data-theme] .hover\:bg-indigo-500:hover {
+  background-color: var(--theme-accent-hover) !important;
+}
+
+[data-theme] .text-indigo-400,
+[data-theme] .text-indigo-300 {
+  color: var(--theme-highlight) !important;
 }
 
 /* Custom scrollbars */
@@ -23,13 +154,12 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: var(--theme-bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: var(--theme-border);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: var(--theme-accent);
 }
-
