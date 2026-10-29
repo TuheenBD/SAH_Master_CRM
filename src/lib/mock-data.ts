@@ -1,4 +1,12 @@
-import { LeadItem, ExpenseItem, JournalEntryItem, AccountBalance } from './types';
+import { 
+  LeadItem, 
+  ExpenseItem, 
+  JournalEntryItem, 
+  AccountBalance,
+  MasterContact,
+  PersonalAccount,
+  PersonalTransaction
+} from './types';
 
 export const INITIAL_LEADS: LeadItem[] = [
   // BIZMAN MEDIA LEADS
@@ -58,58 +66,60 @@ export const INITIAL_LEADS: LeadItem[] = [
     createdAt: '2026-10-22',
   },
 
-  // ADPRO COMMUNICATIONS LEADS
+  // LINDA RESORT LIMITED LEADS (LUXURY ECO-RESORT & HOSPITALITY)
   {
-    id: 'lead-adp-1',
-    companyCode: 'ADPRO',
-    title: 'bKash Merchant Q4 Regional DOOH Blitz',
-    customerName: 'bKash Limited',
-    contactPerson: 'Tanvir Ahmed (Senior Manager Commercial)',
-    phone: '+8801730445566',
-    whatsapp: '8801730445566',
-    email: 'tanvir.ahmed@bkash.com',
+    id: 'lead-lnd-1',
+    companyCode: 'LINDA',
+    title: 'Standard Chartered Bank Annual Leadership Retreat & Executive Banquet',
+    customerName: 'Standard Chartered Bank (SCB)',
+    contactPerson: 'Farhana Chowdhury (Head of Corporate Communications & Events)',
+    phone: '+8801713009988',
+    whatsapp: '8801713009988',
+    email: 'farhana.chowdhury@sc.com',
     country: 'Bangladesh',
-    pipelineType: 'DOOH_MEDIA_SLOT',
+    pipelineType: 'RESORT_BANQUET_RETREAT',
     stage: 'WON',
-    estimatedValue: 3600000,
+    estimatedValue: 3200000,
     currency: 'BDT',
     probability: 100,
-    expectedCloseDate: '2026-10-25',
-    notepadMarkdown: `### bKash Campaign Execution
-- Booking our Flagship 1 Own LED Board in Motijheel Commercial Area.
-- Sourced 42 Partner Vendor Screens covering divisional hubs: Khulna, Rajshahi, Rangpur, Bogura.
-- Production approved. Invoiced with 50% advance received into Bank A/C.`,
+    expectedCloseDate: '2026-10-28',
+    notepadMarkdown: `### Linda Resort - SCB Corporate Retreat
+- Confirmed 10 Couple Private Pool Villas + 5 Family Villas for executive board members.
+- Grand Banquet Hall reserved for 120 guests with organic farm-to-table banquet catering.
+- 50% deposit (৳ 1,600,000) received into Linda Resort Brac Bank corporate account.`,
     specifics: {
-      ownBoards: 1,
-      vendorBoards: 42,
-      runPeriod: '45 Days',
+      villaUnits: 15,
+      banquetGuests: 120,
+      retreatDuration: '3 Days / 2 Nights',
     },
     createdAt: '2026-10-10',
   },
   {
-    id: 'lead-adp-2',
-    companyCode: 'ADPRO',
-    title: 'Walton Hi-Tech Static Unipole & Billboard Setup',
-    customerName: 'Walton Hi-Tech Industries PLC',
-    contactPerson: 'Engr. Masud Alam (DGM Procurement)',
-    phone: '+8801912334455',
-    whatsapp: '8801912334455',
-    email: 'masud.alam@waltonbd.com',
+    id: 'lead-lnd-2',
+    companyCode: 'LINDA',
+    title: 'High-Net-Worth Investor Timeshare Villa Ownership Share',
+    customerName: 'Dr. Tariqul Islam (HNWI & Healthcare Entrepreneur)',
+    contactPerson: 'Dr. Tariqul Islam',
+    phone: '+8801711223344',
+    whatsapp: '8801711223344',
+    email: 'tariqul.islam@healthhorizon.com',
     country: 'Bangladesh',
-    pipelineType: 'STATIC_BILLBOARD',
-    stage: 'MEETING_SCHEDULED',
-    estimatedValue: 1800000,
+    pipelineType: 'RESORT_TIMESHARE_SHARE',
+    stage: 'NEGOTIATION',
+    estimatedValue: 2500000,
     currency: 'BDT',
-    probability: 50,
-    expectedCloseDate: '2026-12-05',
-    notepadMarkdown: `### Walton Outdoor Hoardings
-- Site survey completed at Dhaka-Mawa Expressway interchange.
-- Structural stability certificate requested for 60ft x 30ft unipole structure.`,
+    probability: 75,
+    expectedCloseDate: '2026-11-15',
+    notepadMarkdown: `### Linda Resort Timeshare Equity Pitch
+- Presentation given on 1-Unit Luxury Couple Private Pool Villa investment model.
+- Reviewing fast-track 9-month execution schedule and 30-day annual complimentary owner stay.
+- Follow-up call scheduled on Sunday for final shareholder deed signing.`,
     specifics: {
-      siteLocation: 'Dhaka-Mawa Expressway',
-      boardDimension: '60ft x 30ft',
+      shareUnits: 1,
+      villaCategory: 'Couple Private Pool Villa',
+      annualReturnEst: '18% Projected Yield',
     },
-    createdAt: '2026-10-26',
+    createdAt: '2026-10-18',
   },
 
   // ARIEL MARKETING & COMMUNICATIONS (EXPORT) LEADS
@@ -233,18 +243,18 @@ export const INITIAL_EXPENSES: ExpenseItem[] = [
   },
   {
     id: 'exp-3',
-    companyCode: 'ADPRO',
-    expenseNumber: 'EXP-ADP-2026-0044',
+    companyCode: 'LINDA',
+    expenseNumber: 'EXP-LND-2026-0044',
     date: '2026-10-26',
     amount: 450000,
     currency: 'BDT',
-    category: 'VENDOR_BOARD_RENTAL',
-    description: 'Wholesale settlement for 18 Vendor screens in North Bengal regional clusters',
-    vendorRecipient: 'Rajshahi Outdoor Network',
-    leadId: 'lead-adp-1',
-    leadTitle: 'bKash Merchant Q4 Regional DOOH Blitz',
-    paidFromAccount: '1020 - Corporate Bank A/C',
-    expenseAccount: '5010 - Vendor Billboard Rental Cost',
+    category: 'RESORT_POOL_FILTRATION',
+    description: 'German swimming pool filtration pump & underwater lighting installation for Couple Villas',
+    vendorRecipient: 'AquaPure Engineering Solutions Ltd',
+    leadId: 'lead-lnd-1',
+    leadTitle: 'Standard Chartered Bank Annual Leadership Retreat & Executive Banquet',
+    paidFromAccount: '1020 - Brac Bank Corporate Resort Operations A/C',
+    expenseAccount: '5010 - Resort Operations & Pool Maintenance',
     isVerified: true,
   },
   {
@@ -308,29 +318,29 @@ export const INITIAL_JOURNAL_ENTRIES: JournalEntryItem[] = [
     ],
   },
   {
-    id: 'je-adp-1',
-    companyCode: 'ADPRO',
-    entryNumber: 'JE-ADP-2026-0062',
+    id: 'je-lnd-1',
+    companyCode: 'LINDA',
+    entryNumber: 'JE-LND-2026-0062',
     date: '2026-10-25',
-    description: 'bKash Merchant Q4 Campaign 50% Contract Advance Received',
-    reference: 'INV-ADP-2026-0041',
+    description: 'Standard Chartered Bank Retreat 50% Contract Advance Received',
+    reference: 'INV-LND-2026-0041',
     isPosted: true,
     lines: [
       {
         id: 'jl-3',
         accountCode: '1020',
-        accountName: 'Main Corporate Operating Bank A/C',
-        debit: 1800000,
+        accountName: 'Brac Bank Corporate Resort Operations A/C',
+        debit: 1600000,
         credit: 0,
-        description: 'Debit Cash at Bank for 50% Campaign Advance',
+        description: 'Debit Cash at Bank for 50% Retreat Advance',
       },
       {
         id: 'jl-4',
         accountCode: '4010',
-        accountName: 'DOOH Media Advertising Revenue',
+        accountName: 'Private Pool Villa & Cottage Accommodation Revenue',
         debit: 0,
-        credit: 1800000,
-        description: 'Credit Revenue Account for booked broadcast run',
+        credit: 1600000,
+        description: 'Credit Revenue Account for booked villa accommodation',
       },
     ],
   },
@@ -363,7 +373,7 @@ export const INITIAL_JOURNAL_ENTRIES: JournalEntryItem[] = [
   },
 ];
 
-export const FINANCIAL_BALANCES: Record<'BIZMAN' | 'ADPRO' | 'ARIELMC', AccountBalance[]> = {
+export const FINANCIAL_BALANCES: Record<'BIZMAN' | 'LINDA' | 'ARIELMC', AccountBalance[]> = {
   BIZMAN: [
     // Assets
     { code: '1010', name: 'Petty Cash in Office Safe', type: 'ASSET', classification: 'CASH_AND_BANK', currency: 'BDT', balance: 185000 },
@@ -387,27 +397,27 @@ export const FINANCIAL_BALANCES: Record<'BIZMAN' | 'ADPRO' | 'ARIELMC', AccountB
     { code: '6030', name: 'Staff Salaries & Field Engineers', type: 'EXPENSE', classification: 'SALARIES_AND_WAGES', currency: 'BDT', balance: 2400000 },
     { code: '6040', name: 'Office Rent & High-Speed Optical Fiber', type: 'EXPENSE', classification: 'OFFICE_RENT_UTILITIES', currency: 'BDT', balance: 1120000 },
   ],
-  ADPRO: [
+  LINDA: [
     // Assets
-    { code: '1010', name: 'Cash on Hand', type: 'ASSET', classification: 'CASH_AND_BANK', currency: 'BDT', balance: 95000 },
-    { code: '1020', name: 'City Bank Corporate A/C', type: 'ASSET', classification: 'CASH_AND_BANK', currency: 'BDT', balance: 3120000 },
-    { code: '1200', name: 'Accounts Receivable (Corporate Brands)', type: 'ASSET', classification: 'ACCOUNTS_RECEIVABLE', currency: 'BDT', balance: 2800000 },
-    { code: '1500', name: '1 Own LED Flagship Display & Structures', type: 'ASSET', classification: 'FIXED_ASSET_EQUIPMENT', currency: 'BDT', balance: 3200000 },
+    { code: '1010', name: 'Front Desk Cash & Petty Vault', type: 'ASSET', classification: 'CASH_AND_BANK', currency: 'BDT', balance: 145000 },
+    { code: '1020', name: 'Brac Bank Corporate Resort Operations A/C', type: 'ASSET', classification: 'CASH_AND_BANK', currency: 'BDT', balance: 4850000 },
+    { code: '1200', name: 'Accounts Receivable (Corporate Retreats & Banquets)', type: 'ASSET', classification: 'ACCOUNTS_RECEIVABLE', currency: 'BDT', balance: 2150000 },
+    { code: '1500', name: 'Resort Land, Private Pool Villas & Eco-Cottages', type: 'ASSET', classification: 'FIXED_ASSET_EQUIPMENT', currency: 'BDT', balance: 45000000 },
     // Liabilities
-    { code: '2010', name: 'Accounts Payable (70+ Vendor Network)', type: 'LIABILITY', classification: 'ACCOUNTS_PAYABLE', currency: 'BDT', balance: 2100000 },
-    { code: '2100', name: 'Government Taxes Payable', type: 'LIABILITY', classification: 'TAXES_PAYABLE', currency: 'BDT', balance: 230000 },
+    { code: '2010', name: 'Accounts Payable (Architects, Landscape & F&B Vendors)', type: 'LIABILITY', classification: 'ACCOUNTS_PAYABLE', currency: 'BDT', balance: 1850000 },
+    { code: '2100', name: 'Government VAT & Tourism Tax Payable', type: 'LIABILITY', classification: 'TAXES_PAYABLE', currency: 'BDT', balance: 310000 },
     // Equity
-    { code: '3010', name: "Owner's Equity Capital", type: 'EQUITY', classification: 'OWNER_CAPITAL', currency: 'BDT', balance: 4000000 },
-    { code: '3020', name: 'Retained Earnings', type: 'EQUITY', classification: 'RETAINED_EARNINGS', currency: 'BDT', balance: 2885000 },
+    { code: '3010', name: "Sponsor Directors & Investor Timeshare Equity", type: 'EQUITY', classification: 'OWNER_CAPITAL', currency: 'BDT', balance: 42000000 },
+    { code: '3020', name: 'Accumulated Retained Operating Surplus', type: 'EQUITY', classification: 'RETAINED_EARNINGS', currency: 'BDT', balance: 7985000 },
     // Revenue
-    { code: '4010', name: 'Countrywide DOOH Network Sales', type: 'REVENUE', classification: 'DOOH_MEDIA_REVENUE', currency: 'BDT', balance: 8900000 },
-    { code: '4020', name: 'Promotional Gifts & Brand Merchandising', type: 'REVENUE', classification: 'EVENT_ACTIVATION_REVENUE', currency: 'BDT', balance: 2150000 },
+    { code: '4010', name: 'Private Pool Villa & Cottage Accommodation Revenue', type: 'REVENUE', classification: 'DOOH_MEDIA_REVENUE', currency: 'BDT', balance: 7850000 },
+    { code: '4020', name: 'Corporate Retreats, Banquets & Organic Dining', type: 'REVENUE', classification: 'EVENT_ACTIVATION_REVENUE', currency: 'BDT', balance: 3450000 },
     // Expenses
-    { code: '5010', name: '70+ Partner Billboard Rental Payouts', type: 'EXPENSE', classification: 'COST_OF_GOODS_SOLD_VENDOR_BOARDS', currency: 'BDT', balance: 5400000 },
-    { code: '5020', name: 'Gift Fabrication & Direct Materials', type: 'EXPENSE', classification: 'COST_OF_GOODS_SOLD_MATERIALS', currency: 'BDT', balance: 980000 },
-    { code: '6010', name: 'Marketing & Business Development', type: 'EXPENSE', classification: 'MARKETING_ENTERTAINMENT', currency: 'BDT', balance: 210000 },
-    { code: '6030', name: 'Personnel & Field Technicians', type: 'EXPENSE', classification: 'SALARIES_AND_WAGES', currency: 'BDT', balance: 1650000 },
-    { code: '6040', name: 'Administrative & Utilities', type: 'EXPENSE', classification: 'OFFICE_RENT_UTILITIES', currency: 'BDT', balance: 870000 },
+    { code: '5010', name: 'Resort Operations, Housekeeping & Pool Maintenance', type: 'EXPENSE', classification: 'COST_OF_GOODS_SOLD_VENDOR_BOARDS', currency: 'BDT', balance: 2650000 },
+    { code: '5020', name: 'F&B Direct Supplies, Organic Sourcing & Kitchen Provisions', type: 'EXPENSE', classification: 'COST_OF_GOODS_SOLD_MATERIALS', currency: 'BDT', balance: 1420000 },
+    { code: '6010', name: 'Digital Guest Acquisition & Timeshare Marketing', type: 'EXPENSE', classification: 'MARKETING_ENTERTAINMENT', currency: 'BDT', balance: 380000 },
+    { code: '6030', name: 'Resort Staff, Chefs, Life-Guards & Hospitality Team', type: 'EXPENSE', classification: 'SALARIES_AND_WAGES', currency: 'BDT', balance: 1850000 },
+    { code: '6040', name: 'Property Landscaping, Solar Utilities & Optical Fiber', type: 'EXPENSE', classification: 'OFFICE_RENT_UTILITIES', currency: 'BDT', balance: 720000 },
   ],
   ARIELMC: [
     // Assets (Denominated in USD)
@@ -476,20 +486,20 @@ export const INITIAL_CONTACTS: MasterContact[] = [
   },
   {
     id: 'cnt-3',
-    fullName: 'Tanvir Ahmed',
-    organization: 'bKash Limited',
-    designation: 'Senior Manager Commercial',
+    fullName: 'Farhana Chowdhury',
+    organization: 'Standard Chartered Bank (SCB)',
+    designation: 'Head of Corporate Communications & Events',
     category: 'BUYER_CLIENT',
-    primaryPhone: '+8801730445566',
-    whatsappNumber: '8801730445566',
-    email: 'tanvir.ahmed@bkash.com',
+    primaryPhone: '+8801713009988',
+    whatsappNumber: '8801713009988',
+    email: 'farhana.chowdhury@sc.com',
     city: 'Dhaka',
     country: 'Bangladesh',
-    companyAffiliation: 'ADPRO',
-    relationshipNotes: 'Campaign won for 42 divisional vendor screens plus Motijheel flagship LED unipole.',
+    companyAffiliation: 'LINDA',
+    relationshipNotes: 'Contract won for 15 Private Pool & Family Villas plus Grand Banquet for 120 guests.',
     isConvertibleToLead: true,
-    convertedLeadId: 'lead-adp-1',
-    tags: ['Fintech', 'Divisional DOOH', 'Adpro Client'],
+    convertedLeadId: 'lead-lnd-1',
+    tags: ['Corporate Retreat', 'Linda Resort Client', 'Banquet'],
     createdAt: '2026-10-15',
   },
 
@@ -549,19 +559,19 @@ export const INITIAL_CONTACTS: MasterContact[] = [
   },
   {
     id: 'cnt-7',
-    fullName: 'Zubair Rahman',
-    organization: 'North Bengal Outdoor Hub',
-    designation: 'General Manager',
+    fullName: 'Arch. Zubair Rahman',
+    organization: 'EcoArchitects & Landscape Studio',
+    designation: 'Principal Architect & Landscaper',
     category: 'VENDOR_BILLBOARD',
     primaryPhone: '+8801715443322',
     whatsappNumber: '8801715443322',
-    email: 'zubair@northbengaloutdoor.com',
-    city: 'Rajshahi',
+    email: 'zubair@ecoarchitects-bd.com',
+    city: 'Dhaka',
     country: 'Bangladesh',
-    companyAffiliation: 'ADPRO',
-    relationshipNotes: 'Partner network covering 18 screens across Rajshahi, Bogura, Rangpur for Adpro campaigns.',
+    companyAffiliation: 'LINDA',
+    relationshipNotes: 'Lead landscape designer for Linda Resort luxury cottages, private swimming pools and organic flora perimeter.',
     isConvertibleToLead: false,
-    tags: ['Vendor Screens', 'Rajshahi', '70+ Partner'],
+    tags: ['Architecture', 'Landscape', 'Linda Resort Partner'],
     createdAt: '2026-08-20',
   },
 
@@ -727,8 +737,8 @@ export const INITIAL_PERSONAL_TRANSACTIONS: PersonalTransaction[] = [
     type: 'INCOME',
     amount: 250000,
     currency: 'BDT',
-    category: 'SALARY_ADPRO',
-    description: 'October General Manager Compensation from Adpro Communications',
+    category: 'SALARY_LINDA_RESORT',
+    description: 'October Executive Director Compensation from Linda Resort Limited',
     accountId: 'pacc-2',
     accountName: 'City Bank Personal Operating A/C',
   },

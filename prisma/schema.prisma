@@ -2,7 +2,7 @@
 // MASTER CRM - Multi-Company Personal Business & Financial Operating System
 // Companies Managed:
 //   1. Bizman Media Limited (DOOH, LED Installation, Events, Billboards, Gifts)
-//   2. Adpro Communications Limited (DOOH, LED, Static Billboards, Activations)
+//   2. Linda Resort Limited (Luxury Eco-Resort Hospitality: Villas, Cottages, Retreats, Shares)
 //   3. Ariel Marketing & Communications Limited (Global B2B/B2C Export: UK/EU/AU/US)
 // ==============================================================================
 
@@ -30,12 +30,13 @@ enum UserRole {
 
 enum CompanyCode {
   BIZMAN  // Bizman Media Limited
-  ADPRO   // Adpro Communications Limited
+  LINDA   // Linda Resort Limited
   ARIELMC // Ariel Marketing & Communications Limited
 }
 
 enum IndustryDomain {
-  DOOH_MEDIA_ADVERTISING // Bizman & Adpro
+  DOOH_MEDIA_ADVERTISING // Bizman Media
+  HOSPITALITY_ECO_RESORT // Linda Resort Limited
   GLOBAL_TRADE_EXPORT     // ArielMC
 }
 
@@ -62,9 +63,9 @@ model Company {
   code            CompanyCode    @unique
   name            String
   legalName       String
-  roleTitle       String         // e.g. "Director & CEO" (Bizman), "General Manager" (Adpro), "Managing Director" (ArielMC)
+  roleTitle       String         // e.g. "Director & CEO" (Bizman), "Executive Director" (Linda Resort), "Managing Director" (ArielMC)
   industry        IndustryDomain
-  baseCurrency    String         @default("BDT") // "BDT" for Bizman/Adpro, "USD" for ArielMC
+  baseCurrency    String         @default("BDT") // "BDT" for Bizman/Linda, "USD" for ArielMC
   secondaryCurrency String?      // e.g. "USD", "EUR", "GBP" for ArielMC
   address         String?
   phone           String?
@@ -189,7 +190,7 @@ model Lead {
   expectedCloseDate   DateTime?
 
   // Domain-Specific Details (Stored in structured JSON for infinite agility)
-  // For Bizman/Adpro: { durationDays: 30, slotCount: 10, targetScreens: ["Dhanmondi-01", "Gulshan-02"], ownVsVendorRatio: "60/40" }
+  // For Bizman: { durationDays: 30, slotCount: 10, targetScreens: ["Dhanmondi-01", "Gulshan-02"], ownVsVendorRatio: "60/40" }
   // For ArielMC: { exportPort: "Chittagong", incoterm: "FOB", targetMarket: "UK", sampleApproved: true, containerSize: "20ft" }
   customDealMetadata  Json?
 
@@ -217,12 +218,12 @@ model Lead {
 }
 
 // ------------------------------------------------------------------------------
-// 3. INVENTORY & ASSET CATALOGS (BIZMAN / ADPRO / ARIELMC)
+// 3. INVENTORY & ASSET CATALOGS (BIZMAN / LINDA / ARIELMC)
 // ------------------------------------------------------------------------------
 
 enum BillboardType {
-  OWN_LED_BOARD        // Bizman has 20, Adpro has 1
-  VENDOR_LED_BOARD     // Bizman has 50+, Adpro has 70+
+  OWN_LED_BOARD        // Bizman has 20 Own Boards
+  VENDOR_LED_BOARD     // Bizman has 50+ Partner Network
   STATIC_BILLBOARD     // Traditional mega sign / rooftop
   UNIPOLE
   EVENT_ASSET_LIGHTING
@@ -236,7 +237,7 @@ enum AssetStatus {
   INACTIVE
 }
 
-// Bizman Media & Adpro Communications: Outdoor Asset Inventory
+// Bizman Media Limited: Outdoor Asset Inventory
 model BillboardAsset {
   id                  String        @id @default(uuid())
   companyId           String
@@ -819,7 +820,7 @@ model Contact {
   email               String?
   city                String?
   country             String          @default("Bangladesh")
-  companyAffiliation  String          @default("GROUP") // "BIZMAN", "ADPRO", "ARIELMC", "PERSONAL", "GROUP"
+  companyAffiliation  String          @default("GROUP") // "BIZMAN", "LINDA", "ARIELMC", "PERSONAL", "GROUP"
   relationshipNotes   String?         @db.Text
   isConvertibleToLead Boolean         @default(true)
   convertedLeadId     String?

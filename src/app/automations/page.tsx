@@ -52,23 +52,23 @@ export default function AutomationsPage() {
     },
     {
       id: 'seq-2',
-      company: 'ADPRO',
-      name: 'Regional DOOH & Activation Onboarding Drip',
+      company: 'LINDA',
+      name: 'Corporate Retreat & Investor Timeshare Onboarding Drip',
       triggerStage: 'MEETING_DEMO_SCHEDULED',
-      activeEnrolled: 4,
+      activeEnrolled: 6,
       status: 'ACTIVE',
       steps: [
         {
           step: 1,
           delay: 'Immediate',
-          subject: 'Adpro Communications: Meeting Confirmation & Regional Footprint Specs',
-          preview: 'Confirming our discussion regarding the 70+ partner screen activation blitz...',
+          subject: 'Linda Resort Limited: Executive Retreat Proposal & Villa Deck',
+          preview: 'Thank you for your interest in Linda Resort. Attached is our Fast-Track Execution Plan & Villa Portfolio...',
         },
         {
           step: 2,
           delay: '2 Days after Step 1',
-          subject: 'Case Study: 300% Engagement Boost via Divisional Screen Synchronization',
-          preview: 'Sharing a quick snapshot of how recent regional campaigns achieved maximum reach...',
+          subject: 'Linda Resort: High-Net-Worth Investor Timeshare Model & Projected 18% Yield',
+          preview: 'Exploring the passive hospitality equity returns on our 1-Unit Couple Private Pool Villas...',
         },
       ],
     },
@@ -124,7 +124,7 @@ export default function AutomationsPage() {
               <div className="flex items-center gap-2.5">
                 <span className={`px-2 py-0.5 text-[10px] font-bold rounded ${
                   seq.company === 'BIZMAN' ? 'bg-blue-950 text-blue-400 border border-blue-800' :
-                  seq.company === 'ADPRO' ? 'bg-orange-950 text-orange-400 border border-orange-800' :
+                  seq.company === 'LINDA' ? 'bg-[#FFF3D6] text-[#8A5A00] border border-[#FBE0A8]' :
                   'bg-emerald-950 text-emerald-400 border border-emerald-800'
                 }`}>
                   {seq.company}

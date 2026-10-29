@@ -67,11 +67,11 @@ export default function Sidebar() {
       {/* Mobile Top Navbar */}
       <div className="lg:hidden sticky top-0 z-50 flex items-center justify-between border-b border-[#2C5240] bg-[#1F3A2E] px-4 py-3 text-white">
         <div className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-full bg-[#C8A96A] animate-pulse" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[var(--sidebar-active-text)] animate-pulse" />
           <span className="font-extrabold text-sm tracking-wide">
-            MASTER_<span style={{ color: '#C8A96A' }}>CRM</span>
+            MASTER_<span className="text-[var(--sidebar-active-text)] font-extrabold">CRM</span>
           </span>
-          <span className="text-[10px] rounded bg-[#2C5240] text-[#CFE0D5] px-1.5 py-0.5 font-mono">v2.4</span>
+          <span className="text-[10px] rounded bg-[var(--sidebar-hover)] text-[var(--sidebar-muted)] px-1.5 py-0.5 font-mono">v2.4</span>
         </div>
 
         <button
@@ -106,8 +106,8 @@ export default function Sidebar() {
                 <div>
                   <div className="font-extrabold text-sm text-white tracking-tight flex items-center gap-1.5">
                     <span>MASTER_</span>
-                    <span style={{ color: '#C8A96A' }}>CRM</span>
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#C8A96A]" />
+                    <span className="text-[var(--sidebar-active-text)] font-extrabold">CRM</span>
+                    <span className="h-1.5 w-1.5 rounded-full bg-[var(--sidebar-active-text)]" />
                   </div>
                   <div className="text-[10px] text-[#CFE0D5] font-mono tracking-wider">EXECUTIVE OS</div>
                 </div>

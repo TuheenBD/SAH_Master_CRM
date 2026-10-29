@@ -17,7 +17,7 @@ import { CompanyCode } from '@/lib/types';
 
 interface TaskItem {
   id: string;
-  company: 'BIZMAN' | 'ADPRO' | 'ARIELMC';
+  company: 'BIZMAN' | 'LINDA' | 'ARIELMC';
   title: string;
   dueDate: string;
   dueTime: string;
@@ -43,13 +43,13 @@ export default function CalendarPage() {
     },
     {
       id: 'task-2',
-      company: 'ADPRO',
-      title: 'Inspect Motijheel Shapla Chattar Unipole LED display module wiring',
+      company: 'LINDA',
+      title: 'Review architectural blueprints & pool plumbing for Couple Private Pool Villas',
       dueDate: 'Today',
       dueTime: '5:00 PM',
       priority: 'HIGH',
       status: 'PENDING',
-      relatedDeal: 'Adpro Flagship Maintenance',
+      relatedDeal: 'Linda Resort Fast-Track 9-Month Execution Plan',
     },
     {
       id: 'task-3',
@@ -140,7 +140,7 @@ export default function CalendarPage() {
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <span className={`px-2 py-0.5 text-[10px] font-bold rounded ${
                         t.company === 'BIZMAN' ? 'bg-blue-950 text-blue-400 border border-blue-800' :
-                        t.company === 'ADPRO' ? 'bg-orange-950 text-orange-400 border border-orange-800' :
+                        t.company === 'LINDA' ? 'bg-[#FFF3D6] text-[#8A5A00] border border-[#FBE0A8]' :
                         'bg-emerald-950 text-emerald-400 border border-emerald-800'
                       }`}>
                         {t.company}

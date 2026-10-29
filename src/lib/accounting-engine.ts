@@ -29,7 +29,7 @@ export interface BalanceSheetStatement {
   isBalanced: boolean;
 }
 
-export function generatePLStatement(company: 'BIZMAN' | 'ADPRO' | 'ARIELMC'): PLStatement {
+export function generatePLStatement(company: 'BIZMAN' | 'LINDA' | 'ARIELMC'): PLStatement {
   const accounts = FINANCIAL_BALANCES[company] || [];
 
   const revenueAccounts = accounts.filter(a => a.type === 'REVENUE');
@@ -69,7 +69,7 @@ export function generatePLStatement(company: 'BIZMAN' | 'ADPRO' | 'ARIELMC'): PL
   };
 }
 
-export function generateBalanceSheet(company: 'BIZMAN' | 'ADPRO' | 'ARIELMC'): BalanceSheetStatement {
+export function generateBalanceSheet(company: 'BIZMAN' | 'LINDA' | 'ARIELMC'): BalanceSheetStatement {
   const accounts = FINANCIAL_BALANCES[company] || [];
 
   const assetAccounts = accounts.filter(a => a.type === 'ASSET');

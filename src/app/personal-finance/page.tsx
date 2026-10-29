@@ -362,7 +362,7 @@ export default function PersonalFinancePage() {
                   {txType === 'INCOME' ? (
                     <>
                       <option value="SALARY_BIZMAN">Bizman Media Executive Salary</option>
-                      <option value="SALARY_ADPRO">Adpro Communications GM Salary</option>
+                      <option value="SALARY_LINDA_RESORT">Linda Resort Executive Director Compensation</option>
                       <option value="DIRECTOR_DIVIDEND_ARIELMC">ArielMC Export Dividend</option>
                       <option value="CONSULTING_FEE">Media / Sourcing Advisory Fee</option>
                       <option value="INVESTMENT_INTEREST">DPS / FDR Interest Accrued</option>

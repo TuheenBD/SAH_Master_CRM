@@ -82,7 +82,7 @@ export default function LeadsPage() {
             Customer & Deal Control
           </h1>
           <p className="text-xs text-slate-400">
-            Managing DOOH campaigns (Bizman/Adpro) and international export containers (ArielMC)
+            Managing DOOH campaigns (Bizman Media), luxury eco-resort hospitality (Linda Resort) and international export containers (ArielMC)
           </p>
         </div>
 
@@ -122,7 +122,7 @@ export default function LeadsPage() {
                   <div className="flex items-center justify-between text-xs">
                     <span className={`px-2 py-0.5 text-[10px] font-bold rounded ${
                       lead.companyCode === 'BIZMAN' ? 'bg-blue-950 text-blue-400 border border-blue-800' :
-                      lead.companyCode === 'ADPRO' ? 'bg-orange-950 text-orange-400 border border-orange-800' :
+                      lead.companyCode === 'LINDA' ? 'bg-[#FFF3D6] text-[#8A5A00] border border-[#FBE0A8]' :
                       'bg-emerald-950 text-emerald-400 border border-emerald-800'
                     }`}>
                       {lead.companyCode}
@@ -156,7 +156,7 @@ export default function LeadsPage() {
                 <div className="flex items-center gap-2">
                   <span className={`px-2 py-0.5 text-xs font-bold rounded ${
                     selectedLead.companyCode === 'BIZMAN' ? 'bg-blue-950 text-blue-400 border border-blue-800' :
-                    selectedLead.companyCode === 'ADPRO' ? 'bg-orange-950 text-orange-400 border border-orange-800' :
+                    selectedLead.companyCode === 'LINDA' ? 'bg-[#FFF3D6] text-[#8A5A00] border border-[#FBE0A8]' :
                     'bg-emerald-950 text-emerald-400 border border-emerald-800'
                   }`}>
                     {selectedLead.companyCode}

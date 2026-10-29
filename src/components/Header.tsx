@@ -18,7 +18,8 @@ import {
   ChevronDown,
   Sparkles,
   Palette,
-  Check
+  Check,
+  Palmtree
 } from 'lucide-react';
 import { CompanyCode, COMPANIES } from '@/lib/types';
 import { useTheme, THEMES } from '@/lib/theme';
@@ -69,7 +70,7 @@ export default function Header() {
             <div className="flex items-center gap-1.5 text-[10px] text-[#CFE0D5] font-mono uppercase tracking-wider">
               <span>{meta.code === 'CONSOLIDATED' ? 'GROUP' : meta.code}</span>
               <span>/</span>
-              <span style={{ color: '#C8A96A' }} className="font-bold">{getPageTitle()}</span>
+              <span className="text-[var(--header-accent)] font-bold">{getPageTitle()}</span>
             </div>
             <h1 className="text-sm sm:text-base font-extrabold text-white tracking-tight">
               {getPageTitle()}
@@ -95,9 +96,9 @@ export default function Header() {
               >
                 {code === 'CONSOLIDATED' && <Layers className="h-3.5 w-3.5" />}
                 {code === 'BIZMAN' && <Tv2 className="h-3.5 w-3.5" />}
-                {code === 'ADPRO' && <Building2 className="h-3.5 w-3.5" />}
+                {code === 'LINDA' && <Palmtree className="h-3.5 w-3.5" />}
                 {code === 'ARIELMC' && <Globe2 className="h-3.5 w-3.5" />}
-                <span>{code === 'CONSOLIDATED' ? 'ALL ENTITIES' : code}</span>
+                <span>{code === 'CONSOLIDATED' ? 'ALL ENTITIES' : code === 'LINDA' ? 'LINDA RESORT' : code}</span>
               </button>
             );
           })}

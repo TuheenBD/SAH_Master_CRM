@@ -3,7 +3,7 @@ import { PrismaClient, CompanyCode, IndustryDomain, AccountType, AccountClassifi
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Seeding Master CRM Database for Bizman, Adpro, and ArielMC...');
+  console.log('🌱 Seeding Master CRM Database for Bizman, Linda Resort, and ArielMC...');
 
   // 1. Create Superadmin User
   const adminUser = await prisma.user.upsert({
@@ -40,22 +40,24 @@ async function main() {
     },
   });
 
-  const adpro = await prisma.company.upsert({
-    where: { code: CompanyCode.ADPRO },
+  const linda = await prisma.company.upsert({
+    where: { code: CompanyCode.LINDA },
     update: {},
     create: {
-      code: CompanyCode.ADPRO,
-      name: 'Adpro Communications Limited',
-      legalName: 'Adpro Communications Limited',
-      roleTitle: 'General Manager',
-      industry: IndustryDomain.DOOH_MEDIA_ADVERTISING,
+      code: CompanyCode.LINDA,
+      name: 'Linda Resort Limited',
+      legalName: 'Linda Resort Limited',
+      roleTitle: 'Executive Director',
+      industry: IndustryDomain.HOSPITALITY_ECO_RESORT,
       baseCurrency: 'BDT',
       settings: {
-        invoicePrefix: 'INV-ADP',
-        orderPrefix: 'ORD-ADP',
-        expensePrefix: 'EXP-ADP',
-        ownBoardsCount: 1,
-        vendorBoardsCount: 70,
+        invoicePrefix: 'INV-LND',
+        orderPrefix: 'ORD-LND',
+        expensePrefix: 'EXP-LND',
+        villasCount: 10,
+        cottagesCount: 10,
+        banquetCapacity: 500,
+        website: 'www.lindaresort.com',
       },
     },
   });
@@ -82,7 +84,7 @@ async function main() {
   });
 
   // Link User to all 3 Companies
-  const companies = [bizman, adpro, arielmc];
+  const companies = [bizman, linda, arielmc];
   for (const comp of companies) {
     await prisma.companyUser.upsert({
       where: {

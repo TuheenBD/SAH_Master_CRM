@@ -1,12 +1,13 @@
-export type CompanyCode = 'CONSOLIDATED' | 'BIZMAN' | 'ADPRO' | 'ARIELMC';
+export type CompanyCode = 'CONSOLIDATED' | 'BIZMAN' | 'LINDA' | 'ARIELMC';
 
 export interface CompanyMeta {
   code: CompanyCode;
   name: string;
   role: string;
   industry: string;
+  website: string;
   currency: string;
-  accentColor: string;
+  paletteDescription: string;
   stats: {
     label: string;
     value: string;
@@ -16,53 +17,57 @@ export interface CompanyMeta {
 export const COMPANIES: Record<CompanyCode, CompanyMeta> = {
   CONSOLIDATED: {
     code: 'CONSOLIDATED',
-    name: 'Consolidated Master View',
+    name: 'Consolidated Executive Master View',
     role: 'Group Executive Overview',
-    industry: 'Media, Communications & Global Trade',
+    industry: 'Media DOOH, Luxury Eco-Resort Hospitality & Global Export Trade',
+    website: 'Executive OS',
     currency: 'USD/BDT',
-    accentColor: 'indigo',
+    paletteDescription: 'Royal Green, Bottle Green, Imperial Gold & Ivory White',
     stats: [
-      { label: 'Active Companies', value: '3 Entities' },
-      { label: 'Consolidated Deals', value: '38 Active' },
-      { label: 'Consolidated YTD Revenue', value: '৳ 4.82 Cr / $128K' },
+      { label: 'Operating Entities', value: '3 Companies' },
+      { label: 'Consolidated Active Deals', value: '42 Deals' },
+      { label: 'Consolidated YTD Revenue', value: '৳ 5.40 Cr / $198K' },
     ],
   },
   BIZMAN: {
     code: 'BIZMAN',
     name: 'Bizman Media Limited',
     role: 'Director & CEO',
-    industry: 'DOOH, LED Installation, Static Billboards, Events, Gifts & Activations',
+    industry: 'DOOH Countrywide (20 Own LED, 50+ Vendor), Static Billboards, Events & Activations',
+    website: 'www.bizmanbd.com',
     currency: 'BDT',
-    accentColor: 'blue',
+    paletteDescription: 'Bottle Green (#1F3A2E), Imperial Gold (#C8A96A) & Ivory White',
     stats: [
-      { label: 'Own LED Boards', value: '20 Displays' },
-      { label: 'Partner Vendor Boards', value: '50+ Countrywide' },
-      { label: 'Active Campaigns', value: '14 Brands' },
+      { label: 'Own LED Displays', value: '20 Premium Boards' },
+      { label: 'Partner Vendor Boards', value: '50+ Nationwide' },
+      { label: 'Active Campaigns', value: '16 Brands' },
     ],
   },
-  ADPRO: {
-    code: 'ADPRO',
-    name: 'Adpro Communications Limited',
-    role: 'General Manager',
-    industry: 'DOOH Countrywide, LED Installation, Static Billboards, Gifts & Activations',
+  LINDA: {
+    code: 'LINDA',
+    name: 'Linda Resort Limited',
+    role: 'Executive Director',
+    industry: 'Luxury Eco-Resort: Private Pool Villas, Family Cottages, Banquet Retreats & Investor Shares',
+    website: 'www.lindaresort.com',
     currency: 'BDT',
-    accentColor: 'orange',
+    paletteDescription: 'Bottle Green (#1F3A2E), Imperial Gold (#C8A96A) & Ivory White',
     stats: [
-      { label: 'Own LED Boards', value: '1 Premium Screen' },
-      { label: 'Partner Vendor Boards', value: '70+ Nationwide' },
-      { label: 'Active Activations', value: '9 Projects' },
+      { label: 'Private Pool Villas', value: 'Couple & Family Villas' },
+      { label: 'Corporate Retreats', value: 'Banquet & Day-Out Hub' },
+      { label: 'Investor Timeshare', value: 'Active Share Sales' },
     ],
   },
   ARIELMC: {
     code: 'ARIELMC',
     name: 'Ariel Marketing & Communications Limited',
     role: 'Managing Director',
-    industry: 'Global B2B/B2C Export: UK, EU, Australia & US (Jute, Leather, Textiles, Ceramics)',
+    industry: 'Global B2B/B2C Export (UK, EU, AU, US): Jute, Leather, Ceramics, Pottery & Home Textiles',
+    website: 'www.arielmc.com',
     currency: 'USD',
-    accentColor: 'emerald',
+    paletteDescription: 'Royal Green (#1F3A2E), Imperial Gold (#C8A96A) & Ivory White',
     stats: [
-      { label: 'Key Export Markets', value: 'UK, EU, AU, US' },
-      { label: 'Active Export Shipments', value: '7 In Transit' },
+      { label: 'Export Markets', value: 'UK, EU, US, Australia' },
+      { label: 'Active Shipments', value: '7 In Transit' },
       { label: 'Core Categories', value: 'Jute, Leather, Ceramics' },
     ],
   },
@@ -79,7 +84,7 @@ export type PipelineStage =
 
 export interface LeadItem {
   id: string;
-  companyCode: 'BIZMAN' | 'ADPRO' | 'ARIELMC';
+  companyCode: 'BIZMAN' | 'LINDA' | 'ARIELMC';
   title: string;
   customerName: string;
   contactPerson: string;
@@ -100,7 +105,7 @@ export interface LeadItem {
 
 export interface ExpenseItem {
   id: string;
-  companyCode: 'BIZMAN' | 'ADPRO' | 'ARIELMC';
+  companyCode: 'BIZMAN' | 'LINDA' | 'ARIELMC';
   expenseNumber: string;
   date: string;
   amount: number;
@@ -128,7 +133,7 @@ export interface JournalLineItem {
 
 export interface JournalEntryItem {
   id: string;
-  companyCode: 'BIZMAN' | 'ADPRO' | 'ARIELMC';
+  companyCode: 'BIZMAN' | 'LINDA' | 'ARIELMC';
   entryNumber: string;
   date: string;
   description: string;
@@ -170,7 +175,7 @@ export interface MasterContact {
   email: string;
   city: string;
   country: string;
-  companyAffiliation: 'BIZMAN' | 'ADPRO' | 'ARIELMC' | 'PERSONAL' | 'GROUP';
+  companyAffiliation: 'BIZMAN' | 'LINDA' | 'ARIELMC' | 'PERSONAL' | 'GROUP';
   relationshipNotes: string;
   isConvertibleToLead: boolean;
   convertedLeadId?: string;
@@ -192,17 +197,15 @@ export interface PersonalAccount {
   currency: 'BDT' | 'USD';
   currentBalance: number;
   accountNumberMasked: string;
-  isLiability?: boolean; // e.g. Credit Card balance due
+  isLiability?: boolean;
 }
 
 export type PersonalTxCategory = 
-  // Inflow (Income)
   | 'SALARY_BIZMAN'
-  | 'SALARY_ADPRO'
+  | 'SALARY_LINDA_RESORT'
   | 'DIRECTOR_DIVIDEND_ARIELMC'
   | 'CONSULTING_FEE'
   | 'INVESTMENT_INTEREST'
-  // Outflow (Expenses)
   | 'HOUSING_RENT'
   | 'FAMILY_LIVING'
   | 'GROCERIES_FOOD'
@@ -225,5 +228,3 @@ export interface PersonalTransaction {
   accountName: string;
   notes?: string;
 }
-
-

@@ -34,7 +34,7 @@ export default function ReportsPage() {
   const [selectedReport, setSelectedReport] = useState<ReportType>('CONSOLIDATED_EXECUTIVE');
 
   const plBizman = generatePLStatement('BIZMAN');
-  const plAdpro = generatePLStatement('ADPRO');
+  const plLinda = generatePLStatement('LINDA');
   const plAriel = generatePLStatement('ARIELMC');
 
   const handlePrint = () => {
@@ -122,7 +122,7 @@ export default function ReportsPage() {
             <div>
               <div className="text-xs uppercase tracking-widest text-indigo-400 font-bold">Standard Management Framework &bull; Report 01</div>
               <h2 className="text-xl font-extrabold text-white mt-1 print:text-black">Consolidated Group Financial & Operating Brief</h2>
-              <p className="text-xs text-slate-400">Bizman Media Limited &bull; Adpro Communications Limited &bull; Ariel Marketing & Communications</p>
+              <p className="text-xs text-slate-400">Bizman Media Limited &bull; Linda Resort Limited &bull; Ariel Marketing & Communications</p>
             </div>
             <div className="text-right text-xs font-mono text-slate-400">
               <div>Period: YTD 2026</div>
@@ -137,7 +137,7 @@ export default function ReportsPage() {
                 <tr>
                   <th className="py-3 px-4">Financial KPI</th>
                   <th className="py-3 px-4">Bizman Media Ltd (BDT)</th>
-                  <th className="py-3 px-4">Adpro Comm Ltd (BDT)</th>
+                  <th className="py-3 px-4">Linda Resort Ltd (BDT)</th>
                   <th className="py-3 px-4">ArielMC Ltd (USD)</th>
                   <th className="py-3 px-4 text-right">Consolidated Group Impact</th>
                 </tr>
@@ -146,37 +146,37 @@ export default function ReportsPage() {
                 <tr className="hover:bg-slate-800/30">
                   <td className="py-3 px-4 font-sans font-semibold text-slate-200 print:text-black">Recognized Operating Revenue</td>
                   <td className="py-3 px-4 text-slate-100">৳ {plBizman.totalRevenue.toLocaleString()}</td>
-                  <td className="py-3 px-4 text-slate-100">৳ {plAdpro.totalRevenue.toLocaleString()}</td>
+                  <td className="py-3 px-4 text-slate-100">৳ {plLinda.totalRevenue.toLocaleString()}</td>
                   <td className="py-3 px-4 text-slate-100">${plAriel.totalRevenue.toLocaleString()}</td>
-                  <td className="py-3 px-4 text-right font-bold text-indigo-400">৳ 2.51 Cr + $198K</td>
+                  <td className="py-3 px-4 text-right font-bold text-indigo-400">৳ 2.75 Cr + $198K</td>
                 </tr>
                 <tr className="hover:bg-slate-800/30">
-                  <td className="py-3 px-4 font-sans text-slate-300">Cost of Goods Sold (Vendor Screens & Materials)</td>
+                  <td className="py-3 px-4 font-sans text-slate-300">Cost of Goods Sold (Vendor Screens, Resort Ops & Materials)</td>
                   <td className="py-3 px-4 text-rose-400">-৳ {plBizman.cogsTotal.toLocaleString()}</td>
-                  <td className="py-3 px-4 text-rose-400">-৳ {plAdpro.cogsTotal.toLocaleString()}</td>
+                  <td className="py-3 px-4 text-rose-400">-৳ {plLinda.cogsTotal.toLocaleString()}</td>
                   <td className="py-3 px-4 text-rose-400">-${plAriel.cogsTotal.toLocaleString()}</td>
-                  <td className="py-3 px-4 text-right text-rose-400 font-bold">-৳ 1.37 Cr - $125K</td>
+                  <td className="py-3 px-4 text-right text-rose-400 font-bold">-৳ 1.14 Cr - $125K</td>
                 </tr>
                 <tr className="bg-slate-950/40 font-bold">
-                  <td className="py-3 px-4 font-sans text-emerald-400">Gross Profit (Post Wholesale Payouts)</td>
+                  <td className="py-3 px-4 font-sans text-emerald-400">Gross Operating Profit</td>
                   <td className="py-3 px-4 text-emerald-400">৳ {plBizman.grossProfit.toLocaleString()} ({plBizman.grossMarginPercent.toFixed(1)}%)</td>
-                  <td className="py-3 px-4 text-emerald-400">৳ {plAdpro.grossProfit.toLocaleString()} ({plAdpro.grossMarginPercent.toFixed(1)}%)</td>
+                  <td className="py-3 px-4 text-emerald-400">৳ {plLinda.grossProfit.toLocaleString()} ({plLinda.grossMarginPercent.toFixed(1)}%)</td>
                   <td className="py-3 px-4 text-emerald-400">${plAriel.grossProfit.toLocaleString()} ({plAriel.grossMarginPercent.toFixed(1)}%)</td>
-                  <td className="py-3 px-4 text-right text-emerald-400">৳ 1.14 Cr + $72.8K</td>
+                  <td className="py-3 px-4 text-right text-emerald-400">৳ 1.61 Cr + $72.8K</td>
                 </tr>
                 <tr className="hover:bg-slate-800/30">
-                  <td className="py-3 px-4 font-sans text-slate-300">Total Operating Expenses (SG&A)</td>
+                  <td className="py-3 px-4 font-sans text-slate-300">Total Operating Expenses (SG&A, Personnel & Utilities)</td>
                   <td className="py-3 px-4 text-slate-400">-৳ {plBizman.operatingExpensesTotal.toLocaleString()}</td>
-                  <td className="py-3 px-4 text-slate-400">-৳ {plAdpro.operatingExpensesTotal.toLocaleString()}</td>
+                  <td className="py-3 px-4 text-slate-400">-৳ {plLinda.operatingExpensesTotal.toLocaleString()}</td>
                   <td className="py-3 px-4 text-slate-400">-${plAriel.operatingExpensesTotal.toLocaleString()}</td>
-                  <td className="py-3 px-4 text-right text-slate-400">-৳ 68.9L - $40.7K</td>
+                  <td className="py-3 px-4 text-right text-slate-400">-৳ 70.9L - $40.7K</td>
                 </tr>
                 <tr className="bg-indigo-950/40 border-t-2 border-indigo-500 font-extrabold text-sm">
                   <td className="py-3 px-4 font-sans text-white print:text-black">Net Operating Profit (EBITDA)</td>
                   <td className="py-3 px-4 text-emerald-400">৳ {plBizman.netProfit.toLocaleString()} ({plBizman.netMarginPercent.toFixed(1)}%)</td>
-                  <td className="py-3 px-4 text-emerald-400">৳ {plAdpro.netProfit.toLocaleString()} ({plAdpro.netMarginPercent.toFixed(1)}%)</td>
+                  <td className="py-3 px-4 text-emerald-400">৳ {plLinda.netProfit.toLocaleString()} ({plLinda.netMarginPercent.toFixed(1)}%)</td>
                   <td className="py-3 px-4 text-emerald-400">${plAriel.netProfit.toLocaleString()} ({plAriel.netMarginPercent.toFixed(1)}%)</td>
-                  <td className="py-3 px-4 text-right text-emerald-400">৳ 72.85 Lakhs + $32.1K</td>
+                  <td className="py-3 px-4 text-right text-emerald-400">৳ 90.35 Lakhs + $32.1K</td>
                 </tr>
               </tbody>
             </table>
@@ -221,7 +221,7 @@ export default function ReportsPage() {
                       <td className="py-3.5 px-4 font-sans font-bold">
                         <span className={`px-2 py-0.5 text-[10px] rounded ${
                           lead.companyCode === 'BIZMAN' ? 'bg-blue-950 text-blue-400 border border-blue-800' :
-                          lead.companyCode === 'ADPRO' ? 'bg-orange-950 text-orange-400 border border-orange-800' :
+                          lead.companyCode === 'LINDA' ? 'bg-[#FFF3D6] text-[#8A5A00] border border-[#FBE0A8]' :
                           'bg-emerald-950 text-emerald-400 border border-emerald-800'
                         }`}>
                           {lead.companyCode}
@@ -260,19 +260,19 @@ export default function ReportsPage() {
           <div className="border-b border-slate-800 pb-4">
             <div className="text-xs uppercase tracking-widest text-indigo-400 font-bold">Standard Management Framework &bull; Report 03</div>
             <h2 className="text-xl font-extrabold text-white mt-1">DOOH Screen Network Utilization & Vendor Payout Audit</h2>
-            <p className="text-xs text-slate-400">Managing Bizman (20 Own + 50+ Vendor Screens) and Adpro (1 Own + 70+ Vendor Screens)</p>
+            <p className="text-xs text-slate-400">Bizman Media Limited (20 Own LED Boards + 50+ Countrywide Partner Vendor Screens)</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="rounded-lg bg-slate-950 p-4 border border-slate-800">
               <div className="text-xs text-slate-400">Own LED Displays (High Margin Asset)</div>
-              <div className="mt-1 text-2xl font-bold text-white font-mono">21 Screens</div>
-              <div className="text-xs text-emerald-400 mt-1">Bizman: 20 Displays &bull; Adpro: 1 Premium Display</div>
+              <div className="mt-1 text-2xl font-bold text-white font-mono">20 Screens</div>
+              <div className="text-xs text-emerald-400 mt-1">Prime Dhaka Hubs (Dhanmondi, Gulshan, Motijheel)</div>
             </div>
             <div className="rounded-lg bg-slate-950 p-4 border border-slate-800">
               <div className="text-xs text-slate-400">Partner Vendor Network</div>
-              <div className="mt-1 text-2xl font-bold text-orange-400 font-mono">120+ Screens</div>
-              <div className="text-xs text-slate-400 mt-1">Bizman: 50+ Countrywide &bull; Adpro: 70+ Regional</div>
+              <div className="mt-1 text-2xl font-bold text-orange-400 font-mono">50+ Screens</div>
+              <div className="text-xs text-slate-400 mt-1">Countrywide Divisional Clusters</div>
             </div>
             <div className="rounded-lg bg-slate-950 p-4 border border-slate-800">
               <div className="text-xs text-slate-400">Overall Slot Utilization Rate</div>

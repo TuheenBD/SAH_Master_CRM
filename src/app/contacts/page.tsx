@@ -71,14 +71,14 @@ export default function ContactsPage() {
     email: '',
     city: 'Dhaka',
     country: 'Bangladesh',
-    companyAffiliation: 'BIZMAN' as 'BIZMAN' | 'ADPRO' | 'ARIELMC' | 'PERSONAL' | 'GROUP',
+    companyAffiliation: 'BIZMAN' as 'BIZMAN' | 'LINDA' | 'ARIELMC' | 'PERSONAL' | 'GROUP',
     relationshipNotes: '',
     tags: 'Media, Corporate',
     isConvertibleToLead: true,
   });
 
   // Lead Conversion State
-  const [targetCompany, setTargetCompany] = useState<'BIZMAN' | 'ADPRO' | 'ARIELMC'>('BIZMAN');
+  const [targetCompany, setTargetCompany] = useState<'BIZMAN' | 'LINDA' | 'ARIELMC'>('BIZMAN');
   const [dealTitle, setDealTitle] = useState<string>('');
   const [dealValue, setDealValue] = useState<string>('');
   const [pipelineType, setPipelineType] = useState<string>('DOOH_MEDIA_SLOT');
@@ -208,9 +208,9 @@ export default function ContactsPage() {
   const handleOpenConvert = (contact: MasterContact) => {
     setConvertingContact(contact);
     setDealTitle(`${contact.organization} - New Commercial Project`);
-    setTargetCompany(contact.companyAffiliation === 'ARIELMC' ? 'ARIELMC' : contact.companyAffiliation === 'ADPRO' ? 'ADPRO' : 'BIZMAN');
-    setDealValue('600000');
-    setPipelineType(contact.companyAffiliation === 'ARIELMC' ? 'EXPORT_JUTE' : 'DOOH_MEDIA_SLOT');
+    setTargetCompany(contact.companyAffiliation === 'ARIELMC' ? 'ARIELMC' : contact.companyAffiliation === 'LINDA' ? 'LINDA' : 'BIZMAN');
+    setDealValue(contact.companyAffiliation === 'LINDA' ? '2500000' : '600000');
+    setPipelineType(contact.companyAffiliation === 'ARIELMC' ? 'EXPORT_JUTE' : contact.companyAffiliation === 'LINDA' ? 'RESORT_BANQUET_RETREAT' : 'DOOH_MEDIA_SLOT');
     setConversionSuccess(false);
   };
 
@@ -774,7 +774,7 @@ export default function ContactsPage() {
                     className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-slate-200 focus:outline-none focus:border-indigo-500"
                   >
                     <option value="BIZMAN">Bizman Media Limited</option>
-                    <option value="ADPRO">Adpro Communications Limited</option>
+                    <option value="LINDA">Linda Resort Limited</option>
                     <option value="ARIELMC">Ariel Marketing & Communications</option>
                     <option value="PERSONAL">Personal / Family</option>
                     <option value="GROUP">Group / All Companies</option>
@@ -867,7 +867,7 @@ export default function ContactsPage() {
                     className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-slate-200 focus:outline-none focus:border-indigo-500"
                   >
                     <option value="BIZMAN">Bizman Media Limited (DOOH / Static / Events)</option>
-                    <option value="ADPRO">Adpro Communications Limited (DOOH / Activations)</option>
+                    <option value="LINDA">Linda Resort Limited (Luxury Eco-Resort / Villas)</option>
                     <option value="ARIELMC">Ariel Marketing & Communications (Global Export)</option>
                   </select>
                 </div>

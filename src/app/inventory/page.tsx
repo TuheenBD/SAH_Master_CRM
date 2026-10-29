@@ -13,7 +13,10 @@ import {
   Plus,
   Radio,
   Clock,
-  Sparkles
+  Sparkles,
+  Palmtree,
+  Hotel,
+  Users
 } from 'lucide-react';
 import { CompanyCode } from '@/lib/types';
 
@@ -21,14 +24,14 @@ export default function InventoryPage() {
   const searchParams = useSearchParams();
   const activeCompany = (searchParams.get('company') as CompanyCode) || 'CONSOLIDATED';
 
-  // Sample DOOH Assets for Bizman Media and Adpro
+  // DOOH Assets for Bizman Media Limited (20 Own + 50+ Partner Network)
   const billboards = [
     {
       id: 'bb-1',
       company: 'BIZMAN',
       code: 'BIZ-LED-DHA-01',
       name: 'Dhanmondi 27 Crossing Digital Display',
-      type: 'OWN_LED_BOARD',
+      type: 'OWN_LED_BOARD (20 Fleet)',
       location: 'Mirpur Road x Dhanmondi 27 Crossing, Dhaka',
       dimensions: '40ft x 20ft',
       dailyImpressions: 185000,
@@ -42,7 +45,7 @@ export default function InventoryPage() {
       company: 'BIZMAN',
       code: 'BIZ-LED-GUL-02',
       name: 'Gulshan 2 Circle North Facing Screen',
-      type: 'OWN_LED_BOARD',
+      type: 'OWN_LED_BOARD (20 Fleet)',
       location: 'Gulshan 2 Roundabout, Dhaka',
       dimensions: '45ft x 25ft High Brightness P6',
       dailyImpressions: 220000,
@@ -68,10 +71,10 @@ export default function InventoryPage() {
     },
     {
       id: 'bb-4',
-      company: 'ADPRO',
-      code: 'ADP-LED-MOT-01',
-      name: 'Motijheel Commercial Area Flagship LED',
-      type: 'OWN_LED_BOARD (Premium)',
+      company: 'BIZMAN',
+      code: 'BIZ-LED-MOT-03',
+      name: 'Motijheel Commercial Hub Flagship LED',
+      type: 'OWN_LED_BOARD (20 Fleet)',
       location: 'Shapla Chattar, Motijheel, Dhaka',
       dimensions: '50ft x 25ft Unipole LED',
       dailyImpressions: 260000,
@@ -82,10 +85,10 @@ export default function InventoryPage() {
     },
     {
       id: 'bb-5',
-      company: 'ADPRO',
-      code: 'ADP-VND-RAJ-08',
+      company: 'BIZMAN',
+      code: 'BIZ-VND-RAJ-08',
       name: 'Rajshahi Shaheb Bazar Partner Display',
-      type: 'VENDOR_LED_BOARD (70+ Network)',
+      type: 'VENDOR_LED_BOARD (50+ Network)',
       location: 'Shaheb Bazar Zero Point, Rajshahi',
       dimensions: '25ft x 15ft',
       dailyImpressions: 95000,
@@ -94,6 +97,70 @@ export default function InventoryPage() {
       monthlyRate: 75000,
       status: 'AVAILABLE',
       vendor: 'North Bengal Outdoor Hub',
+    },
+  ];
+
+  // Linda Resort Limited Assets (Luxury Eco-Resort, Villas, Banquets & Timeshare Equity)
+  const resortAssets = [
+    {
+      id: 'res-1',
+      company: 'LINDA',
+      code: 'LND-VIL-CPL-01',
+      name: 'Couple Private Pool Villa (Unit 1 to 5)',
+      type: 'PRIVATE_POOL_VILLA',
+      description: 'Luxury 1-bedroom villa with private temperature-controlled plunge pool, open-sky sundeck & king master suite',
+      capacity: '2 Adults + 1 Child',
+      unitsTotal: 5,
+      unitsAvailable: 2,
+      rackRateBDT: 18500,
+      investorSharePriceBDT: 2500000,
+      annualYield: '18% Projected Yield',
+      status: 'AVAILABLE',
+    },
+    {
+      id: 'res-2',
+      company: 'LINDA',
+      code: 'LND-VIL-FAM-02',
+      name: 'Family Executive Villa with Private Pool (5 Units)',
+      type: 'FAMILY_VILLA',
+      description: '2-Bedroom interconnected villa with 24ft private lap pool, living pavilion & dedicated butler service',
+      capacity: '4-6 Guests',
+      unitsTotal: 5,
+      unitsAvailable: 1,
+      rackRateBDT: 28500,
+      investorSharePriceBDT: 4200000,
+      annualYield: '19.5% Projected Yield',
+      status: 'PARTIALLY_BOOKED',
+    },
+    {
+      id: 'res-3',
+      company: 'LINDA',
+      code: 'LND-COT-ECO-03',
+      name: 'Luxury Eco-Cottages (Garden & Forest View)',
+      type: 'ECO_COTTAGES',
+      description: 'Earthy luxury cottages built with terracotta, high wooden ceilings, bamboo verandas & organic garden view',
+      capacity: '2-3 Guests',
+      unitsTotal: 10,
+      unitsAvailable: 4,
+      rackRateBDT: 12500,
+      investorSharePriceBDT: 1800000,
+      annualYield: '17% Projected Yield',
+      status: 'AVAILABLE',
+    },
+    {
+      id: 'res-4',
+      company: 'LINDA',
+      code: 'LND-BNQ-HALL-01',
+      name: 'Grand Evergreen Banquet & Corporate Retreat Hall',
+      type: 'BANQUET_AND_EVENTS',
+      description: 'Acoustic banquet pavilion with 500-guest seating capacity, high-tech audiovisual system & breakout lawn',
+      capacity: '500 Persons',
+      unitsTotal: 1,
+      unitsAvailable: 1,
+      rackRateBDT: 150000,
+      investorSharePriceBDT: 0,
+      annualYield: 'High Event Frequency',
+      status: 'AVAILABLE',
     },
   ];
 
@@ -153,7 +220,8 @@ export default function InventoryPage() {
     },
   ];
 
-  const showBillboards = activeCompany === 'CONSOLIDATED' || activeCompany === 'BIZMAN' || activeCompany === 'ADPRO';
+  const showBillboards = activeCompany === 'CONSOLIDATED' || activeCompany === 'BIZMAN';
+  const showResort = activeCompany === 'CONSOLIDATED' || activeCompany === 'LINDA';
   const showProducts = activeCompany === 'CONSOLIDATED' || activeCompany === 'ARIELMC';
 
   return (
@@ -162,27 +230,95 @@ export default function InventoryPage() {
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-indigo-400">
             <Layers className="h-4 w-4" />
-            <span>Asset Fleet & Product Catalogs</span>
+            <span>Asset Fleet, Resort Capacity & Export Catalogs</span>
           </div>
           <h1 className="mt-1 text-2xl font-extrabold text-white">
-            DOOH Inventory & Export Catalog
+            Asset Inventory & Catalogs
           </h1>
           <p className="text-xs text-slate-400">
-            Tracking Bizman (20 Own + 50+ Vendor), Adpro (1 Own + 70+ Vendor), and ArielMC Export lines
+            Bizman Media DOOH fleet (20 Own + 50+ Vendor), Linda Resort Eco-Hospitality (Pool Villas & Banquets), and ArielMC Global Export lines
           </p>
         </div>
       </div>
 
-      {/* Outdoor Media Section (Bizman / Adpro) */}
+      {/* Linda Resort Hospitality Section */}
+      {showResort && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-bold text-white flex items-center gap-2">
+              <Palmtree className="h-5 w-5 text-[#C8A96A]" />
+              <span>Linda Resort Limited: Luxury Villas, Cottages & Banquets</span>
+            </h2>
+            <span className="text-xs text-slate-400">
+              Executive Director Portfolio &bull; www.lindaresort.com
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+            {resortAssets.map((r) => (
+              <div key={r.id} className="rounded-xl border border-[#C8A96A]/30 bg-slate-900/60 p-5 space-y-3 relative overflow-hidden">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-[#FFF3D6] text-[#8A5A00] border border-[#FBE0A8]">
+                    LINDA RESORT
+                  </span>
+                  <span className="font-mono text-[#C8A96A] text-xs font-bold">{r.code}</span>
+                </div>
+
+                <div>
+                  <h3 className="text-base font-bold text-white flex items-center gap-2">
+                    <Hotel className="h-4 w-4 text-[#C8A96A]" />
+                    <span>{r.name}</span>
+                  </h3>
+                  <p className="text-xs text-slate-300 mt-1 leading-relaxed">{r.description}</p>
+                </div>
+
+                <div className="rounded-lg bg-slate-950/70 p-3 text-xs grid grid-cols-2 sm:grid-cols-3 gap-2.5 border border-slate-800">
+                  <div>
+                    <span className="text-slate-500 text-[10px] block">Capacity:</span>
+                    <span className="text-slate-200 font-semibold">{r.capacity}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 text-[10px] block">Inventory Fleet:</span>
+                    <span className="text-emerald-400 font-bold">{r.unitsAvailable} Available of {r.unitsTotal} Units</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 text-[10px] block">Rack Rate / Night:</span>
+                    <span className="text-[#C8A96A] font-bold font-mono">৳ {r.rackRateBDT.toLocaleString()}</span>
+                  </div>
+                  {r.investorSharePriceBDT > 0 && (
+                    <div className="sm:col-span-2">
+                      <span className="text-slate-500 text-[10px] block">Timeshare Share Equity:</span>
+                      <span className="text-sky-400 font-mono font-bold">৳ {r.investorSharePriceBDT.toLocaleString()}</span>
+                      <span className="text-slate-400 text-[10px] ml-1.5 font-medium">({r.annualYield})</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1">
+                  <span className="rounded bg-slate-800 px-2 py-0.5 text-[#C8A96A] font-mono text-[10px]">
+                    {r.type.replace(/_/g, ' ')}
+                  </span>
+                  <span className="text-emerald-400 font-semibold flex items-center gap-1">
+                    <CheckCircle2 className="h-3 w-3" />
+                    <span>Active In Fleet</span>
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Outdoor Media Section (Bizman Media) */}
       {showBillboards && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-bold text-white flex items-center gap-2">
               <Tv2 className="h-5 w-5 text-blue-400" />
-              <span>DOOH LED Screens & Static Billboards</span>
+              <span>Bizman Media DOOH LED Screens & Static Billboards</span>
             </h2>
             <span className="text-xs text-slate-400">
-              Own Screens & Partner Vendor Network (50+ Bizman / 70+ Adpro)
+              Own Screens & Partner Vendor Network (20 Own Displays / 50+ Nationwide)
             </span>
           </div>
 

@@ -28,15 +28,15 @@ export default function FinancePage() {
   const currentEntity = activeCompany === 'CONSOLIDATED' ? 'BIZMAN' : activeCompany;
 
   const plBizman = generatePLStatement('BIZMAN');
-  const plAdpro = generatePLStatement('ADPRO');
+  const plLinda = generatePLStatement('LINDA');
   const plAriel = generatePLStatement('ARIELMC');
 
   const bsBizman = generateBalanceSheet('BIZMAN');
-  const bsAdpro = generateBalanceSheet('ADPRO');
+  const bsLinda = generateBalanceSheet('LINDA');
   const bsAriel = generateBalanceSheet('ARIELMC');
 
-  const activePL = activeCompany === 'ADPRO' ? plAdpro : activeCompany === 'ARIELMC' ? plAriel : plBizman;
-  const activeBS = activeCompany === 'ADPRO' ? bsAdpro : activeCompany === 'ARIELMC' ? bsAriel : bsBizman;
+  const activePL = activeCompany === 'LINDA' ? plLinda : activeCompany === 'ARIELMC' ? plAriel : plBizman;
+  const activeBS = activeCompany === 'LINDA' ? bsLinda : activeCompany === 'ARIELMC' ? bsAriel : bsBizman;
 
   const currentAccounts = FINANCIAL_BALANCES[currentEntity] || [];
 
@@ -53,7 +53,7 @@ export default function FinancePage() {
             Ledger, P&L & Balance Sheet
           </h1>
           <p className="text-xs text-slate-400">
-            Strict double-entry bookkeeping: ΣDebits == ΣCredits across Bizman, Adpro, and ArielMC
+            Strict double-entry bookkeeping: ΣDebits == ΣCredits across Bizman, Linda Resort, and ArielMC
           </p>
         </div>
 

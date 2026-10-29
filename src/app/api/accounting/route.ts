@@ -3,7 +3,7 @@ import { generatePLStatement, generateBalanceSheet, validateJournalEntry } from 
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const company = (searchParams.get('company') || 'BIZMAN') as 'BIZMAN' | 'ADPRO' | 'ARIELMC';
+  const company = (searchParams.get('company') || 'BIZMAN') as 'BIZMAN' | 'LINDA' | 'ARIELMC';
   const type = searchParams.get('type') || 'PL';
 
   if (type === 'BALANCE_SHEET') {

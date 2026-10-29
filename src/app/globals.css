@@ -3,12 +3,19 @@
 @tailwind utilities;
 
 /* ==============================================================================
-   ARIELMC ERP AUTHENTIC HYBRID THEME
-   - Dark Forest Pine (#1F3A2E) Side Panel & Top Header
-   - Crisp Light (#F4F6F4) Main Content Window with White (#FFFFFF) Cards
-   - Imperial Gold (#C8A96A) Accents & Brand Highlights
+   MASTER CRM MULTI-THEME ENGINE
+   Rule: Side Panel & Header DARK | Main Window LIGHT
+   Themes:
+     1. ArielMC ERP (Preferred Signature)
+     2. Ink Wash (Image 1: #4A4A4A, #CBCBCB, #FFFFE3, #6D8196)
+     3. Fresh Peach (Image 2: #FFD3AC, #FFB5AB, #E39A7B, #DBB06B)
+     4. Stormy Morning (Image 3: #6A89A7, #BDDDFC, #88BDF2, #384959)
+     5. California Beaches (Image 4: #FFC067, #66F4FF, #66C4FF, #7D99AA)
+     6. Mossy Hollow (Image 5: #636B2F, #BAC095, #D4DE95, #3D4127)
+     7. Executive Obsidian
    ============================================================================== */
 
+/* 1. ArielMC ERP (Default Preferred) */
 :root,
 [data-theme="arielmc-erp"] {
   --header-bg: #1F3A2E;
@@ -18,10 +25,11 @@
   --header-accent: #C8A96A;
 
   --sidebar-bg: #1F3A2E;
+  --sidebar-box-bg: #162B22;
   --sidebar-border: #2C5240;
   --sidebar-text: #FFFFFF;
   --sidebar-muted: #CFE0D5;
-  --sidebar-hover: #2C5240;
+  --sidebar-hover: #27493A;
   --sidebar-active-bg: #27493A;
   --sidebar-active-text: #C8A96A;
 
@@ -35,43 +43,224 @@
   --main-brand-gold: #C8A96A;
 }
 
+/* 2. Ink Wash (#4A4A4A, #CBCBCB, #FFFFE3, #6D8196) */
+[data-theme="ink-wash"] {
+  --header-bg: #343838;
+  --header-border: #4F5555;
+  --header-text: #FFFFFF;
+  --header-sub: #CBCBCB;
+  --header-accent: #6D8196;
+
+  --sidebar-bg: #2C2F2F;
+  --sidebar-box-bg: #222525;
+  --sidebar-border: #444949;
+  --sidebar-text: #FFFFFF;
+  --sidebar-muted: #CBCBCB;
+  --sidebar-hover: #3E4343;
+  --sidebar-active-bg: #3E4343;
+  --sidebar-active-text: #FFFFE3;
+
+  --main-bg: #FAF9F2;
+  --main-card: #FFFFFF;
+  --main-card-sub: #F4F3EB;
+  --main-border: #DEDDCF;
+  --main-text: #222426;
+  --main-muted: #6D8196;
+  --main-brand-green: #4A4A4A;
+  --main-brand-gold: #6D8196;
+}
+
+/* 3. Fresh Peach (#FFD3AC, #FFB5AB, #E39A7B, #DBB06B) */
+[data-theme="fresh-peach"] {
+  --header-bg: #3D201A;
+  --header-border: #593128;
+  --header-text: #FFFFFF;
+  --header-sub: #FFD3AC;
+  --header-accent: #DBB06B;
+
+  --sidebar-bg: #321A15;
+  --sidebar-box-bg: #281410;
+  --sidebar-border: #4E271F;
+  --sidebar-text: #FFFFFF;
+  --sidebar-muted: #FFD3AC;
+  --sidebar-hover: #48251E;
+  --sidebar-active-bg: #48251E;
+  --sidebar-active-text: #DBB06B;
+
+  --main-bg: #FFF7F2;
+  --main-card: #FFFFFF;
+  --main-card-sub: #FFF0E7;
+  --main-border: #F2DED5;
+  --main-text: #281C19;
+  --main-muted: #9E695D;
+  --main-brand-green: #8C4434;
+  --main-brand-gold: #DBB06B;
+}
+
+/* 4. Stormy Morning (#6A89A7, #BDDDFC, #88BDF2, #384959) */
+[data-theme="stormy-morning"] {
+  --header-bg: #283440;
+  --header-border: #45586A;
+  --header-text: #FFFFFF;
+  --header-sub: #BDDDFC;
+  --header-accent: #88BDF2;
+
+  --sidebar-bg: #1F2933;
+  --sidebar-box-bg: #182028;
+  --sidebar-border: #3A4A59;
+  --sidebar-text: #FFFFFF;
+  --sidebar-muted: #BDDDFC;
+  --sidebar-hover: #2E3C4B;
+  --sidebar-active-bg: #2E3C4B;
+  --sidebar-active-text: #88BDF2;
+
+  --main-bg: #F1F5F8;
+  --main-card: #FFFFFF;
+  --main-card-sub: #E7EEF3;
+  --main-border: #CFDFEA;
+  --main-text: #1A2530;
+  --main-muted: #6A89A7;
+  --main-brand-green: #384959;
+  --main-brand-gold: #6A89A7;
+}
+
+/* 5. California Beaches (#FFC067, #66F4FF, #66C4FF, #7D99AA) */
+[data-theme="california-beaches"] {
+  --header-bg: #21333F;
+  --header-border: #3B5567;
+  --header-text: #FFFFFF;
+  --header-sub: #A5D9EC;
+  --header-accent: #FFC067;
+
+  --sidebar-bg: #1A2832;
+  --sidebar-box-bg: #131E26;
+  --sidebar-border: #2F4554;
+  --sidebar-text: #FFFFFF;
+  --sidebar-muted: #A5D9EC;
+  --sidebar-hover: #283E4E;
+  --sidebar-active-bg: #283E4E;
+  --sidebar-active-text: #FFC067;
+
+  --main-bg: #F3F9FC;
+  --main-card: #FFFFFF;
+  --main-card-sub: #E7F3F8;
+  --main-border: #CDE2EC;
+  --main-text: #16232B;
+  --main-muted: #7D99AA;
+  --main-brand-green: #283F4E;
+  --main-brand-gold: #FFC067;
+}
+
+/* 6. Mossy Hollow (#636B2F, #BAC095, #D4DE95, #3D4127) */
+[data-theme="mossy-hollow"] {
+  --header-bg: #2E311D;
+  --header-border: #4A502F;
+  --header-text: #FFFFFF;
+  --header-sub: #BAC095;
+  --header-accent: #D4DE95;
+
+  --sidebar-bg: #242717;
+  --sidebar-box-bg: #1B1E11;
+  --sidebar-border: #3C4125;
+  --sidebar-text: #FFFFFF;
+  --sidebar-muted: #BAC095;
+  --sidebar-hover: #353922;
+  --sidebar-active-bg: #353922;
+  --sidebar-active-text: #D4DE95;
+
+  --main-bg: #F5F7F0;
+  --main-card: #FFFFFF;
+  --main-card-sub: #ECF0E4;
+  --main-border: #DDE3D1;
+  --main-text: #1C2013;
+  --main-muted: #636B2F;
+  --main-brand-green: #3D4127;
+  --main-brand-gold: #636B2F;
+}
+
+/* 7. Executive Obsidian */
+[data-theme="executive-dark"] {
+  --header-bg: #1E293B;
+  --header-border: #334155;
+  --header-text: #FFFFFF;
+  --header-sub: #94A3B8;
+  --header-accent: #38BDF8;
+
+  --sidebar-bg: #0F172A;
+  --sidebar-box-bg: #0B1120;
+  --sidebar-border: #1E293B;
+  --sidebar-text: #FFFFFF;
+  --sidebar-muted: #94A3B8;
+  --sidebar-hover: #1E293B;
+  --sidebar-active-bg: #1E293B;
+  --sidebar-active-text: #38BDF8;
+
+  --main-bg: #F8FAFC;
+  --main-card: #FFFFFF;
+  --main-card-sub: #F1F5F9;
+  --main-border: #E2E8F0;
+  --main-text: #0F172A;
+  --main-muted: #64748B;
+  --main-brand-green: #0F172A;
+  --main-brand-gold: #38BDF8;
+}
+
 body {
   background-color: var(--main-bg);
   color: var(--main-text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   overflow-x: hidden;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 /* ------------------------------------------------------------------------------
-   SIDEBAR (DARK FOREST PINE #1F3A2E)
+   SIDEBAR (PERSISTENT DARK ACCORDING TO SELECTED THEME)
    ------------------------------------------------------------------------------ */
 aside {
   background-color: var(--sidebar-bg) !important;
   border-color: var(--sidebar-border) !important;
   color: var(--sidebar-text) !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
-aside .border-slate-800,
-aside .border-slate-800\/80,
-aside .border-slate-800\/70 {
+aside [class*="bg-[#162B22]"],
+aside [class*="bg-slate-900"] {
+  background-color: var(--sidebar-box-bg) !important;
   border-color: var(--sidebar-border) !important;
 }
 
-aside .text-slate-400,
-aside .text-slate-500 {
+aside [class*="bg-[#1F3A2E]"] {
+  background-color: var(--sidebar-bg) !important;
+  border-color: var(--sidebar-border) !important;
+}
+
+aside [class*="border-[#2C5240]"],
+aside [class*="border-slate-800"] {
+  border-color: var(--sidebar-border) !important;
+}
+
+aside [class*="text-[#CFE0D5]"],
+aside [class*="text-[#8FA899]"],
+aside [class*="text-slate-400"],
+aside [class*="text-slate-500"] {
   color: var(--sidebar-muted) !important;
 }
 
-aside .text-white {
+aside [class*="text-white"] {
   color: #FFFFFF !important;
 }
 
-aside .bg-slate-900,
-aside .bg-slate-900\/70,
-aside .bg-slate-900\/80,
-aside .bg-slate-900\/90 {
-  background-color: #162B22 !important;
-  border-color: var(--sidebar-border) !important;
+aside [class*="text-[#C8A96A]"] {
+  color: var(--sidebar-active-text) !important;
+}
+
+aside [class*="bg-[#C8A96A]"] {
+  background-color: var(--sidebar-active-text) !important;
+  color: var(--sidebar-bg) !important;
+}
+
+aside [class*="border-l-[#C8A96A]"] {
+  border-left-color: var(--sidebar-active-text) !important;
 }
 
 aside a:hover {
@@ -79,6 +268,7 @@ aside a:hover {
   color: #FFFFFF !important;
 }
 
+aside a[class*="bg-[#27493A]"],
 aside a[class*="bg-indigo-600"] {
   background-color: var(--sidebar-active-bg) !important;
   color: var(--sidebar-active-text) !important;
@@ -86,45 +276,66 @@ aside a[class*="bg-indigo-600"] {
 }
 
 /* ------------------------------------------------------------------------------
-   HEADER (DARK FOREST PINE #1F3A2E)
+   HEADER (PERSISTENT DARK ACCORDING TO SELECTED THEME)
    ------------------------------------------------------------------------------ */
 header {
   background-color: var(--header-bg) !important;
   border-color: var(--header-border) !important;
   color: var(--header-text) !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
-header .text-white {
-  color: #FFFFFF !important;
+header [class*="bg-[#162B22]"],
+header [class*="bg-slate-900"] {
+  background-color: var(--sidebar-box-bg) !important;
+  border-color: var(--header-border) !important;
 }
 
-header .text-slate-400,
-header .text-slate-500 {
+header [class*="bg-[#1F3A2E]"] {
+  background-color: var(--header-bg) !important;
+  border-color: var(--header-border) !important;
+}
+
+header [class*="border-[#2C5240]"],
+header [class*="border-slate-800"] {
+  border-color: var(--header-border) !important;
+}
+
+header [class*="text-[#CFE0D5]"],
+header [class*="text-[#8FA899]"],
+header [class*="text-slate-400"],
+header [class*="text-slate-500"] {
   color: var(--header-sub) !important;
 }
 
-header .text-indigo-400 {
+header [class*="text-[#C8A96A]"],
+header [class*="text-indigo-400"] {
   color: var(--header-accent) !important;
 }
 
-header .bg-slate-900,
-header .bg-slate-900\/90,
-header .bg-slate-900\/70 {
-  background-color: #162B22 !important;
-  border-color: var(--header-border) !important;
+header [class*="bg-[#C8A96A]"],
+header button[class*="bg-[#C8A96A]"] {
+  background-color: var(--header-accent) !important;
+  color: var(--header-bg) !important;
 }
 
-header .border-slate-800,
-header .border-slate-800\/80 {
-  border-color: var(--header-border) !important;
+header [class*="bg-[#27493A]"] {
+  background-color: var(--sidebar-active-bg) !important;
+  color: var(--sidebar-active-text) !important;
+  border-color: var(--sidebar-active-text) !important;
+}
+
+header [class*="hover:bg-[#2C5240]"]:hover {
+  background-color: var(--sidebar-hover) !important;
 }
 
 /* ------------------------------------------------------------------------------
-   MAIN CONTENT WINDOW (LIGHT #F4F6F4 + CARDS #FFFFFF)
+   MAIN CONTENT WINDOW (LIGHT CANVAS + WHITE CARDS)
    ------------------------------------------------------------------------------ */
 main {
   background-color: var(--main-bg);
   color: var(--main-text);
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 /* Cards & Surface Containers */
@@ -182,7 +393,7 @@ main h3 {
 
 /* Tables in Light Canvas */
 main table thead {
-  background-color: #EDF1ED !important;
+  background-color: var(--main-card-sub) !important;
   color: var(--main-brand-green) !important;
   border-bottom: 2px solid var(--main-border) !important;
 }
@@ -192,7 +403,7 @@ main table thead th {
 }
 
 main table tbody tr:hover {
-  background-color: #F8FAF8 !important;
+  background-color: var(--main-card-sub) !important;
 }
 
 /* Primary Action Buttons */
@@ -202,7 +413,7 @@ main .bg-indigo-600 {
 }
 
 main .bg-indigo-600:hover {
-  background-color: #2C5240 !important;
+  opacity: 0.9;
 }
 
 /* Inputs, Textareas & Selects in Light Canvas */
@@ -217,8 +428,8 @@ main select {
 main input:focus,
 main textarea:focus,
 main select:focus {
-  outline: 2px solid #CFE0D5 !important;
-  border-color: #2C5240 !important;
+  outline: 2px solid var(--sidebar-border) !important;
+  border-color: var(--main-brand-green) !important;
 }
 
 /* Custom Scrollbars */

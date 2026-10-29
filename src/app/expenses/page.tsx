@@ -27,7 +27,7 @@ export default function ExpensesPage() {
   const [showModal, setShowModal] = useState(false);
 
   // Form State
-  const [targetCompany, setTargetCompany] = useState<'BIZMAN' | 'ADPRO' | 'ARIELMC'>(
+  const [targetCompany, setTargetCompany] = useState<'BIZMAN' | 'LINDA' | 'ARIELMC'>(
     activeCompany === 'CONSOLIDATED' ? 'BIZMAN' : activeCompany
   );
   const [amount, setAmount] = useState<string>('');
@@ -155,7 +155,7 @@ export default function ExpensesPage() {
                   <td className="py-3.5 px-4 whitespace-nowrap">
                     <span className={`px-2 py-0.5 text-[10px] font-bold rounded ${
                       exp.companyCode === 'BIZMAN' ? 'bg-blue-950 text-blue-400 border border-blue-800' :
-                      exp.companyCode === 'ADPRO' ? 'bg-orange-950 text-orange-400 border border-orange-800' :
+                      exp.companyCode === 'LINDA' ? 'bg-[#FFF3D6] text-[#8A5A00] border border-[#FBE0A8]' :
                       'bg-emerald-950 text-emerald-400 border border-emerald-800'
                     }`}>
                       {exp.companyCode}
@@ -218,7 +218,7 @@ export default function ExpensesPage() {
                     className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-slate-200 focus:outline-none focus:border-indigo-500"
                   >
                     <option value="BIZMAN">Bizman Media Limited</option>
-                    <option value="ADPRO">Adpro Communications Limited</option>
+                    <option value="LINDA">Linda Resort Limited</option>
                     <option value="ARIELMC">Ariel Marketing & Communications</option>
                   </select>
                 </div>

@@ -53,8 +53,8 @@ export default function MasterDashboard() {
     grossProfitDisplay = `৳ ${(pl.grossProfit).toLocaleString()}`;
     netProfitDisplay = `৳ ${(pl.netProfit).toLocaleString()}`;
     netMarginDisplay = `${pl.netMarginPercent.toFixed(1)}%`;
-  } else if (activeCompany === 'ADPRO') {
-    const pl = generatePLStatement('ADPRO');
+  } else if (activeCompany === 'LINDA') {
+    const pl = generatePLStatement('LINDA');
     totalRevenueDisplay = `৳ ${(pl.totalRevenue).toLocaleString()}`;
     grossProfitDisplay = `৳ ${(pl.grossProfit).toLocaleString()}`;
     netProfitDisplay = `৳ ${(pl.netProfit).toLocaleString()}`;
@@ -231,7 +231,7 @@ export default function MasterDashboard() {
                     <div className="flex items-center gap-2.5">
                       <span className={`px-2 py-0.5 text-[10px] font-bold rounded ${
                         badgeCompany === 'BIZMAN' ? 'bg-[#E8F0FA] text-[#1F5FA8] border border-[#BBD5F2]' :
-                        badgeCompany === 'ADPRO' ? 'bg-[#FFF3D6] text-[#8A5A00] border border-[#FBE0A8]' :
+                        badgeCompany === 'LINDA' ? 'bg-[#FFF3D6] text-[#8A5A00] border border-[#FBE0A8]' :
                         'bg-[#E4F3E9] text-[#1E6B3A] border border-[#B6E2C5]'
                       }`}>
                         {lead.companyCode}

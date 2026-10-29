@@ -77,7 +77,7 @@ export default function Navigation() {
             if (isSelected) {
               if (code === 'CONSOLIDATED') badgeStyle = "bg-indigo-600 text-white font-semibold shadow-md shadow-indigo-600/30 border-indigo-500";
               if (code === 'BIZMAN') badgeStyle = "bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30 border-blue-500";
-              if (code === 'ADPRO') badgeStyle = "bg-orange-600 text-white font-semibold shadow-md shadow-orange-600/30 border-orange-500";
+              if (code === 'LINDA') badgeStyle = "bg-[#1F3A2E] text-[#C8A96A] font-bold shadow-md border-[#C8A96A]";
               if (code === 'ARIELMC') badgeStyle = "bg-emerald-600 text-white font-semibold shadow-md shadow-emerald-600/30 border-emerald-500";
             }
 
@@ -89,7 +89,7 @@ export default function Navigation() {
               >
                 {code === 'CONSOLIDATED' && <Layers className="h-3 w-3" />}
                 {code === 'BIZMAN' && <Tv2 className="h-3 w-3" />}
-                {code === 'ADPRO' && <Building2 className="h-3 w-3" />}
+                {code === 'LINDA' && <Building2 className="h-3 w-3" />}
                 {code === 'ARIELMC' && <Globe2 className="h-3 w-3" />}
                 <span>{code}</span>
               </button>

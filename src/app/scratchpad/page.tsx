@@ -15,7 +15,7 @@ import {
 import { CompanyCode } from '@/lib/types';
 
 const DEFAULT_SCRATCHPAD = `# Executive Master Scratchpad
-**Active Entities:** Bizman Media Limited | Adpro Communications | Ariel Marketing & Communications
+**Active Entities:** Bizman Media Limited | Linda Resort Limited | Ariel Marketing & Communications
 
 ---
 
@@ -24,10 +24,11 @@ const DEFAULT_SCRATCHPAD = `# Executive Master Scratchpad
 - [ ] Dhanmondi 27 LED screen P6 outdoor power supply module replaced.
 - [ ] Finalize Grameenphone Ramadan bundle pricing (negotiate 10% wholesale vendor discount).
 
-## 2. Adpro Communications Checklist
-- [ ] Shapla Chattar Motijheel flagship LED unipole maintenance check at 5:00 PM.
-- [ ] Review billing for bKash Q4 regional broadcast run (50% advance confirmed).
-- [ ] Static billboard site survey at Dhaka-Mawa Expressway for Walton proposal.
+## 2. Linda Resort Limited Checklist (Executive Director)
+- [ ] Fast-Track 9-Month Execution Plan: Review Couple Private Pool Villa foundation milestones.
+- [ ] Finalize Grand Banquet Hall audiovisual specs for SCB Corporate Leadership Retreat.
+- [ ] High-Net-Worth Investor Timeshare pitch: Send shareholder agreement deed to Dr. Tariqul Islam.
+- [ ] German pool filtration pump and underwater LED lighting inspection with AquaPure team.
 
 ## 3. ArielMC Export Pipeline
 - [ ] EcoLiving UK: 25,000 Pcs Jute Tote Bags order pending T/T advance.
