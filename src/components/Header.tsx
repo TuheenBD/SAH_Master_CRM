@@ -25,9 +25,14 @@ import {
   Volume2,
   VolumeX,
   Menu,
-  Lock
+  Lock,
+  Clock,
+  AlertTriangle,
+  Calendar,
+  ExternalLink
 } from 'lucide-react';
-import { CompanyCode, COMPANIES } from '@/lib/types';
+import { CompanyCode, COMPANIES, isRenewalDue, getDaysUntilExpiration, DocumentRecord } from '@/lib/types';
+import { INITIAL_DOCUMENTS } from '@/lib/mock-data';
 import { useTheme, THEMES } from '@/lib/theme';
 import { isAudioEnabled, toggleAudioEnabled } from '@/lib/sound';
 
@@ -42,8 +47,10 @@ export default function Header() {
 
   const [quickActionOpen, setQuickActionOpen] = useState(false);
   const [themeDropdownOpen, setThemeDropdownOpen] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [pendingTasksCount, setPendingTasksCount] = useState<number>(0);
+  const [pendingTasks, setPendingTasks] = useState<any[]>([]);
+  const [expiringDocs, setExpiringDocs] = useState<{ id: string; title: string; companyCode: string; daysLeft: number; expiryDate: string }[]>([]);
 
   useEffect(() => {
     setSoundEnabled(isAudioEnabled());
@@ -57,34 +64,67 @@ export default function Header() {
     return () => window.removeEventListener('sound-toggle-change', onSoundChange);
   }, []);
 
-  // Sync Pending Tasks count with Calendar
+  // Sync Pending Tasks count and Expiring Documents (30-day renewal threshold)
   useEffect(() => {
-    const updatePendingCount = () => {
+    const updateNotifications = () => {
+      // 1. Pending Tasks
       try {
-        const stored = localStorage.getItem('sah_master_crm_tasks_v3') || localStorage.getItem('sah_master_crm_tasks');
-        if (stored) {
-          const parsed = JSON.parse(stored);
+        const storedTasks = localStorage.getItem('sah_master_crm_tasks_v3') || localStorage.getItem('sah_master_crm_tasks');
+        if (storedTasks) {
+          const parsed = JSON.parse(storedTasks);
           if (Array.isArray(parsed)) {
-            const count = parsed.filter((t: any) => t.status === 'PENDING').length;
-            setPendingTasksCount(count);
-            return;
+            const pending = parsed.filter((t: any) => t.status === 'PENDING');
+            setPendingTasks(pending);
+          } else {
+            setPendingTasks([]);
+          }
+        } else {
+          setPendingTasks([]);
+        }
+      } catch (e) {
+        setPendingTasks([]);
+      }
+
+      // 2. Expiring Documents (Within 30 Days)
+      try {
+        let docs: DocumentRecord[] = INITIAL_DOCUMENTS;
+        const storedDocs = localStorage.getItem('sah_master_crm_documents_v2');
+        if (storedDocs) {
+          const parsed = JSON.parse(storedDocs);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            docs = parsed;
           }
         }
-        // Default when no custom tasks exist
-        setPendingTasksCount(0);
+
+        const dueList = docs
+          .filter(d => isRenewalDue(d.expiryDate))
+          .map(d => ({
+            id: d.id,
+            title: d.title,
+            companyCode: d.companyCode,
+            daysLeft: getDaysUntilExpiration(d.expiryDate) ?? 0,
+            expiryDate: d.expiryDate ?? ''
+          }))
+          .sort((a, b) => a.daysLeft - b.daysLeft);
+
+        setExpiringDocs(dueList);
       } catch (e) {
-        setPendingTasksCount(0);
+        setExpiringDocs([]);
       }
     };
 
-    updatePendingCount();
-    window.addEventListener('storage', updatePendingCount);
-    window.addEventListener('calendar-tasks-updated', updatePendingCount);
+    updateNotifications();
+    window.addEventListener('storage', updateNotifications);
+    window.addEventListener('calendar-tasks-updated', updateNotifications);
+    window.addEventListener('documents-updated', updateNotifications);
     return () => {
-      window.removeEventListener('storage', updatePendingCount);
-      window.removeEventListener('calendar-tasks-updated', updatePendingCount);
+      window.removeEventListener('storage', updateNotifications);
+      window.removeEventListener('calendar-tasks-updated', updateNotifications);
+      window.removeEventListener('documents-updated', updateNotifications);
     };
   }, []);
+
+  const totalAlertsCount = pendingTasks.length + expiringDocs.length;
 
   const switchCompany = (code: CompanyCode) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -404,17 +444,152 @@ export default function Header() {
             )}
           </button>
 
-          {/* Agenda Reminder Bell - Red dot only appears when pendingTasksCount > 0 */}
-          <Link
-            href={`/calendar?company=${activeCompany}`}
-            title={pendingTasksCount > 0 ? `Today's Priority Agenda (${pendingTasksCount} Pending)` : "All Action Items Completed (0 Pending)"}
-            className="relative rounded-lg border border-[#2C5240] bg-[#162B22] p-2 text-[#CFE0D5] hover:text-white hover:bg-[#2C5240] transition-colors"
-          >
-            <Bell className="h-4 w-4" />
-            {pendingTasksCount > 0 && (
-              <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-rose-500 animate-pulse" />
+          {/* Executive Notification Center (Bell with Dynamic 30-Day Renewal & Task Alerts) */}
+          <div className="relative">
+            <button
+              onClick={() => setNotificationOpen(!notificationOpen)}
+              title={totalAlertsCount > 0 ? `${totalAlertsCount} Active Alert(s) - Click to review` : "Notification Center: All Clear (0 Alerts)"}
+              className={`relative rounded-lg border p-2 transition-all ${
+                notificationOpen 
+                  ? 'border-[#C8A96A] bg-[#2C5240] text-white' 
+                  : 'border-[#2C5240] bg-[#162B22] text-[#CFE0D5] hover:text-white hover:bg-[#2C5240]'
+              }`}
+            >
+              <Bell className="h-4 w-4" />
+              {totalAlertsCount > 0 && (
+                <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-rose-500 animate-pulse" />
+              )}
+            </button>
+
+            {notificationOpen && (
+              <>
+                <div 
+                  onClick={() => setNotificationOpen(false)}
+                  className="fixed inset-0 z-30"
+                />
+                <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl border border-[#2C5240] bg-[#0E1F18] text-white p-3.5 shadow-2xl z-40 text-xs space-y-3">
+                  {/* Top Header */}
+                  <div className="flex items-center justify-between border-b border-[#2C5240] pb-2 px-0.5">
+                    <div className="flex items-center gap-2">
+                      <div className="h-6 w-6 rounded-lg bg-[#1F3A2E] text-[#C8A96A] flex items-center justify-center font-bold">
+                        <Bell className="h-3.5 w-3.5" />
+                      </div>
+                      <span className="font-extrabold text-[#F4F6F4]">Executive Notification Center</span>
+                    </div>
+                    {totalAlertsCount > 0 ? (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-900/80 text-rose-200 border border-rose-700">
+                        {totalAlertsCount} Active {totalAlertsCount === 1 ? 'Alert' : 'Alerts'}
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-900/80 text-emerald-200 border border-emerald-700">
+                        All Clear
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Section 1: 📄 Document Renewal Alerts (30 Days Threshold) */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between px-1 text-[11px] font-bold text-[#C8A96A] uppercase tracking-wider">
+                      <span className="flex items-center gap-1.5">
+                        <Clock className="h-3 w-3" />
+                        <span>Document Renewals (&le; 30 Days)</span>
+                      </span>
+                      <span className="text-[10px] font-mono text-[#8FA899]">{expiringDocs.length} Due</span>
+                    </div>
+
+                    {expiringDocs.length === 0 ? (
+                      <div className="rounded-xl border border-[#2C5240]/50 bg-[#142A20]/40 p-2.5 text-center text-[11px] text-[#A3B8AC]">
+                        <Check className="h-3.5 w-3.5 text-emerald-400 inline mr-1" />
+                        All vault documents current. No renewals due within 30 days.
+                      </div>
+                    ) : (
+                      <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                        {expiringDocs.map(doc => (
+                          <Link
+                            key={doc.id}
+                            href={`/documents?company=${doc.companyCode}`}
+                            onClick={() => setNotificationOpen(false)}
+                            className="block p-2 rounded-xl border border-amber-500/40 bg-amber-950/30 hover:bg-amber-950/50 transition-all text-[11px] space-y-1"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold text-amber-200 truncate max-w-[210px]">{doc.title}</span>
+                              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30 shrink-0">
+                                {doc.daysLeft < 0 ? `Expired ${Math.abs(doc.daysLeft)}d ago` : `${doc.daysLeft}d left`}
+                              </span>
+                            </div>
+                            <div className="text-[10px] text-[#A3B8AC] flex items-center justify-between">
+                              <span>Expires: {doc.expiryDate}</span>
+                              <span className="font-mono text-[#C8A96A] uppercase font-bold">{doc.companyCode}</span>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Section 2: 📅 Pending Action Items */}
+                  <div className="space-y-1.5 border-t border-[#2C5240] pt-2.5">
+                    <div className="flex items-center justify-between px-1 text-[11px] font-bold text-[#C8A96A] uppercase tracking-wider">
+                      <span className="flex items-center gap-1.5">
+                        <Calendar className="h-3 w-3" />
+                        <span>Action Items & Agenda</span>
+                      </span>
+                      <span className="text-[10px] font-mono text-[#8FA899]">{pendingTasks.length} Pending</span>
+                    </div>
+
+                    {pendingTasks.length === 0 ? (
+                      <div className="rounded-xl border border-[#2C5240]/50 bg-[#142A20]/40 p-2.5 text-center text-[11px] text-[#A3B8AC]">
+                        <Check className="h-3.5 w-3.5 text-emerald-400 inline mr-1" />
+                        Agenda clear. 0 pending action items.
+                      </div>
+                    ) : (
+                      <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                        {pendingTasks.slice(0, 4).map(task => (
+                          <Link
+                            key={task.id}
+                            href={`/calendar?company=${task.company}`}
+                            onClick={() => setNotificationOpen(false)}
+                            className="block p-2 rounded-xl border border-[#2C5240] bg-[#142A20] hover:bg-[#1E3B2D] transition-all text-[11px] space-y-1"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold text-[#F4F6F4] truncate max-w-[210px]">{task.title}</span>
+                              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                                {task.priority}
+                              </span>
+                            </div>
+                            <div className="text-[10px] text-[#8FA899] flex items-center justify-between">
+                              <span>Due: {task.dueDate} &bull; {task.dueTime}</span>
+                              <span className="font-mono text-[#C8A96A] font-bold">{task.company}</span>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Footer Quick Links */}
+                  <div className="border-t border-[#2C5240] pt-2 flex items-center justify-between px-1 text-[11px]">
+                    <Link
+                      href="/documents"
+                      onClick={() => setNotificationOpen(false)}
+                      className="text-[#C8A96A] hover:underline flex items-center gap-1 font-semibold"
+                    >
+                      <span>Document Center</span>
+                      <ExternalLink className="h-3 w-3" />
+                    </Link>
+                    <Link
+                      href="/calendar"
+                      onClick={() => setNotificationOpen(false)}
+                      className="text-[#CFE0D5] hover:text-white flex items-center gap-1 font-semibold"
+                    >
+                      <span>Calendar & Tasks</span>
+                      <ExternalLink className="h-3 w-3" />
+                    </Link>
+                  </div>
+                </div>
+              </>
             )}
-          </Link>
+          </div>
 
           {/* Executive Vault Lock Button */}
           <button

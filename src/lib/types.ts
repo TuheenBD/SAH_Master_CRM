@@ -372,3 +372,29 @@ export interface DocumentRecord {
   downloadCount?: number;
   fileDataUrl?: string;
 }
+
+/**
+ * Calculates calendar days remaining until document expiration.
+ * - Negative: Expired
+ * - Positive (e.g. 15): 15 days until expiration
+ * - null: No expiry date recorded
+ */
+export function getDaysUntilExpiration(expiryDate?: string): number | null {
+  if (!expiryDate || !expiryDate.trim()) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const exp = new Date(expiryDate);
+  exp.setHours(0, 0, 0, 0);
+  if (isNaN(exp.getTime())) return null;
+  const diffTime = exp.getTime() - today.getTime();
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}
+
+/**
+ * Checks if document renewal is due (within 30 days of expiration or already expired).
+ */
+export function isRenewalDue(expiryDate?: string, thresholdDays = 30): boolean {
+  const days = getDaysUntilExpiration(expiryDate);
+  if (days === null) return false;
+  return days <= thresholdDays;
+}

@@ -42,7 +42,9 @@ import {
   AlertTriangle,
   MessageSquare,
   FileCheck2,
-  RotateCcw
+  RotateCcw,
+  Clock,
+  Bell
 } from 'lucide-react';
 import { 
   DocumentRecord, 
@@ -50,7 +52,9 @@ import {
   DocumentFileType, 
   DocumentSecurityLevel, 
   CompanyCode, 
-  COMPANIES 
+  COMPANIES,
+  getDaysUntilExpiration,
+  isRenewalDue
 } from '@/lib/types';
 import { INITIAL_DOCUMENTS } from '@/lib/mock-data';
 
@@ -82,6 +86,8 @@ export default function DocumentCenterPage() {
   const [isLoadedFromStorage, setIsLoadedFromStorage] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [newlySavedId, setNewlySavedId] = useState<string | null>(null);
+  const [renewalOnlyFilter, setRenewalOnlyFilter] = useState(false);
+  const [renewalBannerDismissed, setRenewalBannerDismissed] = useState(false);
 
   // Auto-dismiss toast
   useEffect(() => {
@@ -112,11 +118,12 @@ export default function DocumentCenterPage() {
     }
   }, []);
 
-  // Sync to localStorage on change
+  // Sync to localStorage on change and broadcast to Notification Center
   useEffect(() => {
     if (!isLoadedFromStorage) return;
     try {
       localStorage.setItem('sah_master_crm_documents_v2', JSON.stringify(documents));
+      window.dispatchEvent(new Event('documents-updated'));
     } catch (err) {
       console.warn('Quota exceeded saving full documents, persisting without large dataUrls', err);
       try {
@@ -125,11 +132,48 @@ export default function DocumentCenterPage() {
           fileDataUrl: d.fileDataUrl && d.fileDataUrl.length < 200000 ? d.fileDataUrl : undefined
         }));
         localStorage.setItem('sah_master_crm_documents_v2', JSON.stringify(stripped));
+        window.dispatchEvent(new Event('documents-updated'));
       } catch (err2) {
         console.error('LocalStorage persistence failed', err2);
       }
     }
   }, [documents, isLoadedFromStorage]);
+
+  // Schedule Document Renewal in Calendar & Tasks
+  const handleScheduleRenewalTask = (doc: DocumentRecord) => {
+    try {
+      const stored = localStorage.getItem('sah_master_crm_tasks_v3') || localStorage.getItem('sah_master_crm_tasks');
+      let currentTasks: any[] = [];
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) currentTasks = parsed;
+        } catch (e) {}
+      }
+
+      const newTask = {
+        id: `task-renewal-${doc.id}-${Date.now()}`,
+        company: (doc.companyCode === 'PERSONAL' || doc.companyCode === 'CONSOLIDATED') ? 'ARIELMC' : doc.companyCode,
+        title: `Renew Document: ${doc.title}`,
+        dueDate: doc.expiryDate || 'Within 30 Days',
+        dueTime: '10:00 AM',
+        priority: 'URGENT',
+        status: 'PENDING',
+        relatedDeal: 'Document Renewal Vault',
+        actionType: 'REVIEW',
+        notes: `Statutory / corporate renewal review required for ${doc.title} (${doc.fileName}). Expiration date: ${doc.expiryDate || 'N/A'}. Vault Attestation: Syed Akramul Hassan.`,
+        createdAt: new Date().toISOString()
+      };
+
+      const updated = [newTask, ...currentTasks];
+      localStorage.setItem('sah_master_crm_tasks_v3', JSON.stringify(updated));
+      window.dispatchEvent(new Event('calendar-tasks-updated'));
+      setToastMessage(`Renewal reminder for "${doc.title}" successfully added to Calendar & Tasks!`);
+    } catch (err) {
+      console.error('Failed to create calendar task', err);
+      setToastMessage(`Document marked for renewal.`);
+    }
+  };
 
   // File Upload Drag & Drop State
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -166,9 +210,25 @@ export default function DocumentCenterPage() {
     fileDataUrl: '',
   });
 
+  // Expiring Documents (Within 30 Days or Expired)
+  const expiringDocuments = useMemo(() => {
+    return documents
+      .filter(doc => isRenewalDue(doc.expiryDate))
+      .map(doc => ({
+        ...doc,
+        daysLeft: getDaysUntilExpiration(doc.expiryDate) ?? 0,
+      }))
+      .sort((a, b) => a.daysLeft - b.daysLeft);
+  }, [documents]);
+
   // Filtered Documents
   const filteredDocuments = useMemo(() => {
     return documents.filter((doc) => {
+      // 30-Day Renewal Filter
+      if (renewalOnlyFilter && !isRenewalDue(doc.expiryDate)) {
+        return false;
+      }
+
       // Entity Filter
       if (selectedEntity !== 'CONSOLIDATED' && doc.companyCode !== selectedEntity) {
         return false;
@@ -193,7 +253,7 @@ export default function DocumentCenterPage() {
 
       return true;
     });
-  }, [documents, selectedEntity, selectedCategory, searchQuery]);
+  }, [documents, selectedEntity, selectedCategory, searchQuery, renewalOnlyFilter]);
 
   // Statistics
   const stats = useMemo(() => {
@@ -204,6 +264,7 @@ export default function DocumentCenterPage() {
       linda: documents.filter(d => d.companyCode === 'LINDA').length,
       personal: documents.filter(d => d.companyCode === 'PERSONAL').length,
       confidential: documents.filter(d => d.securityLevel === 'CONFIDENTIAL').length,
+      renewalsDue: documents.filter(d => isRenewalDue(d.expiryDate)).length,
     };
   }, [documents]);
 
@@ -921,6 +982,83 @@ Attested: Syed Akramul Hassan`;
       )}
 
       {/* =================================================================== */}
+      {/* 1.B. STATUTORY & EXPIRATION 30-DAY RENEWAL ALERT BANNER */}
+      {/* =================================================================== */}
+      {expiringDocuments.length > 0 && !renewalBannerDismissed && (
+        <div className="rounded-2xl border-2 border-amber-400 bg-gradient-to-r from-amber-50 via-white to-amber-50/50 p-4 shadow-sm animate-in fade-in">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="flex items-start gap-3">
+              <div className="h-10 w-10 rounded-xl bg-amber-100 text-amber-900 border border-amber-300 flex items-center justify-center shrink-0">
+                <AlertTriangle className="h-5 w-5 text-amber-700 animate-pulse" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-black uppercase tracking-wider text-amber-900">
+                    Vault Renewal Notice &bull; 30-Day Expiration Alert
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-200 text-amber-950 font-mono">
+                    {expiringDocuments.length} Document{expiringDocuments.length === 1 ? '' : 's'} Due
+                  </span>
+                </div>
+                <p className="text-xs text-[#556055] mt-0.5">
+                  The following vault records expire within the next 30 days and require statutory, export, or personal renewal:
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => setRenewalOnlyFilter(!renewalOnlyFilter)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
+                  renewalOnlyFilter
+                    ? 'bg-amber-800 text-white border-amber-900 shadow-xs'
+                    : 'bg-white text-amber-900 border-amber-300 hover:bg-amber-100'
+                }`}
+              >
+                {renewalOnlyFilter ? 'Show All Documents' : 'Filter Due Renewals'}
+              </button>
+              <button
+                onClick={() => setRenewalBannerDismissed(true)}
+                className="text-[#6B7269] hover:text-[#1A1A1A] p-1 rounded-lg"
+                title="Dismiss Banner"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Quick List of Expiring Docs */}
+          <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 pt-3 border-t border-amber-200/80">
+            {expiringDocuments.map((doc) => (
+              <div
+                key={doc.id}
+                className="rounded-xl border border-amber-300 bg-white/90 p-2.5 flex items-center justify-between gap-2 shadow-2xs"
+              >
+                <div className="min-w-0">
+                  <div className="font-extrabold text-xs text-[#1F3A2E] truncate">{doc.title}</div>
+                  <div className="text-[10px] text-amber-800 font-medium">
+                    {doc.daysLeft < 0 ? (
+                      <span className="text-rose-700 font-bold">Expired {Math.abs(doc.daysLeft)} days ago</span>
+                    ) : (
+                      <span>Expires in <strong>{doc.daysLeft} days</strong> ({doc.expiryDate})</span>
+                    )}
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleScheduleRenewalTask(doc)}
+                  title="Schedule high-priority renewal reminder in Calendar & Tasks"
+                  className="px-2 py-1 rounded-md bg-[#1F3A2E] hover:bg-[#2C5240] text-white text-[10px] font-extrabold shrink-0 flex items-center gap-1 shadow-xs"
+                >
+                  <Calendar className="h-3 w-3" />
+                  <span>Schedule</span>
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* =================================================================== */}
       {/* 2. EXECUTIVE REPOSITORY METRICS OVERVIEW */}
       {/* =================================================================== */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3.5">
@@ -1089,14 +1227,38 @@ Attested: Syed Akramul Hassan`;
             )}
           </div>
 
-          {/* Category Dropdown */}
-          <div className="flex items-center gap-2">
-            <Filter className="h-3.5 w-3.5 text-[#556055]" />
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="rounded-lg border border-[#DDE3DD] bg-white px-3 py-2 text-xs text-[#1A1A1A] font-semibold focus:outline-none"
+          {/* Filters: Category & 30-Day Renewal Filter */}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* 30-Day Renewal Quick Filter */}
+            <button
+              onClick={() => setRenewalOnlyFilter(!renewalOnlyFilter)}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all border ${
+                renewalOnlyFilter
+                  ? 'bg-amber-700 text-white border-amber-800 shadow-xs'
+                  : expiringDocuments.length > 0
+                  ? 'bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100'
+                  : 'bg-white text-[#556055] border-[#DDE3DD] hover:bg-[#F4F6F4]'
+              }`}
             >
+              <Clock className="h-3.5 w-3.5" />
+              <span>Renewals Due (30d)</span>
+              {expiringDocuments.length > 0 && (
+                <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold ${
+                  renewalOnlyFilter ? 'bg-amber-900 text-white' : 'bg-amber-200 text-amber-950'
+                }`}>
+                  {expiringDocuments.length}
+                </span>
+              )}
+            </button>
+
+            {/* Category Dropdown */}
+            <div className="flex items-center gap-2">
+              <Filter className="h-3.5 w-3.5 text-[#556055]" />
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="rounded-lg border border-[#DDE3DD] bg-white px-3 py-2 text-xs text-[#1A1A1A] font-semibold focus:outline-none"
+              >
               <option value="ALL">All Categories</option>
               <option value="CONTRACT_AGREEMENT">Contracts & Agreements</option>
               <option value="EXPORT_SHIPPING_LC">Export & Shipping (LC / BL)</option>
@@ -1109,6 +1271,7 @@ Attested: Syed Akramul Hassan`;
           </div>
         </div>
       </div>
+    </div>
 
       {/* =================================================================== */}
       {/* 4. SELECTION ACTION BAR (Appears when 1+ items are selected) */}
@@ -1277,6 +1440,30 @@ Attested: Syed Akramul Hassan`;
                   ))}
                 </div>
 
+                {/* 30-Day Renewal Alert Notice & One-Click Calendar Reminder */}
+                {doc.expiryDate && isRenewalDue(doc.expiryDate) && (
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-950 text-xs shadow-2xs">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <Clock className="h-4 w-4 text-amber-700 animate-pulse shrink-0" />
+                      <span className="font-bold truncate">
+                        {(() => {
+                          const d = getDaysUntilExpiration(doc.expiryDate);
+                          if (d === null) return '';
+                          return d < 0 ? `Expired ${Math.abs(d)}d ago` : `Renewal Due (${d} days left)`;
+                        })()}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => handleScheduleRenewalTask(doc)}
+                      title="Schedule high-priority renewal reminder in Calendar & Tasks"
+                      className="px-2 py-1 rounded bg-[#1F3A2E] hover:bg-[#2C5240] text-white text-[10px] font-extrabold shrink-0 flex items-center gap-1 shadow-xs"
+                    >
+                      <Calendar className="h-3 w-3" />
+                      <span>Schedule</span>
+                    </button>
+                  </div>
+                )}
+
                 {/* Footer Metadata & Action Buttons */}
                 <div className="flex items-center justify-between border-t border-[#DDE3DD] pt-3 text-xs text-[#6B7269]">
                   <div className="text-[11px] font-mono">
@@ -1435,7 +1622,27 @@ Attested: Syed Akramul Hassan`;
                       <td className="py-3 px-4 whitespace-nowrap font-mono text-[11px] text-[#6B7269]">
                         <div>{doc.uploadDate}</div>
                         {doc.expiryDate && (
-                          <div className="text-[10px] text-[#8A5A00]">Exp: {doc.expiryDate}</div>
+                          <div>
+                            <div className="text-[10px] text-[#8A5A00] font-semibold">Exp: {doc.expiryDate}</div>
+                            {isRenewalDue(doc.expiryDate) && (
+                              <div className="mt-0.5 flex items-center gap-1">
+                                <span className="inline-flex items-center gap-1 text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-amber-100 text-amber-900 border border-amber-300 animate-pulse font-mono">
+                                  <Clock className="h-2.5 w-2.5" />
+                                  {(() => {
+                                    const d = getDaysUntilExpiration(doc.expiryDate);
+                                    return d !== null && d < 0 ? `Expired ${Math.abs(d)}d ago` : `${d}d left`;
+                                  })()}
+                                </span>
+                                <button
+                                  onClick={() => handleScheduleRenewalTask(doc)}
+                                  title="Schedule renewal reminder in Calendar"
+                                  className="text-[9px] font-bold text-[#1F3A2E] hover:underline"
+                                >
+                                  Schedule
+                                </button>
+                              </div>
+                            )}
+                          </div>
                         )}
                       </td>
 
@@ -1668,6 +1875,10 @@ Attested: Syed Akramul Hassan`;
                     onChange={(e) => setFormData({ ...formData, expiryDate: e.target.value })}
                     className="w-full rounded-lg border border-[#DDE3DD] p-2 text-[#1A1A1A] focus:outline-none"
                   />
+                  <p className="text-[10px] text-[#556055] mt-1 flex items-center gap-1 font-medium">
+                    <Bell className="h-3 w-3 text-[#C8A96A] shrink-0" />
+                    <span>Notification Center alerts 30 days prior to expiration.</span>
+                  </p>
                 </div>
               </div>
 
@@ -1821,6 +2032,10 @@ Attested: Syed Akramul Hassan`;
                     onChange={(e) => setFormData({ ...formData, expiryDate: e.target.value })}
                     className="w-full rounded-lg border border-[#DDE3DD] p-2 text-[#1A1A1A] focus:outline-none"
                   />
+                  <p className="text-[10px] text-[#556055] mt-1 flex items-center gap-1 font-medium">
+                    <Bell className="h-3 w-3 text-[#C8A96A] shrink-0" />
+                    <span>Notification Center alerts 30 days prior to expiration.</span>
+                  </p>
                 </div>
               </div>
 
