@@ -102,16 +102,16 @@ export default function Sidebar() {
           <div className="p-4 border-b border-[var(--sidebar-border)]">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="h-8 w-8 rounded-lg bg-[var(--sidebar-active-text)] flex items-center justify-center font-black text-[var(--sidebar-bg)] shadow-md">
-                  M
+                <div className="h-10 w-10 rounded-xl overflow-hidden border border-[#C8A96A]/60 bg-[#0A1628] shadow-md flex items-center justify-center shrink-0 p-0.5">
+                  <img src="/logos/master-crm-icon.png" alt="Master CRM" className="h-full w-full object-contain" />
                 </div>
                 <div>
                   <div className="font-extrabold text-sm text-white tracking-tight flex items-center gap-1.5">
-                    <span>MASTER_</span>
+                    <span>MASTER</span>
                     <span className="text-[var(--sidebar-active-text)] font-extrabold">CRM</span>
                     <span className="h-1.5 w-1.5 rounded-full bg-[var(--sidebar-active-text)]" />
                   </div>
-                  <div className="text-[10px] text-[var(--sidebar-muted)] font-mono tracking-wider">EXECUTIVE OS</div>
+                  <div className="text-[9px] text-[#C8A96A] font-serif tracking-wider uppercase font-semibold">SYED AKRAMUL HASSAN</div>
                 </div>
               </div>
 
@@ -208,8 +208,8 @@ export default function Sidebar() {
           {/* User Profile Footer */}
           <div className="p-3 border-t border-[var(--sidebar-border)] bg-[var(--sidebar-box-bg)]">
             <div className="flex items-center gap-2.5 rounded-lg p-2 bg-[var(--sidebar-bg)] border border-[var(--sidebar-border)]">
-              <div className="h-8 w-8 rounded-full bg-[var(--sidebar-active-text)] flex items-center justify-center font-bold text-xs text-[var(--sidebar-bg)] shrink-0">
-                SH
+              <div className="h-9 w-9 rounded-full overflow-hidden border border-[#C8A96A]/80 bg-[#0A1628] shadow-sm flex items-center justify-center shrink-0">
+                <img src="/logos/master-crm-icon.png" alt="Syed Akramul Hassan" className="h-full w-full object-cover" />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="text-xs font-bold text-white truncate">Syed Akramul Hassan</div>

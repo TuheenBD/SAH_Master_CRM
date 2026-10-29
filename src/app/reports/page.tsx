@@ -367,16 +367,21 @@ ${specificContent}
         {selectedReport === 'PERSONAL_FINANCIAL_STATEMENT' && (
           <div className="report-header mb-6 pb-4 border-b border-[#DDE3DD]">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div>
-                <div className="text-[10px] uppercase tracking-widest text-[#556055] font-extrabold">
-                  Personal Accounts Suite &bull; Strictly Private
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-12 rounded-xl overflow-hidden border border-[#C8A96A] bg-[#0A1628] shadow-sm flex items-center justify-center shrink-0 p-0.5">
+                  <img src="/logos/master-crm-icon.png" alt="Syed Akramul Hassan" className="h-full w-full object-contain" />
                 </div>
-                <h2 className="text-xl sm:text-2xl font-black text-[#1F3A2E] mt-0.5 tracking-tight">
-                  Confidential Personal Financial Statement (PFS)
-                </h2>
-                <p className="text-xs text-[#6B7269]">
-                  Statement of Financial Condition, Liquid Bank Deposits & Certified Net Worth for <strong>Syed Akramul Hassan</strong>
-                </p>
+                <div>
+                  <div className="text-[10px] uppercase tracking-widest text-[#556055] font-extrabold">
+                    Personal Accounts Suite &bull; Strictly Private
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-black text-[#1F3A2E] mt-0.5 tracking-tight">
+                    Confidential Personal Financial Statement (PFS)
+                  </h2>
+                  <p className="text-xs text-[#6B7269]">
+                    Statement of Financial Condition, Liquid Bank Deposits & Certified Net Worth for <strong>Syed Akramul Hassan</strong>
+                  </p>
+                </div>
               </div>
 
               <div className="text-right text-xs font-mono text-[#556055]">

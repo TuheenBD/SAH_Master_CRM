@@ -24,7 +24,7 @@ export const COMPANIES: Record<CompanyCode, CompanyMeta> = {
     website: 'Executive OS',
     currency: 'USD/BDT',
     paletteDescription: 'Royal Green, Bottle Green, Imperial Gold & Ivory White',
-    logoUrl: '/logos/arielmc-logo.png',
+    logoUrl: '/logos/master-crm-icon.png',
     stats: [
       { label: 'Operating Entities', value: '3 Companies' },
       { label: 'Consolidated Active Deals', value: '42 Deals' },

@@ -6,8 +6,13 @@ import { ThemeProvider } from '@/lib/theme';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Master CRM - Personal Executive OS',
-  description: 'Multi-Company CRM & Double-Entry Financial Engine for Ariel Marketing & Communications, Bizman Media Limited, and Linda Resort Limited',
+  title: 'Master CRM | Syed Akramul Hassan - Executive OS',
+  description: 'Multi-Company CRM & Double-Entry Financial Engine for ArielMC, Bizman Media Limited, and Linda Resort Limited - Owned by Syed Akramul Hassan',
+  icons: {
+    icon: '/logos/master-crm-icon.png',
+    shortcut: '/logos/master-crm-icon.png',
+    apple: '/logos/master-crm-icon.png',
+  },
 };
 
 export default function RootLayout({

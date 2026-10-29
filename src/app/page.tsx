@@ -98,15 +98,20 @@ export default function MasterDashboard() {
               </div>
             )}
             {activeCompany === 'CONSOLIDATED' && (
-              <div className="flex items-center -space-x-1.5 shrink-0 pt-1">
-                <div className="h-12 w-14 rounded-xl overflow-hidden border border-[#DDE3DD] bg-white p-1 shadow-sm flex items-center justify-center">
-                  <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-10 w-auto object-contain" />
+              <div className="flex items-center gap-3 shrink-0 pt-1">
+                <div className="h-16 w-16 rounded-2xl overflow-hidden border border-[#C8A96A] bg-[#0A1628] p-1 shadow-md flex items-center justify-center shrink-0">
+                  <img src="/logos/master-crm-icon.png" alt="Master CRM" className="h-full w-full object-contain" />
                 </div>
-                <div className="h-12 w-12 rounded-xl overflow-hidden border border-[#DDE3DD] bg-[#0D3B29] p-1 shadow-sm flex items-center justify-center">
-                  <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-full w-full object-contain" />
-                </div>
-                <div className="h-12 w-24 rounded-xl overflow-hidden border border-[#DDE3DD] bg-black p-1.5 shadow-sm flex items-center justify-center">
-                  <img src="/logos/linda-logo.png" alt="Linda" className="max-h-9 w-auto object-contain" />
+                <div className="flex items-center -space-x-1.5 shrink-0">
+                  <div className="h-12 w-14 rounded-xl overflow-hidden border border-[#DDE3DD] bg-white p-1 shadow-sm flex items-center justify-center">
+                    <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-10 w-auto object-contain" />
+                  </div>
+                  <div className="h-12 w-12 rounded-xl overflow-hidden border border-[#DDE3DD] bg-[#0D3B29] p-1 shadow-sm flex items-center justify-center">
+                    <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-full w-full object-contain" />
+                  </div>
+                  <div className="h-12 w-24 rounded-xl overflow-hidden border border-[#DDE3DD] bg-black p-1.5 shadow-sm flex items-center justify-center">
+                    <img src="/logos/linda-logo.png" alt="Linda" className="max-h-9 w-auto object-contain" />
+                  </div>
                 </div>
               </div>
             )}

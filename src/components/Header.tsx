@@ -85,8 +85,8 @@ export default function Header() {
             </div>
           )}
           {activeCompany === 'CONSOLIDATED' && (
-            <div className="h-8 w-8 rounded-lg bg-[var(--header-accent)] text-[var(--header-bg)] flex items-center justify-center font-black shadow shrink-0">
-              <Layers className="h-4 w-4" />
+            <div className="h-9 w-9 rounded-xl overflow-hidden border border-[#C8A96A]/60 bg-[#0A1628] shadow flex items-center justify-center shrink-0 p-0.5">
+              <img src="/logos/master-crm-icon.png" alt="Master CRM" className="h-full w-full object-contain" />
             </div>
           )}
 
@@ -120,7 +120,9 @@ export default function Header() {
                   onClick={() => switchCompany(code)}
                   className={`rounded-lg px-2.5 sm:px-3 py-1 text-xs transition-all whitespace-nowrap flex items-center gap-1.5 ${activeStyle}`}
                 >
-                  {code === 'CONSOLIDATED' && <Layers className="h-3.5 w-3.5 shrink-0" />}
+                  {code === 'CONSOLIDATED' && (
+                    <img src="/logos/master-crm-icon.png" alt="Master CRM" className="h-4 w-4 rounded-full object-contain shrink-0 border border-[#C8A96A]/40" />
+                  )}
                   {code === 'ARIELMC' && (
                     <img src="/logos/arielmc-logo.png" alt="ArielMC" className="h-4 w-auto object-contain shrink-0 bg-white px-0.5 rounded shadow-xs" />
                   )}
