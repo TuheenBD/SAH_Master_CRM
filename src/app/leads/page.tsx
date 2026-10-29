@@ -34,7 +34,20 @@ import {
   Briefcase,
   UserPlus,
   FolderPlus,
-  Building
+  Building,
+  ShieldCheck,
+  ShieldAlert,
+  FileText,
+  FileCheck2,
+  CreditCard,
+  Camera,
+  Eye,
+  Download,
+  Upload,
+  AlertTriangle,
+  Paperclip,
+  Award,
+  Image as ImageIcon
 } from 'lucide-react';
 import { 
   CompanyCode, 
@@ -45,7 +58,12 @@ import {
   ContactRoleType, 
   PipelineStage, 
   CustomerPaymentStatus, 
-  EntityPayoutStatus 
+  EntityPayoutStatus,
+  CompanyComplianceDocs,
+  SupplementaryDoc,
+  getDaysUntilExpiration,
+  isRenewalDue,
+  DocumentRecord
 } from '@/lib/types';
 import { INITIAL_LEADS, INITIAL_COMPANY_LEADS, INITIAL_CONTACTS } from '@/lib/mock-data';
 
@@ -195,6 +213,72 @@ export default function LeadsPage() {
     whatsapp: '',
     notes: '',
     isPrimary: false,
+    photoUrl: '',
+    visitingCardFrontUrl: '',
+    visitingCardBackUrl: '',
+    nidNo: '',
+    nidDocUrl: '',
+    passportNo: '',
+    passportExpiry: '',
+    passportDocUrl: '',
+    personalTinNo: '',
+    personalTinDocUrl: '',
+  });
+
+  // Corporate Compliance & Statutory Documents Vault State
+  const [isComplianceModalOpen, setIsComplianceModalOpen] = useState(false);
+  const [complianceFormData, setComplianceFormData] = useState<CompanyComplianceDocs>({
+    tradeLicenseNo: '',
+    tradeLicenseExpiry: '',
+    tradeLicenseFileName: '',
+    tradeLicenseDocUrl: '',
+    tinNo: '',
+    tinFileName: '',
+    tinDocUrl: '',
+    binVatNo: '',
+    binVatFileName: '',
+    binVatDocUrl: '',
+    incorporationNo: '',
+    incorporationFileName: '',
+    incorporationDocUrl: '',
+    bankSolvencyFileName: '',
+    bankSolvencyDocUrl: '',
+    companyProfileFileName: '',
+    companyProfileDocUrl: '',
+    supplementaryDocs: []
+  });
+
+  // Contact Visiting Card & KYC State
+  const [activeContact, setActiveContact] = useState<LeadContact | null>(null);
+  const [isVisitingCardModalOpen, setIsVisitingCardModalOpen] = useState(false);
+  const [isContactKYCModalOpen, setIsContactKYCModalOpen] = useState(false);
+  const [cardSideView, setCardSideView] = useState<'FRONT' | 'BACK'>('FRONT');
+  const [contactKYCFormData, setContactKYCFormData] = useState({
+    photoUrl: '',
+    visitingCardFrontUrl: '',
+    visitingCardBackUrl: '',
+    nidNo: '',
+    nidDocUrl: '',
+    passportNo: '',
+    passportExpiry: '',
+    passportDocUrl: '',
+    personalTinNo: '',
+    personalTinDocUrl: ''
+  });
+
+  // Universal File Preview Modal (Inspect Fullscreen Images & Documents)
+  const [previewModal, setPreviewModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    fileName: string;
+    fileUrl?: string;
+    fileType?: 'PDF' | 'IMAGE';
+  }>({
+    isOpen: false,
+    title: '',
+    fileName: '',
+    fileUrl: '',
+    fileType: 'PDF'
   });
 
   // Modal: Add Parallel Project to Corporate Lead
@@ -555,6 +639,16 @@ export default function LeadsPage() {
       whatsapp: contactFormData.whatsapp.trim() || contactFormData.phone.replace(/[^0-9]/g, ''),
       notes: contactFormData.notes.trim(),
       isPrimary: contactFormData.isPrimary,
+      photoUrl: contactFormData.photoUrl || undefined,
+      visitingCardFrontUrl: contactFormData.visitingCardFrontUrl || undefined,
+      visitingCardBackUrl: contactFormData.visitingCardBackUrl || undefined,
+      nidNo: contactFormData.nidNo || undefined,
+      nidDocUrl: contactFormData.nidDocUrl || undefined,
+      passportNo: contactFormData.passportNo || undefined,
+      passportExpiry: contactFormData.passportExpiry || undefined,
+      passportDocUrl: contactFormData.passportDocUrl || undefined,
+      personalTinNo: contactFormData.personalTinNo || undefined,
+      personalTinDocUrl: contactFormData.personalTinDocUrl || undefined,
     };
 
     const updatedCompany: CompanyLead = {
@@ -565,6 +659,18 @@ export default function LeadsPage() {
     updateAndPersistCompanyLeads(prev => prev.map(c => c.id === targetComp.id ? updatedCompany : c));
     setSelectedCompany(updatedCompany);
     setIsAddContactModalOpen(false);
+
+    // Sync passport or NID to Document Vault if present
+    if (newContact.passportExpiry || newContact.passportDocUrl) {
+      syncComplianceToDocVault(
+        targetComp,
+        `${newContact.name} - Passport Copy`,
+        `${newContact.name.toLowerCase().replace(/\s+/g, '_')}_passport.pdf`,
+        newContact.passportDocUrl,
+        newContact.passportExpiry,
+        `Contact KYC: Passport record for ${newContact.name} (${newContact.designation}) at ${targetComp.companyName}`
+      );
+    }
 
     // Pre-populate formData for Step 3 (Launch Pipeline Deal)
     setFormData(prev => ({
@@ -592,7 +698,241 @@ export default function LeadsPage() {
       whatsapp: '',
       notes: '',
       isPrimary: false,
+      photoUrl: '',
+      visitingCardFrontUrl: '',
+      visitingCardBackUrl: '',
+      nidNo: '',
+      nidDocUrl: '',
+      passportNo: '',
+      passportExpiry: '',
+      passportDocUrl: '',
+      personalTinNo: '',
+      personalTinDocUrl: '',
     });
+  };
+
+  // Helper to read file to base64 Data URL
+  const handleReadFileAsBase64 = (file: File, callback: (base64Url: string, fileName: string) => void) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = (e.target?.result as string) || '';
+      callback(dataUrl, file.name);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Sync Corporate KYB / Contact KYC Document to Sovereign Vault (with 30-Day Expiry Tracking)
+  const syncComplianceToDocVault = (
+    company: CompanyLead,
+    docTitle: string,
+    fileName: string,
+    fileDataUrl?: string,
+    expiryDate?: string,
+    notes?: string
+  ) => {
+    if (typeof window === 'undefined') return;
+    try {
+      const stored = localStorage.getItem('sah_master_crm_documents_v3');
+      const docs: DocumentRecord[] = stored ? JSON.parse(stored) : [];
+      const title = `${company.companyName} - ${docTitle}`;
+      const existingIdx = docs.findIndex(d => d.title === title && d.companyCode === company.companyCode);
+
+      const record: DocumentRecord = {
+        id: existingIdx >= 0 ? docs[existingIdx].id : `doc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        title,
+        fileName: fileName || `${docTitle.toLowerCase().replace(/\s+/g, '_')}.pdf`,
+        fileSize: '1.4 MB',
+        fileType: (fileName && fileName.match(/\.(png|jpe?g|webp)$/i)) ? 'IMAGE' : 'PDF',
+        companyCode: company.companyCode,
+        category: docTitle.includes('Passport') || docTitle.includes('KYC') ? 'CONTACT_KYC_DOSSIER' : 'SUPPLIER_VENDOR_KYB',
+        securityLevel: 'CONFIDENTIAL',
+        uploadDate: new Date().toISOString().split('T')[0],
+        expiryDate: expiryDate || undefined,
+        tags: [company.companyName, 'StatutoryKYB', docTitle.replace(/\s+/g, '')],
+        notes: notes || `Official statutory compliance document for ${company.companyName} (${company.clientType}).`,
+        uploadedBy: 'Syed Akramul Hassan',
+        version: 'v1.0',
+        fileDataUrl
+      };
+
+      const updated = existingIdx >= 0 ? docs.map((d, i) => i === existingIdx ? record : d) : [record, ...docs];
+      localStorage.setItem('sah_master_crm_documents_v3', JSON.stringify(updated));
+      window.dispatchEvent(new Event('document-vault-updated'));
+    } catch (err) {
+      console.error('Error syncing document to vault', err);
+    }
+  };
+
+  // Compliance Modal Handlers
+  const handleOpenComplianceModal = (company: CompanyLead) => {
+    const comp = company.compliance || {};
+    setComplianceFormData({
+      tradeLicenseNo: comp.tradeLicenseNo || '',
+      tradeLicenseExpiry: comp.tradeLicenseExpiry || '',
+      tradeLicenseFileName: comp.tradeLicenseFileName || '',
+      tradeLicenseDocUrl: comp.tradeLicenseDocUrl || '',
+      tinNo: comp.tinNo || '',
+      tinFileName: comp.tinFileName || '',
+      tinDocUrl: comp.tinDocUrl || '',
+      binVatNo: comp.binVatNo || '',
+      binVatFileName: comp.binVatFileName || '',
+      binVatDocUrl: comp.binVatDocUrl || '',
+      incorporationNo: comp.incorporationNo || '',
+      incorporationFileName: comp.incorporationFileName || '',
+      incorporationDocUrl: comp.incorporationDocUrl || '',
+      bankSolvencyFileName: comp.bankSolvencyFileName || '',
+      bankSolvencyDocUrl: comp.bankSolvencyDocUrl || '',
+      companyProfileFileName: comp.companyProfileFileName || '',
+      companyProfileDocUrl: comp.companyProfileDocUrl || '',
+      supplementaryDocs: comp.supplementaryDocs || []
+    });
+    setIsComplianceModalOpen(true);
+  };
+
+  const handleSaveCompliance = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedCompany) return;
+
+    const updatedCompany: CompanyLead = {
+      ...selectedCompany,
+      compliance: complianceFormData
+    };
+
+    updateAndPersistCompanyLeads(prev => prev.map(c => c.id === selectedCompany.id ? updatedCompany : c));
+    setSelectedCompany(updatedCompany);
+
+    // Sync statutory documents with Document Vault & renewal engine
+    if (complianceFormData.tradeLicenseFileName || complianceFormData.tradeLicenseNo) {
+      syncComplianceToDocVault(
+        updatedCompany,
+        'Trade License',
+        complianceFormData.tradeLicenseFileName || 'Trade_License.pdf',
+        complianceFormData.tradeLicenseDocUrl,
+        complianceFormData.tradeLicenseExpiry,
+        `Trade License No: ${complianceFormData.tradeLicenseNo || 'N/A'}`
+      );
+    }
+    if (complianceFormData.tinFileName || complianceFormData.tinNo) {
+      syncComplianceToDocVault(
+        updatedCompany,
+        'e-TIN Certificate',
+        complianceFormData.tinFileName || 'eTIN_Certificate.pdf',
+        complianceFormData.tinDocUrl,
+        undefined,
+        `e-TIN Number: ${complianceFormData.tinNo || 'N/A'}`
+      );
+    }
+    if (complianceFormData.binVatFileName || complianceFormData.binVatNo) {
+      syncComplianceToDocVault(
+        updatedCompany,
+        'BIN / VAT Certificate (Mushak 9.1)',
+        complianceFormData.binVatFileName || 'BIN_VAT_Registration.pdf',
+        complianceFormData.binVatDocUrl,
+        undefined,
+        `BIN / VAT Registration: ${complianceFormData.binVatNo || 'N/A'}`
+      );
+    }
+    if (complianceFormData.incorporationFileName || complianceFormData.incorporationNo) {
+      syncComplianceToDocVault(
+        updatedCompany,
+        'Certificate of Incorporation (RJSC)',
+        complianceFormData.incorporationFileName || 'RJSC_Incorporation.pdf',
+        complianceFormData.incorporationDocUrl,
+        undefined,
+        `RJSC Incorporation Reg: ${complianceFormData.incorporationNo || 'N/A'}`
+      );
+    }
+    if (complianceFormData.bankSolvencyFileName) {
+      syncComplianceToDocVault(
+        updatedCompany,
+        'Bank Solvency Letter',
+        complianceFormData.bankSolvencyFileName,
+        complianceFormData.bankSolvencyDocUrl,
+        undefined,
+        `Bank solvency attestation for ${updatedCompany.companyName}`
+      );
+    }
+    if (complianceFormData.companyProfileFileName) {
+      syncComplianceToDocVault(
+        updatedCompany,
+        'Company Profile & Portfolio',
+        complianceFormData.companyProfileFileName,
+        complianceFormData.companyProfileDocUrl,
+        undefined,
+        `Corporate Profile / Catalog for ${updatedCompany.companyName}`
+      );
+    }
+
+    setIsComplianceModalOpen(false);
+  };
+
+  // Visiting Card Modal Handlers
+  const handleOpenVisitingCardModal = (contact: LeadContact) => {
+    setActiveContact(contact);
+    setContactKYCFormData({
+      photoUrl: contact.photoUrl || '',
+      visitingCardFrontUrl: contact.visitingCardFrontUrl || '',
+      visitingCardBackUrl: contact.visitingCardBackUrl || '',
+      nidNo: contact.nidNo || '',
+      nidDocUrl: contact.nidDocUrl || '',
+      passportNo: contact.passportNo || '',
+      passportExpiry: contact.passportExpiry || '',
+      passportDocUrl: contact.passportDocUrl || '',
+      personalTinNo: contact.personalTinNo || '',
+      personalTinDocUrl: contact.personalTinDocUrl || ''
+    });
+    setCardSideView('FRONT');
+    setIsVisitingCardModalOpen(true);
+  };
+
+  // Contact KYC Modal Handlers
+  const handleOpenContactKYCModal = (contact: LeadContact) => {
+    setActiveContact(contact);
+    setContactKYCFormData({
+      photoUrl: contact.photoUrl || '',
+      visitingCardFrontUrl: contact.visitingCardFrontUrl || '',
+      visitingCardBackUrl: contact.visitingCardBackUrl || '',
+      nidNo: contact.nidNo || '',
+      nidDocUrl: contact.nidDocUrl || '',
+      passportNo: contact.passportNo || '',
+      passportExpiry: contact.passportExpiry || '',
+      passportDocUrl: contact.passportDocUrl || '',
+      personalTinNo: contact.personalTinNo || '',
+      personalTinDocUrl: contact.personalTinDocUrl || ''
+    });
+    setIsContactKYCModalOpen(true);
+  };
+
+  const handleSaveContactKYC = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedCompany || !activeContact) return;
+
+    const updatedContact: LeadContact = {
+      ...activeContact,
+      ...contactKYCFormData
+    };
+
+    const updatedCompany: CompanyLead = {
+      ...selectedCompany,
+      contacts: selectedCompany.contacts.map(c => c.id === activeContact.id ? updatedContact : c)
+    };
+
+    updateAndPersistCompanyLeads(prev => prev.map(c => c.id === selectedCompany.id ? updatedCompany : c));
+    setSelectedCompany(updatedCompany);
+
+    if (contactKYCFormData.passportExpiry || contactKYCFormData.passportDocUrl) {
+      syncComplianceToDocVault(
+        selectedCompany,
+        `${activeContact.name} - Passport Copy`,
+        `${activeContact.name.toLowerCase().replace(/\s+/g, '_')}_passport.pdf`,
+        contactKYCFormData.passportDocUrl,
+        contactKYCFormData.passportExpiry,
+        `Contact KYC: Passport record for ${activeContact.name} (${activeContact.designation}) at ${selectedCompany.companyName}`
+      );
+    }
+
+    setIsContactKYCModalOpen(false);
+    setIsVisitingCardModalOpen(false);
   };
 
   const handleAddProjectToCompany = (e: React.FormEvent) => {
@@ -1391,6 +1731,506 @@ export default function LeadsPage() {
                 })()}
               </div>
 
+              {/* Card 1.5: Corporate Compliance & Statutory Documents Vault */}
+              <div className="rounded-xl border border-[#DDE3DD] bg-white p-5 shadow-sm space-y-4">
+                <div className="flex flex-wrap items-center justify-between border-b border-[#DDE3DD] pb-3 gap-2">
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="h-4 w-4 text-[#1F3A2E]" />
+                    <div>
+                      <h3 className="text-xs font-black text-[#1F3A2E] uppercase tracking-wide flex items-center gap-2">
+                        <span>Corporate Compliance & Statutory Vault</span>
+                        <span className="text-[10px] font-bold text-[#6B7269] bg-[#F4F6F4] px-2 py-0.5 rounded-full border border-[#DDE3DD]">
+                          Trade Lic &bull; TIN &bull; BIN &bull; VAT &bull; Profile
+                        </span>
+                      </h3>
+                      <p className="text-[11px] text-[#6B7269] mt-0.5">
+                        Statutory profile documents for supplier, vendor, buyer & client due diligence
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleOpenComplianceModal(selectedCompany)}
+                    className="flex items-center gap-1.5 rounded-lg bg-[#1F3A2E] hover:bg-[#2C5240] text-[#C8A96A] px-3.5 py-1.5 text-xs font-black transition-all shadow-xs"
+                  >
+                    <Upload className="h-3.5 w-3.5" />
+                    <span>+ Manage & Upload Documents</span>
+                  </button>
+                </div>
+
+                {/* Statutory Grid of 6 Core Credentials */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                  {/* 1. Trade License */}
+                  {(() => {
+                    const comp = selectedCompany.compliance;
+                    const isDue = isRenewalDue(comp?.tradeLicenseExpiry);
+                    const daysLeft = getDaysUntilExpiration(comp?.tradeLicenseExpiry);
+                    const hasLic = !!comp?.tradeLicenseNo || !!comp?.tradeLicenseFileName;
+
+                    return (
+                      <div className={`rounded-xl border p-3 flex flex-col justify-between transition-all ${
+                        isDue 
+                          ? 'bg-amber-50/70 border-amber-300 ring-1 ring-amber-300/50' 
+                          : hasLic 
+                            ? 'bg-[#F9FCFA] border-[#A7F3D0]' 
+                            : 'bg-[#FAFAF8] border-[#DDE3DD]'
+                      }`}>
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="text-[10px] font-black uppercase text-[#1F3A2E] flex items-center gap-1">
+                              <FileCheck2 className="h-3 w-3 text-[#1F3A2E]" />
+                              <span>Trade License</span>
+                            </span>
+                            {isDue ? (
+                              <span className="px-1.5 py-0.5 text-[9px] font-extrabold rounded bg-amber-200 text-amber-900 animate-pulse flex items-center gap-1">
+                                <Clock className="h-2.5 w-2.5" />
+                                {daysLeft !== null && daysLeft < 0 ? `Expired ${Math.abs(daysLeft)}d ago` : `Renewal: ${daysLeft}d left`}
+                              </span>
+                            ) : hasLic ? (
+                              <span className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-emerald-100 text-emerald-800">
+                                Active / Valid
+                              </span>
+                            ) : (
+                              <span className="px-1.5 py-0.5 text-[9px] font-semibold rounded bg-gray-100 text-gray-600">
+                                Pending Upload
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="font-mono text-xs font-bold text-[#1A1A1A] truncate">
+                            {comp?.tradeLicenseNo || 'Lic # Not Set'}
+                          </div>
+
+                          <div className="text-[10px] text-[#6B7269]">
+                            Expiry: <span className="font-semibold text-[#1A1A1A]">{comp?.tradeLicenseExpiry || 'No Date Recorded'}</span>
+                          </div>
+                        </div>
+
+                        <div className="pt-2 mt-2 border-t border-[#E5EAE5] flex items-center justify-between text-[11px]">
+                          <span className="text-[10px] text-[#6B7269] truncate max-w-[120px]">
+                            {comp?.tradeLicenseFileName || 'No file attached'}
+                          </span>
+                          <div className="flex items-center gap-1">
+                            {comp?.tradeLicenseDocUrl || comp?.tradeLicenseFileName ? (
+                              <button
+                                type="button"
+                                onClick={() => setPreviewModal({
+                                  isOpen: true,
+                                  title: `${selectedCompany.companyName} - Trade License`,
+                                  fileName: comp.tradeLicenseFileName || 'Trade_License.pdf',
+                                  fileUrl: comp.tradeLicenseDocUrl,
+                                  fileType: (comp.tradeLicenseFileName && comp.tradeLicenseFileName.match(/\.(png|jpe?g|webp)$/i)) ? 'IMAGE' : 'PDF'
+                                })}
+                                className="px-2 py-0.5 rounded bg-white hover:bg-[#1F3A2E] text-[#1F3A2E] hover:text-[#C8A96A] border border-[#DDE3DD] text-[10px] font-bold flex items-center gap-1 shadow-2xs"
+                              >
+                                <Eye className="h-2.5 w-2.5" />
+                                <span>View</span>
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleOpenComplianceModal(selectedCompany)}
+                                className="px-2 py-0.5 rounded bg-[#1F3A2E] text-[#C8A96A] text-[10px] font-bold flex items-center gap-1 shadow-2xs"
+                              >
+                                <Upload className="h-2.5 w-2.5" />
+                                <span>Upload</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* 2. e-TIN Certificate */}
+                  {(() => {
+                    const comp = selectedCompany.compliance;
+                    const hasTin = !!comp?.tinNo || !!comp?.tinFileName;
+
+                    return (
+                      <div className={`rounded-xl border p-3 flex flex-col justify-between transition-all ${
+                        hasTin ? 'bg-[#F9FCFA] border-[#A7F3D0]' : 'bg-[#FAFAF8] border-[#DDE3DD]'
+                      }`}>
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="text-[10px] font-black uppercase text-[#1F3A2E] flex items-center gap-1">
+                              <FileText className="h-3 w-3 text-[#1F3A2E]" />
+                              <span>e-TIN Certificate</span>
+                            </span>
+                            {hasTin ? (
+                              <span className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-emerald-100 text-emerald-800">
+                                Recorded
+                              </span>
+                            ) : (
+                              <span className="px-1.5 py-0.5 text-[9px] font-semibold rounded bg-gray-100 text-gray-600">
+                                Pending Upload
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="font-mono text-xs font-bold text-[#1A1A1A] truncate">
+                            {comp?.tinNo ? `TIN: ${comp.tinNo}` : 'TIN # Not Set'}
+                          </div>
+
+                          <div className="text-[10px] text-[#6B7269]">
+                            NBR Tax Registration Certificate
+                          </div>
+                        </div>
+
+                        <div className="pt-2 mt-2 border-t border-[#E5EAE5] flex items-center justify-between text-[11px]">
+                          <span className="text-[10px] text-[#6B7269] truncate max-w-[120px]">
+                            {comp?.tinFileName || 'No certificate'}
+                          </span>
+                          <div className="flex items-center gap-1">
+                            {comp?.tinDocUrl || comp?.tinFileName ? (
+                              <button
+                                type="button"
+                                onClick={() => setPreviewModal({
+                                  isOpen: true,
+                                  title: `${selectedCompany.companyName} - e-TIN Certificate`,
+                                  fileName: comp.tinFileName || 'eTIN_Certificate.pdf',
+                                  fileUrl: comp.tinDocUrl,
+                                  fileType: (comp.tinFileName && comp.tinFileName.match(/\.(png|jpe?g|webp)$/i)) ? 'IMAGE' : 'PDF'
+                                })}
+                                className="px-2 py-0.5 rounded bg-white hover:bg-[#1F3A2E] text-[#1F3A2E] hover:text-[#C8A96A] border border-[#DDE3DD] text-[10px] font-bold flex items-center gap-1 shadow-2xs"
+                              >
+                                <Eye className="h-2.5 w-2.5" />
+                                <span>View</span>
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleOpenComplianceModal(selectedCompany)}
+                                className="px-2 py-0.5 rounded bg-[#1F3A2E] text-[#C8A96A] text-[10px] font-bold flex items-center gap-1 shadow-2xs"
+                              >
+                                <Upload className="h-2.5 w-2.5" />
+                                <span>Upload</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* 3. BIN / VAT Certificate */}
+                  {(() => {
+                    const comp = selectedCompany.compliance;
+                    const hasBin = !!comp?.binVatNo || !!comp?.binVatFileName;
+
+                    return (
+                      <div className={`rounded-xl border p-3 flex flex-col justify-between transition-all ${
+                        hasBin ? 'bg-[#F9FCFA] border-[#A7F3D0]' : 'bg-[#FAFAF8] border-[#DDE3DD]'
+                      }`}>
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="text-[10px] font-black uppercase text-[#1F3A2E] flex items-center gap-1">
+                              <Award className="h-3 w-3 text-[#1F3A2E]" />
+                              <span>BIN / VAT (Mushak 9.1)</span>
+                            </span>
+                            {hasBin ? (
+                              <span className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-emerald-100 text-emerald-800">
+                                Recorded
+                              </span>
+                            ) : (
+                              <span className="px-1.5 py-0.5 text-[9px] font-semibold rounded bg-gray-100 text-gray-600">
+                                Pending Upload
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="font-mono text-xs font-bold text-[#1A1A1A] truncate">
+                            {comp?.binVatNo ? `BIN: ${comp.binVatNo}` : 'BIN # Not Set'}
+                          </div>
+
+                          <div className="text-[10px] text-[#6B7269]">
+                            Customs, Excise & VAT Commissionerate
+                          </div>
+                        </div>
+
+                        <div className="pt-2 mt-2 border-t border-[#E5EAE5] flex items-center justify-between text-[11px]">
+                          <span className="text-[10px] text-[#6B7269] truncate max-w-[120px]">
+                            {comp?.binVatFileName || 'No certificate'}
+                          </span>
+                          <div className="flex items-center gap-1">
+                            {comp?.binVatDocUrl || comp?.binVatFileName ? (
+                              <button
+                                type="button"
+                                onClick={() => setPreviewModal({
+                                  isOpen: true,
+                                  title: `${selectedCompany.companyName} - BIN / VAT Certificate`,
+                                  fileName: comp.binVatFileName || 'BIN_VAT_Certificate.pdf',
+                                  fileUrl: comp.binVatDocUrl,
+                                  fileType: (comp.binVatFileName && comp.binVatFileName.match(/\.(png|jpe?g|webp)$/i)) ? 'IMAGE' : 'PDF'
+                                })}
+                                className="px-2 py-0.5 rounded bg-white hover:bg-[#1F3A2E] text-[#1F3A2E] hover:text-[#C8A96A] border border-[#DDE3DD] text-[10px] font-bold flex items-center gap-1 shadow-2xs"
+                              >
+                                <Eye className="h-2.5 w-2.5" />
+                                <span>View</span>
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleOpenComplianceModal(selectedCompany)}
+                                className="px-2 py-0.5 rounded bg-[#1F3A2E] text-[#C8A96A] text-[10px] font-bold flex items-center gap-1 shadow-2xs"
+                              >
+                                <Upload className="h-2.5 w-2.5" />
+                                <span>Upload</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* 4. RJSC Certificate of Incorporation */}
+                  {(() => {
+                    const comp = selectedCompany.compliance;
+                    const hasInc = !!comp?.incorporationNo || !!comp?.incorporationFileName;
+
+                    return (
+                      <div className={`rounded-xl border p-3 flex flex-col justify-between transition-all ${
+                        hasInc ? 'bg-[#F9FCFA] border-[#A7F3D0]' : 'bg-[#FAFAF8] border-[#DDE3DD]'
+                      }`}>
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="text-[10px] font-black uppercase text-[#1F3A2E] flex items-center gap-1">
+                              <Building className="h-3 w-3 text-[#1F3A2E]" />
+                              <span>RJSC Incorporation</span>
+                            </span>
+                            {hasInc ? (
+                              <span className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-emerald-100 text-emerald-800">
+                                Registered
+                              </span>
+                            ) : (
+                              <span className="px-1.5 py-0.5 text-[9px] font-semibold rounded bg-gray-100 text-gray-600">
+                                Pending Upload
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="font-mono text-xs font-bold text-[#1A1A1A] truncate">
+                            {comp?.incorporationNo ? `Reg: ${comp.incorporationNo}` : 'Reg # Not Set'}
+                          </div>
+
+                          <div className="text-[10px] text-[#6B7269]">
+                            Registrar of Joint Stock Companies
+                          </div>
+                        </div>
+
+                        <div className="pt-2 mt-2 border-t border-[#E5EAE5] flex items-center justify-between text-[11px]">
+                          <span className="text-[10px] text-[#6B7269] truncate max-w-[120px]">
+                            {comp?.incorporationFileName || 'No document'}
+                          </span>
+                          <div className="flex items-center gap-1">
+                            {comp?.incorporationDocUrl || comp?.incorporationFileName ? (
+                              <button
+                                type="button"
+                                onClick={() => setPreviewModal({
+                                  isOpen: true,
+                                  title: `${selectedCompany.companyName} - Incorporation Certificate`,
+                                  fileName: comp.incorporationFileName || 'Incorporation_Certificate.pdf',
+                                  fileUrl: comp.incorporationDocUrl,
+                                  fileType: (comp.incorporationFileName && comp.incorporationFileName.match(/\.(png|jpe?g|webp)$/i)) ? 'IMAGE' : 'PDF'
+                                })}
+                                className="px-2 py-0.5 rounded bg-white hover:bg-[#1F3A2E] text-[#1F3A2E] hover:text-[#C8A96A] border border-[#DDE3DD] text-[10px] font-bold flex items-center gap-1 shadow-2xs"
+                              >
+                                <Eye className="h-2.5 w-2.5" />
+                                <span>View</span>
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleOpenComplianceModal(selectedCompany)}
+                                className="px-2 py-0.5 rounded bg-[#1F3A2E] text-[#C8A96A] text-[10px] font-bold flex items-center gap-1 shadow-2xs"
+                              >
+                                <Upload className="h-2.5 w-2.5" />
+                                <span>Upload</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* 5. Bank Solvency Certificate */}
+                  {(() => {
+                    const comp = selectedCompany.compliance;
+                    const hasBank = !!comp?.bankSolvencyFileName;
+
+                    return (
+                      <div className={`rounded-xl border p-3 flex flex-col justify-between transition-all ${
+                        hasBank ? 'bg-[#F9FCFA] border-[#A7F3D0]' : 'bg-[#FAFAF8] border-[#DDE3DD]'
+                      }`}>
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="text-[10px] font-black uppercase text-[#1F3A2E] flex items-center gap-1">
+                              <CreditCard className="h-3 w-3 text-[#1F3A2E]" />
+                              <span>Bank Solvency Letter</span>
+                            </span>
+                            {hasBank ? (
+                              <span className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-emerald-100 text-emerald-800">
+                                Attested
+                              </span>
+                            ) : (
+                              <span className="px-1.5 py-0.5 text-[9px] font-semibold rounded bg-gray-100 text-gray-600">
+                                Pending Upload
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="text-xs font-bold text-[#1A1A1A] truncate">
+                            {comp?.bankSolvencyFileName || 'Solvency Letter Not Set'}
+                          </div>
+
+                          <div className="text-[10px] text-[#6B7269]">
+                            Commercial Bank Financial Soundness
+                          </div>
+                        </div>
+
+                        <div className="pt-2 mt-2 border-t border-[#E5EAE5] flex items-center justify-between text-[11px]">
+                          <span className="text-[10px] text-[#6B7269] truncate max-w-[120px]">
+                            {hasBank ? 'Verified Letter' : 'Pending'}
+                          </span>
+                          <div className="flex items-center gap-1">
+                            {comp?.bankSolvencyDocUrl || comp?.bankSolvencyFileName ? (
+                              <button
+                                type="button"
+                                onClick={() => setPreviewModal({
+                                  isOpen: true,
+                                  title: `${selectedCompany.companyName} - Bank Solvency Letter`,
+                                  fileName: comp.bankSolvencyFileName || 'Bank_Solvency.pdf',
+                                  fileUrl: comp.bankSolvencyDocUrl,
+                                  fileType: (comp.bankSolvencyFileName && comp.bankSolvencyFileName.match(/\.(png|jpe?g|webp)$/i)) ? 'IMAGE' : 'PDF'
+                                })}
+                                className="px-2 py-0.5 rounded bg-white hover:bg-[#1F3A2E] text-[#1F3A2E] hover:text-[#C8A96A] border border-[#DDE3DD] text-[10px] font-bold flex items-center gap-1 shadow-2xs"
+                              >
+                                <Eye className="h-2.5 w-2.5" />
+                                <span>View</span>
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleOpenComplianceModal(selectedCompany)}
+                                className="px-2 py-0.5 rounded bg-[#1F3A2E] text-[#C8A96A] text-[10px] font-bold flex items-center gap-1 shadow-2xs"
+                              >
+                                <Upload className="h-2.5 w-2.5" />
+                                <span>Upload</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* 6. Company Profile / Catalog */}
+                  {(() => {
+                    const comp = selectedCompany.compliance;
+                    const hasProfile = !!comp?.companyProfileFileName;
+
+                    return (
+                      <div className={`rounded-xl border p-3 flex flex-col justify-between transition-all ${
+                        hasProfile ? 'bg-[#F9FCFA] border-[#A7F3D0]' : 'bg-[#FAFAF8] border-[#DDE3DD]'
+                      }`}>
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="text-[10px] font-black uppercase text-[#1F3A2E] flex items-center gap-1">
+                              <Paperclip className="h-3 w-3 text-[#1F3A2E]" />
+                              <span>Company Profile / Catalog</span>
+                            </span>
+                            {hasProfile ? (
+                              <span className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-emerald-100 text-emerald-800">
+                                Attached
+                              </span>
+                            ) : (
+                              <span className="px-1.5 py-0.5 text-[9px] font-semibold rounded bg-gray-100 text-gray-600">
+                                Pending Upload
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="text-xs font-bold text-[#1A1A1A] truncate">
+                            {comp?.companyProfileFileName || 'Profile Dossier Not Set'}
+                          </div>
+
+                          <div className="text-[10px] text-[#6B7269]">
+                            Corporate Capability & Credentials PDF
+                          </div>
+                        </div>
+
+                        <div className="pt-2 mt-2 border-t border-[#E5EAE5] flex items-center justify-between text-[11px]">
+                          <span className="text-[10px] text-[#6B7269] truncate max-w-[120px]">
+                            {hasProfile ? 'Portfolio PDF' : 'Pending'}
+                          </span>
+                          <div className="flex items-center gap-1">
+                            {comp?.companyProfileDocUrl || comp?.companyProfileFileName ? (
+                              <button
+                                type="button"
+                                onClick={() => setPreviewModal({
+                                  isOpen: true,
+                                  title: `${selectedCompany.companyName} - Company Profile & Portfolio`,
+                                  fileName: comp.companyProfileFileName || 'Company_Profile.pdf',
+                                  fileUrl: comp.companyProfileDocUrl,
+                                  fileType: (comp.companyProfileFileName && comp.companyProfileFileName.match(/\.(png|jpe?g|webp)$/i)) ? 'IMAGE' : 'PDF'
+                                })}
+                                className="px-2 py-0.5 rounded bg-white hover:bg-[#1F3A2E] text-[#1F3A2E] hover:text-[#C8A96A] border border-[#DDE3DD] text-[10px] font-bold flex items-center gap-1 shadow-2xs"
+                              >
+                                <Eye className="h-2.5 w-2.5" />
+                                <span>View</span>
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleOpenComplianceModal(selectedCompany)}
+                                className="px-2 py-0.5 rounded bg-[#1F3A2E] text-[#C8A96A] text-[10px] font-bold flex items-center gap-1 shadow-2xs"
+                              >
+                                <Upload className="h-2.5 w-2.5" />
+                                <span>Upload</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                {/* Supplementary Regulatory & Business Files */}
+                {(selectedCompany.compliance?.supplementaryDocs || []).length > 0 && (
+                  <div className="pt-2 border-t border-[#DDE3DD] space-y-1.5">
+                    <div className="text-[11px] font-bold text-[#1F3A2E] flex items-center gap-1.5">
+                      <Paperclip className="h-3 w-3 text-[#C8A96A]" />
+                      <span>Supplementary Regulatory & Business Files ({selectedCompany.compliance?.supplementaryDocs?.length})</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedCompany.compliance?.supplementaryDocs?.map((sup) => (
+                        <div key={sup.id} className="flex items-center gap-1.5 bg-[#F4F6F4] border border-[#DDE3DD] px-2.5 py-1 rounded-lg text-xs">
+                          <span className="font-semibold text-[#1A1A1A]">{sup.title}:</span>
+                          <span className="text-[#6B7269] truncate max-w-[150px]">{sup.fileName}</span>
+                          <button
+                            type="button"
+                            onClick={() => setPreviewModal({
+                              isOpen: true,
+                              title: `${selectedCompany.companyName} - ${sup.title}`,
+                              fileName: sup.fileName,
+                              fileUrl: sup.fileDataUrl,
+                              fileType: sup.fileName.match(/\.(png|jpe?g|webp)$/i) ? 'IMAGE' : 'PDF'
+                            })}
+                            className="text-[#1F3A2E] hover:text-[#C8A96A] font-bold ml-1"
+                          >
+                            <Eye className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Card 2: Contact Persons Under this Lead (The Bizman Contact Hierarchy) */}
               <div className="rounded-xl border border-[#DDE3DD] bg-white p-5 shadow-sm space-y-3">
                 <div className="flex items-center justify-between border-b border-[#DDE3DD] pb-2">
@@ -1449,25 +2289,53 @@ export default function LeadsPage() {
                         cnt.roleType === 'OPERATIONS' ? 'Operations & Sourcing' :
                         'Key Contact';
 
+                      const isPassportDue = isRenewalDue(cnt.passportExpiry);
+                      const hasKYC = !!cnt.nidNo || !!cnt.passportNo || !!cnt.personalTinNo;
+
                       return (
                         <div 
                           key={cnt.id} 
-                          className="rounded-lg border border-[#DDE3DD] bg-[#FAFAF8] p-3 space-y-2 hover:border-[#1F3A2E] transition-all"
+                          className="rounded-lg border border-[#DDE3DD] bg-[#FAFAF8] p-3 space-y-2.5 hover:border-[#1F3A2E] transition-all"
                         >
+                          {/* Contact Identity Header */}
                           <div className="flex items-start justify-between gap-1">
-                            <div>
-                              <div className="font-extrabold text-sm text-[#1F3A2E] flex items-center gap-1.5">
-                                <span>{cnt.name}</span>
-                                {cnt.isPrimary && (
-                                  <span className="text-[9px] font-black uppercase bg-[#1F3A2E] text-[#C8A96A] px-1.5 py-0.2 rounded">
-                                    Primary
-                                  </span>
+                            <div className="flex items-start gap-2.5">
+                              {/* Photo Avatar / Monogram */}
+                              <div 
+                                onClick={() => handleOpenVisitingCardModal(cnt)}
+                                className="relative cursor-pointer group shrink-0"
+                                title="Click to view Visiting Card & Photo"
+                              >
+                                {cnt.photoUrl ? (
+                                  <img 
+                                    src={cnt.photoUrl} 
+                                    alt={cnt.name}
+                                    className="h-10 w-10 rounded-full object-cover border border-[#1F3A2E] shadow-2xs group-hover:scale-105 transition-transform" 
+                                  />
+                                ) : (
+                                  <div className="h-10 w-10 rounded-full bg-[#1F3A2E] text-[#C8A96A] font-extrabold flex items-center justify-center text-xs shadow-2xs group-hover:bg-[#2C5240] transition-colors">
+                                    {cnt.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                                  </div>
+                                )}
+                                <span className="absolute -bottom-1 -right-1 bg-white text-[#1F3A2E] rounded-full p-0.5 border border-[#DDE3DD] shadow-2xs group-hover:text-[#C8A96A]">
+                                  <Camera className="h-2.5 w-2.5" />
+                                </span>
+                              </div>
+
+                              <div>
+                                <div className="font-extrabold text-sm text-[#1F3A2E] flex items-center gap-1.5">
+                                  <span>{cnt.name}</span>
+                                  {cnt.isPrimary && (
+                                    <span className="text-[9px] font-black uppercase bg-[#1F3A2E] text-[#C8A96A] px-1.5 py-0.2 rounded">
+                                      Primary
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="text-xs text-[#556055] font-semibold">{cnt.designation}</div>
+                                {cnt.department && (
+                                  <div className="text-[10.5px] text-[#888]">{cnt.department}</div>
                                 )}
                               </div>
-                              <div className="text-xs text-[#556055] font-semibold">{cnt.designation}</div>
-                              {cnt.department && (
-                                <div className="text-[10.5px] text-[#888]">{cnt.department}</div>
-                              )}
                             </div>
 
                             <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border shrink-0 ${roleBadge}`}>
@@ -1511,6 +2379,53 @@ export default function LeadsPage() {
                                 <Mail className="h-3.5 w-3.5" />
                               </a>
                             </div>
+                          </div>
+
+                          {/* Visiting Card & KYC Verification Action Bar */}
+                          <div className="pt-2 border-t border-[#DDE3DD] flex flex-wrap items-center justify-between gap-1.5">
+                            {/* Visiting Card Trigger */}
+                            <button
+                              type="button"
+                              onClick={() => handleOpenVisitingCardModal(cnt)}
+                              className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-white hover:bg-[#F4F6F4] text-[#1F3A2E] border border-[#DDE3DD] text-[10.5px] font-bold transition-all shadow-2xs hover:border-[#1F3A2E]"
+                            >
+                              <CreditCard className="h-3 w-3 text-[#1F3A2E]" />
+                              <span>Visiting Card</span>
+                              {cnt.visitingCardFrontUrl ? (
+                                <span className="text-[9px] bg-emerald-100 text-emerald-800 font-extrabold px-1 rounded">
+                                  {cnt.visitingCardBackUrl ? 'Front & Back' : 'Front'}
+                                </span>
+                              ) : (
+                                <span className="text-[9px] text-[#888]">+ Upload</span>
+                              )}
+                            </button>
+
+                            {/* KYC Dossier Trigger */}
+                            <button
+                              type="button"
+                              onClick={() => handleOpenContactKYCModal(cnt)}
+                              className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-[10.5px] font-bold border transition-all shadow-2xs ${
+                                isPassportDue 
+                                  ? 'bg-amber-50 text-amber-900 border-amber-300 ring-1 ring-amber-300/50' 
+                                  : hasKYC
+                                    ? 'bg-[#FAF5FF] hover:bg-[#F3E8FF] text-[#7E22CE] border-[#E9D5FF]'
+                                    : 'bg-white hover:bg-[#F4F6F4] text-[#556055] border-[#DDE3DD]'
+                              }`}
+                            >
+                              <ShieldCheck className={`h-3 w-3 ${isPassportDue ? 'text-amber-700 animate-pulse' : 'text-[#7E22CE]'}`} />
+                              <span>KYC Dossier</span>
+                              {isPassportDue ? (
+                                <span className="text-[9px] bg-amber-200 text-amber-950 font-black px-1 rounded animate-pulse">
+                                  Pass Renewal Due
+                                </span>
+                              ) : hasKYC ? (
+                                <span className="text-[9px] bg-[#E9D5FF] text-[#6B21A8] font-extrabold px-1 rounded">
+                                  {cnt.passportNo ? 'Pass ' : ''}{cnt.nidNo ? 'NID ' : ''}{cnt.personalTinNo ? 'TIN' : ''}
+                                </span>
+                              ) : (
+                                <span className="text-[9px] text-[#888]">+ NID/Pass</span>
+                              )}
+                            </button>
                           </div>
 
                           {cnt.notes && (
@@ -3288,6 +4203,116 @@ export default function LeadsPage() {
                 />
               </div>
 
+              {/* Optional: Visiting Card, Photo & KYC Credentials */}
+              <div className="rounded-xl border border-[#DDE3DD] bg-[#FAFAF8] p-3 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <CreditCard className="h-4 w-4 text-[#4338CA]" />
+                    <span className="font-extrabold text-xs text-[#1F3A2E]">
+                      Visiting Card & KYC Credentials (Optional)
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-[#888] font-semibold">Store visual copies & IDs</span>
+                </div>
+
+                {/* Photo & Visiting Card Front/Back */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#556055] mb-1">Contact Photo / Headshot</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleReadFileAsBase64(file, (dataUrl) => {
+                            setContactFormData(prev => ({ ...prev, photoUrl: dataUrl }));
+                          });
+                        }
+                      }}
+                      className="w-full text-[11px] file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-[#1F3A2E] file:text-white hover:file:bg-[#2C5240]"
+                    />
+                    {contactFormData.photoUrl && (
+                      <span className="text-[10px] text-emerald-700 font-bold mt-0.5 block">✓ Photo Selected</span>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#556055] mb-1">Visiting Card (Front)</label>
+                    <input
+                      type="file"
+                      accept="image/*,application/pdf"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleReadFileAsBase64(file, (dataUrl) => {
+                            setContactFormData(prev => ({ ...prev, visitingCardFrontUrl: dataUrl }));
+                          });
+                        }
+                      }}
+                      className="w-full text-[11px] file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-[#4338CA] file:text-white hover:file:bg-[#3730A3]"
+                    />
+                    {contactFormData.visitingCardFrontUrl && (
+                      <span className="text-[10px] text-emerald-700 font-bold mt-0.5 block">✓ Front Card Selected</span>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#556055] mb-1">Visiting Card (Back)</label>
+                    <input
+                      type="file"
+                      accept="image/*,application/pdf"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleReadFileAsBase64(file, (dataUrl) => {
+                            setContactFormData(prev => ({ ...prev, visitingCardBackUrl: dataUrl }));
+                          });
+                        }
+                      }}
+                      className="w-full text-[11px] file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-[#4338CA] file:text-white hover:file:bg-[#3730A3]"
+                    />
+                    {contactFormData.visitingCardBackUrl && (
+                      <span className="text-[10px] text-emerald-700 font-bold mt-0.5 block">✓ Back Card Selected</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* NID & Passport Number/Expiry */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 border-t border-[#E5EAE5]">
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#556055] mb-1">National ID (NID No)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 19822692810000412"
+                      value={contactFormData.nidNo}
+                      onChange={(e) => setContactFormData({ ...contactFormData, nidNo: e.target.value })}
+                      className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2 text-xs font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#556055] mb-1">Passport No & Expiry</label>
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="text"
+                        placeholder="Passport #"
+                        value={contactFormData.passportNo}
+                        onChange={(e) => setContactFormData({ ...contactFormData, passportNo: e.target.value })}
+                        className="flex-1 rounded-lg border border-[#DDE3DD] bg-white p-2 text-xs font-mono"
+                      />
+                      <input
+                        type="date"
+                        title="Passport Expiry Date"
+                        value={contactFormData.passportExpiry}
+                        onChange={(e) => setContactFormData({ ...contactFormData, passportExpiry: e.target.value })}
+                        className="w-32 rounded-lg border border-[#DDE3DD] bg-white p-2 text-xs"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* Buttons */}
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#DDE3DD]">
                 <button
@@ -3823,6 +4848,739 @@ export default function LeadsPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* =================================================================== */}
+      {/* MODAL: CORPORATE COMPLIANCE & STATUTORY VAULT */}
+      {/* =================================================================== */}
+      {isComplianceModalOpen && selectedCompany && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-2xl rounded-2xl border-2 border-[#1F3A2E] bg-white p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-[#DDE3DD] pb-3">
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-lg bg-[#1F3A2E] text-[#C8A96A] flex items-center justify-center font-bold">
+                  <ShieldCheck className="h-4 w-4" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-[#1F3A2E] text-base">
+                    Corporate Statutory Vault: {selectedCompany.companyName}
+                  </h3>
+                  <div className="text-xs text-[#6B7269]">
+                    Trade License, TIN, BIN/VAT, RJSC Incorporation & Corporate Catalog
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsComplianceModalOpen(false)}
+                className="rounded-lg p-1 text-[#888] hover:bg-[#F4F6F4] hover:text-[#1A1A1A]"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveCompliance} className="space-y-4 text-xs">
+              {/* 1. Trade License with Expiry */}
+              <div className="rounded-xl border border-[#DDE3DD] bg-[#FAFAF8] p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-black text-[#1F3A2E] flex items-center gap-1.5 uppercase text-[11px]">
+                    <FileCheck2 className="h-3.5 w-3.5 text-[#1F3A2E]" />
+                    <span>1. Trade License (Statutory Municipality / DNCC)</span>
+                  </span>
+                  <span className="text-[10px] text-amber-700 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                    30-Day Renewal Monitoring Enabled
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#556055] mb-1">Trade License Number</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. TRAD/DNCC/019284/2026"
+                      value={complianceFormData.tradeLicenseNo || ''}
+                      onChange={(e) => setComplianceFormData({ ...complianceFormData, tradeLicenseNo: e.target.value })}
+                      className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#556055] mb-1">License Expiration Date</label>
+                    <input
+                      type="date"
+                      value={complianceFormData.tradeLicenseExpiry || ''}
+                      onChange={(e) => setComplianceFormData({ ...complianceFormData, tradeLicenseExpiry: e.target.value })}
+                      className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-[#556055] mb-1">Attach Trade License Copy (PDF / Image)</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="file"
+                      accept="application/pdf,image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleReadFileAsBase64(file, (dataUrl, fileName) => {
+                            setComplianceFormData(prev => ({
+                              ...prev,
+                              tradeLicenseDocUrl: dataUrl,
+                              tradeLicenseFileName: fileName
+                            }));
+                          });
+                        }
+                      }}
+                      className="flex-1 text-[11px] file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-[#1F3A2E] file:text-white"
+                    />
+                    {complianceFormData.tradeLicenseFileName && (
+                      <span className="text-[10px] text-emerald-700 font-bold">
+                        ✓ {complianceFormData.tradeLicenseFileName}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. e-TIN & BIN / VAT 9.1 */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* e-TIN */}
+                <div className="rounded-xl border border-[#DDE3DD] bg-[#FAFAF8] p-3 space-y-2">
+                  <span className="font-black text-[#1F3A2E] flex items-center gap-1.5 uppercase text-[11px]">
+                    <FileText className="h-3.5 w-3.5 text-[#1F3A2E]" />
+                    <span>2. e-TIN Certificate</span>
+                  </span>
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#556055] mb-1">12-Digit Taxpayer TIN</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 419827361928"
+                      value={complianceFormData.tinNo || ''}
+                      onChange={(e) => setComplianceFormData({ ...complianceFormData, tinNo: e.target.value })}
+                      className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#556055] mb-1">Attach TIN Certificate</label>
+                    <input
+                      type="file"
+                      accept="application/pdf,image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleReadFileAsBase64(file, (dataUrl, fileName) => {
+                            setComplianceFormData(prev => ({
+                              ...prev,
+                              tinDocUrl: dataUrl,
+                              tinFileName: fileName
+                            }));
+                          });
+                        }
+                      }}
+                      className="w-full text-[11px] file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-[#1F3A2E] file:text-white"
+                    />
+                    {complianceFormData.tinFileName && (
+                      <span className="text-[10px] text-emerald-700 font-bold block mt-0.5">
+                        ✓ {complianceFormData.tinFileName}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* BIN / VAT */}
+                <div className="rounded-xl border border-[#DDE3DD] bg-[#FAFAF8] p-3 space-y-2">
+                  <span className="font-black text-[#1F3A2E] flex items-center gap-1.5 uppercase text-[11px]">
+                    <Award className="h-3.5 w-3.5 text-[#1F3A2E]" />
+                    <span>3. BIN / VAT (Mushak 9.1)</span>
+                  </span>
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#556055] mb-1">BIN / VAT Registration #</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 000182739-0101"
+                      value={complianceFormData.binVatNo || ''}
+                      onChange={(e) => setComplianceFormData({ ...complianceFormData, binVatNo: e.target.value })}
+                      className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#556055] mb-1">Attach BIN / VAT Copy</label>
+                    <input
+                      type="file"
+                      accept="application/pdf,image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleReadFileAsBase64(file, (dataUrl, fileName) => {
+                            setComplianceFormData(prev => ({
+                              ...prev,
+                              binVatDocUrl: dataUrl,
+                              binVatFileName: fileName
+                            }));
+                          });
+                        }
+                      }}
+                      className="w-full text-[11px] file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-[#1F3A2E] file:text-white"
+                    />
+                    {complianceFormData.binVatFileName && (
+                      <span className="text-[10px] text-emerald-700 font-bold block mt-0.5">
+                        ✓ {complianceFormData.binVatFileName}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. RJSC Incorporation & Bank Solvency */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* RJSC Incorporation */}
+                <div className="rounded-xl border border-[#DDE3DD] bg-[#FAFAF8] p-3 space-y-2">
+                  <span className="font-black text-[#1F3A2E] flex items-center gap-1.5 uppercase text-[11px]">
+                    <Building className="h-3.5 w-3.5 text-[#1F3A2E]" />
+                    <span>4. RJSC Incorporation</span>
+                  </span>
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#556055] mb-1">Incorporation Registration #</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. C-31298/96"
+                      value={complianceFormData.incorporationNo || ''}
+                      onChange={(e) => setComplianceFormData({ ...complianceFormData, incorporationNo: e.target.value })}
+                      className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#556055] mb-1">Attach Incorporation Cert</label>
+                    <input
+                      type="file"
+                      accept="application/pdf,image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleReadFileAsBase64(file, (dataUrl, fileName) => {
+                            setComplianceFormData(prev => ({
+                              ...prev,
+                              incorporationDocUrl: dataUrl,
+                              incorporationFileName: fileName
+                            }));
+                          });
+                        }
+                      }}
+                      className="w-full text-[11px] file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-[#1F3A2E] file:text-white"
+                    />
+                    {complianceFormData.incorporationFileName && (
+                      <span className="text-[10px] text-emerald-700 font-bold block mt-0.5">
+                        ✓ {complianceFormData.incorporationFileName}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Bank Solvency & Company Profile */}
+                <div className="rounded-xl border border-[#DDE3DD] bg-[#FAFAF8] p-3 space-y-2">
+                  <span className="font-black text-[#1F3A2E] flex items-center gap-1.5 uppercase text-[11px]">
+                    <CreditCard className="h-3.5 w-3.5 text-[#1F3A2E]" />
+                    <span>5. Bank Solvency & Profile</span>
+                  </span>
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#556055] mb-1">Bank Solvency Letter</label>
+                    <input
+                      type="file"
+                      accept="application/pdf,image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleReadFileAsBase64(file, (dataUrl, fileName) => {
+                            setComplianceFormData(prev => ({
+                              ...prev,
+                              bankSolvencyDocUrl: dataUrl,
+                              bankSolvencyFileName: fileName
+                            }));
+                          });
+                        }
+                      }}
+                      className="w-full text-[11px] file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-[#1F3A2E] file:text-white"
+                    />
+                    {complianceFormData.bankSolvencyFileName && (
+                      <span className="text-[10px] text-emerald-700 font-bold block mt-0.5">
+                        ✓ {complianceFormData.bankSolvencyFileName}
+                      </span>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#556055] mb-1">Company Profile / Catalog (PDF)</label>
+                    <input
+                      type="file"
+                      accept="application/pdf"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleReadFileAsBase64(file, (dataUrl, fileName) => {
+                            setComplianceFormData(prev => ({
+                              ...prev,
+                              companyProfileDocUrl: dataUrl,
+                              companyProfileFileName: fileName
+                            }));
+                          });
+                        }
+                      }}
+                      className="w-full text-[11px] file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-[#1F3A2E] file:text-white"
+                    />
+                    {complianceFormData.companyProfileFileName && (
+                      <span className="text-[10px] text-emerald-700 font-bold block mt-0.5">
+                        ✓ {complianceFormData.companyProfileFileName}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#DDE3DD]">
+                <button
+                  type="button"
+                  onClick={() => setIsComplianceModalOpen(false)}
+                  className="rounded-lg border border-[#DDE3DD] bg-white px-4 py-2 text-xs font-bold text-[#556055] hover:bg-[#F4F6F4]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex items-center gap-1.5 rounded-lg bg-[#1F3A2E] hover:bg-[#2C5240] text-[#C8A96A] px-5 py-2 text-xs font-black shadow-sm transition-all"
+                >
+                  <Save className="h-4 w-4" />
+                  <span>Save & Sync to Vault</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* =================================================================== */}
+      {/* MODAL: VISITING CARD FRONT / BACK VIEWER & UPLOADER */}
+      {/* =================================================================== */}
+      {isVisitingCardModalOpen && activeContact && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-lg rounded-2xl border-2 border-[#1F3A2E] bg-white p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-[#DDE3DD] pb-3">
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-lg bg-[#1F3A2E] text-[#C8A96A] flex items-center justify-center font-bold">
+                  <CreditCard className="h-4 w-4" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-[#1F3A2E] text-base">
+                    Visiting Card: {activeContact.name}
+                  </h3>
+                  <div className="text-xs text-[#6B7269]">
+                    {activeContact.designation} &bull; {selectedCompany?.companyName}
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsVisitingCardModalOpen(false)}
+                className="rounded-lg p-1 text-[#888] hover:bg-[#F4F6F4] hover:text-[#1A1A1A]"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Front / Back Toggle */}
+            <div className="flex items-center justify-center gap-2 bg-[#FAFAF8] p-1.5 rounded-xl border border-[#DDE3DD]">
+              <button
+                type="button"
+                onClick={() => setCardSideView('FRONT')}
+                className={`flex-1 py-1.5 text-xs font-black rounded-lg transition-all ${
+                  cardSideView === 'FRONT'
+                    ? 'bg-[#1F3A2E] text-[#C8A96A] shadow-xs'
+                    : 'text-[#6B7269] hover:text-[#1A1A1A]'
+                }`}
+              >
+                Front Side Card
+              </button>
+              <button
+                type="button"
+                onClick={() => setCardSideView('BACK')}
+                className={`flex-1 py-1.5 text-xs font-black rounded-lg transition-all ${
+                  cardSideView === 'BACK'
+                    ? 'bg-[#1F3A2E] text-[#C8A96A] shadow-xs'
+                    : 'text-[#6B7269] hover:text-[#1A1A1A]'
+                }`}
+              >
+                Back Side Card
+              </button>
+            </div>
+
+            {/* Card Display Area */}
+            <div className="aspect-16/9 w-full rounded-2xl border-2 border-dashed border-[#DDE3DD] bg-gradient-to-br from-[#FAFAF8] to-[#F0F2F0] p-4 flex flex-col items-center justify-center relative overflow-hidden shadow-inner">
+              {cardSideView === 'FRONT' ? (
+                contactKYCFormData.visitingCardFrontUrl ? (
+                  <img
+                    src={contactKYCFormData.visitingCardFrontUrl}
+                    alt="Visiting Card Front"
+                    className="w-full h-full object-contain rounded-xl"
+                  />
+                ) : (
+                  <div className="text-center space-y-2 p-4">
+                    <CreditCard className="h-10 w-10 text-[#C8A96A] mx-auto opacity-70" />
+                    <div className="font-extrabold text-sm text-[#1F3A2E]">Front Side Card Not Stored</div>
+                    <p className="text-[11px] text-[#6B7269] max-w-xs">
+                      Attach photo of the printed visiting card or digital business card.
+                    </p>
+                  </div>
+                )
+              ) : (
+                contactKYCFormData.visitingCardBackUrl ? (
+                  <img
+                    src={contactKYCFormData.visitingCardBackUrl}
+                    alt="Visiting Card Back"
+                    className="w-full h-full object-contain rounded-xl"
+                  />
+                ) : (
+                  <div className="text-center space-y-2 p-4">
+                    <CreditCard className="h-10 w-10 text-[#C8A96A] mx-auto opacity-70" />
+                    <div className="font-extrabold text-sm text-[#1F3A2E]">Back Side Card Not Stored</div>
+                    <p className="text-[11px] text-[#6B7269] max-w-xs">
+                      Attach reverse side (services, QR codes, branches, bank info).
+                    </p>
+                  </div>
+                )
+              )}
+            </div>
+
+            {/* Upload / Replace Controls */}
+            <div className="space-y-2 pt-1 text-xs">
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block font-bold text-[#556055] mb-1">
+                    {cardSideView === 'FRONT' ? 'Upload Front Image' : 'Upload Back Image'}
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*,application/pdf"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        handleReadFileAsBase64(file, (dataUrl) => {
+                          if (cardSideView === 'FRONT') {
+                            setContactKYCFormData(prev => ({ ...prev, visitingCardFrontUrl: dataUrl }));
+                          } else {
+                            setContactKYCFormData(prev => ({ ...prev, visitingCardBackUrl: dataUrl }));
+                          }
+                        });
+                      }
+                    }}
+                    className="w-full text-[11px] file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-[#1F3A2E] file:text-white"
+                  />
+                </div>
+
+                <div className="flex items-end justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsVisitingCardModalOpen(false);
+                      setIsContactKYCModalOpen(true);
+                    }}
+                    className="flex items-center gap-1.5 rounded-lg border border-[#DDE3DD] bg-white px-3 py-1.5 text-xs font-bold text-[#7E22CE] hover:bg-[#FAF5FF]"
+                  >
+                    <ShieldCheck className="h-3.5 w-3.5" />
+                    <span>KYC IDs</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleSaveContactKYC}
+                    className="flex items-center gap-1.5 rounded-lg bg-[#1F3A2E] hover:bg-[#2C5240] text-[#C8A96A] px-4 py-1.5 text-xs font-black shadow-xs"
+                  >
+                    <Check className="h-3.5 w-3.5" />
+                    <span>Save Card</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =================================================================== */}
+      {/* MODAL: CONTACT KYC DOSSIER (NID, PASSPORT & TIN) */}
+      {/* =================================================================== */}
+      {isContactKYCModalOpen && activeContact && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-lg rounded-2xl border-2 border-[#1F3A2E] bg-white p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-[#DDE3DD] pb-3">
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-lg bg-[#FAF5FF] text-[#7E22CE] flex items-center justify-center font-bold border border-[#E9D5FF]">
+                  <ShieldCheck className="h-4 w-4" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-[#1F3A2E] text-base">
+                    Contact KYC Dossier: {activeContact.name}
+                  </h3>
+                  <div className="text-xs text-[#6B7269]">
+                    National ID, Passport, Personal TIN & Headshot Verification
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsContactKYCModalOpen(false)}
+                className="rounded-lg p-1 text-[#888] hover:bg-[#F4F6F4] hover:text-[#1A1A1A]"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveContactKYC} className="space-y-3.5 text-xs">
+              {/* Photo Upload */}
+              <div className="rounded-xl border border-[#DDE3DD] bg-[#FAFAF8] p-3 flex items-center gap-3">
+                <div className="relative shrink-0">
+                  {contactKYCFormData.photoUrl ? (
+                    <img
+                      src={contactKYCFormData.photoUrl}
+                      alt={activeContact.name}
+                      className="h-14 w-14 rounded-full object-cover border-2 border-[#1F3A2E]"
+                    />
+                  ) : (
+                    <div className="h-14 w-14 rounded-full bg-[#1F3A2E] text-[#C8A96A] font-extrabold flex items-center justify-center text-sm">
+                      {activeContact.name.slice(0, 2).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 space-y-1">
+                  <span className="font-extrabold text-[#1F3A2E] block">Official Contact Photo / Headshot</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        handleReadFileAsBase64(file, (dataUrl) => {
+                          setContactKYCFormData(prev => ({ ...prev, photoUrl: dataUrl }));
+                        });
+                      }
+                    }}
+                    className="w-full text-[11px] file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-[#1F3A2E] file:text-white"
+                  />
+                </div>
+              </div>
+
+              {/* National ID (NID) */}
+              <div className="rounded-xl border border-[#DDE3DD] bg-[#FAFAF8] p-3 space-y-2">
+                <span className="font-black text-[#1F3A2E] uppercase text-[11px] flex items-center gap-1.5">
+                  <CreditCard className="h-3.5 w-3.5 text-[#1F3A2E]" />
+                  <span>National Identity Card (NID)</span>
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#556055] mb-1">NID Number (10 or 17 Digits)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 19822692810000412"
+                      value={contactKYCFormData.nidNo || ''}
+                      onChange={(e) => setContactKYCFormData({ ...contactKYCFormData, nidNo: e.target.value })}
+                      className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#556055] mb-1">Attach NID Copy (PDF/Image)</label>
+                    <input
+                      type="file"
+                      accept="application/pdf,image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleReadFileAsBase64(file, (dataUrl) => {
+                            setContactKYCFormData(prev => ({ ...prev, nidDocUrl: dataUrl }));
+                          });
+                        }
+                      }}
+                      className="w-full text-[11px] file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-[#1F3A2E] file:text-white"
+                    />
+                    {contactKYCFormData.nidDocUrl && (
+                      <span className="text-[10px] text-emerald-700 font-bold block mt-0.5">✓ NID Copy Attached</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Passport Copy & Expiry */}
+              <div className="rounded-xl border border-[#DDE3DD] bg-[#FAFAF8] p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-black text-[#1F3A2E] uppercase text-[11px] flex items-center gap-1.5">
+                    <FileText className="h-3.5 w-3.5 text-[#1F3A2E]" />
+                    <span>International Passport</span>
+                  </span>
+                  <span className="text-[10px] text-amber-700 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                    30-Day Renewal Monitoring
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#556055] mb-1">Passport Number</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. EA0928371"
+                      value={contactKYCFormData.passportNo || ''}
+                      onChange={(e) => setContactKYCFormData({ ...contactKYCFormData, passportNo: e.target.value })}
+                      className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2 font-mono uppercase"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#556055] mb-1">Passport Expiry Date</label>
+                    <input
+                      type="date"
+                      value={contactKYCFormData.passportExpiry || ''}
+                      onChange={(e) => setContactKYCFormData({ ...contactKYCFormData, passportExpiry: e.target.value })}
+                      className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-[#556055] mb-1">Attach Passport Copy</label>
+                  <input
+                    type="file"
+                    accept="application/pdf,image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        handleReadFileAsBase64(file, (dataUrl) => {
+                          setContactKYCFormData(prev => ({ ...prev, passportDocUrl: dataUrl }));
+                        });
+                      }
+                    }}
+                    className="w-full text-[11px] file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-[#1F3A2E] file:text-white"
+                  />
+                  {contactKYCFormData.passportDocUrl && (
+                    <span className="text-[10px] text-emerald-700 font-bold block mt-0.5">✓ Passport Attached</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Personal TIN */}
+              <div className="rounded-xl border border-[#DDE3DD] bg-[#FAFAF8] p-3 space-y-2">
+                <span className="font-black text-[#1F3A2E] uppercase text-[11px] flex items-center gap-1.5">
+                  <Award className="h-3.5 w-3.5 text-[#1F3A2E]" />
+                  <span>Personal e-TIN Certificate</span>
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#556055] mb-1">Personal TIN #</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 582910482910"
+                      value={contactKYCFormData.personalTinNo || ''}
+                      onChange={(e) => setContactKYCFormData({ ...contactKYCFormData, personalTinNo: e.target.value })}
+                      className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#556055] mb-1">Attach Personal TIN File</label>
+                    <input
+                      type="file"
+                      accept="application/pdf,image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleReadFileAsBase64(file, (dataUrl) => {
+                            setContactKYCFormData(prev => ({ ...prev, personalTinDocUrl: dataUrl }));
+                          });
+                        }
+                      }}
+                      className="w-full text-[11px] file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-[#1F3A2E] file:text-white"
+                    />
+                    {contactKYCFormData.personalTinDocUrl && (
+                      <span className="text-[10px] text-emerald-700 font-bold block mt-0.5">✓ TIN File Attached</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#DDE3DD]">
+                <button
+                  type="button"
+                  onClick={() => setIsContactKYCModalOpen(false)}
+                  className="rounded-lg border border-[#DDE3DD] bg-white px-4 py-2 text-xs font-bold text-[#556055] hover:bg-[#F4F6F4]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex items-center gap-1.5 rounded-lg bg-[#7E22CE] hover:bg-[#6B21A8] text-white px-5 py-2 text-xs font-black shadow-sm transition-all"
+                >
+                  <Save className="h-4 w-4" />
+                  <span>Save KYC Dossier</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* =================================================================== */}
+      {/* UNIVERSAL FULLSCREEN DOCUMENT & IMAGE INSPECTOR MODAL */}
+      {/* =================================================================== */}
+      {previewModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+          <div className="w-full max-w-3xl rounded-2xl border-2 border-[#1F3A2E] bg-white p-5 shadow-2xl space-y-3 max-h-[92vh] flex flex-col">
+            <div className="flex items-center justify-between border-b border-[#DDE3DD] pb-3 shrink-0">
+              <div className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-[#1F3A2E]" />
+                <div>
+                  <h3 className="font-extrabold text-[#1F3A2E] text-base">{previewModal.title}</h3>
+                  <div className="text-xs text-[#6B7269] font-mono">{previewModal.fileName}</div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPreviewModal(prev => ({ ...prev, isOpen: false }))}
+                className="rounded-lg p-1 text-[#888] hover:bg-[#F4F6F4] hover:text-[#1A1A1A]"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-auto rounded-xl bg-[#FAFAF8] border border-[#DDE3DD] p-4 flex items-center justify-center min-h-[350px]">
+              {previewModal.fileUrl ? (
+                previewModal.fileType === 'IMAGE' ? (
+                  <img
+                    src={previewModal.fileUrl}
+                    alt={previewModal.title}
+                    className="max-h-[70vh] object-contain rounded-lg shadow-md"
+                  />
+                ) : (
+                  <iframe
+                    src={previewModal.fileUrl}
+                    title={previewModal.title}
+                    className="w-full h-[65vh] rounded-lg border border-[#DDE3DD]"
+                  />
+                )
+              ) : (
+                <div className="text-center space-y-2 p-6">
+                  <FileText className="h-12 w-12 text-[#C8A96A] mx-auto opacity-75" />
+                  <div className="font-extrabold text-sm text-[#1F3A2E]">{previewModal.fileName}</div>
+                  <p className="text-xs text-[#6B7269] max-w-sm">
+                    This statutory credential was recorded in the database ledger. Upload an updated PDF or image copy to view live document rendering.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between pt-2 border-t border-[#DDE3DD] shrink-0 text-xs">
+              <span className="text-[#6B7269] font-semibold">Syed Akramul Hassan - Sovereign Document Center</span>
+              <button
+                type="button"
+                onClick={() => setPreviewModal(prev => ({ ...prev, isOpen: false }))}
+                className="rounded-lg bg-[#1F3A2E] text-[#C8A96A] px-4 py-1.5 font-bold hover:bg-[#2C5240]"
+              >
+                Close Preview
+              </button>
+            </div>
           </div>
         </div>
       )}

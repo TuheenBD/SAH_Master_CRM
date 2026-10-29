@@ -8561,9 +8561,26 @@ export const INITIAL_COMPANY_LEADS: CompanyLead[] = [
         "email": "corp.comm@grameenphone.com",
         "whatsapp": "",
         "isPrimary": true,
-        "notes": "Target corporate procurement lead for Grameenphone Ltd."
+        "notes": "Target corporate procurement lead for Grameenphone Ltd.",
+        "nidNo": "19822692810000412",
+        "passportNo": "EA0928371",
+        "passportExpiry": "2029-08-14",
+        "personalTinNo": "582910482910"
       }
     ],
+    "compliance": {
+      "tradeLicenseNo": "TRAD/DNCC/019284/2026",
+      "tradeLicenseExpiry": "2027-06-30",
+      "tradeLicenseFileName": "GP_Trade_License_2026_27.pdf",
+      "tinNo": "419827361928",
+      "tinFileName": "Grameenphone_eTIN_Certificate.pdf",
+      "binVatNo": "000182739-0101",
+      "binVatFileName": "GP_VAT_BIN_Mushak_9.1.pdf",
+      "incorporationNo": "C-31298/96",
+      "incorporationFileName": "GP_RJSC_Certificate_Of_Incorporation.pdf",
+      "bankSolvencyFileName": "Standard_Chartered_Bank_Solvency_GP.pdf",
+      "companyProfileFileName": "Grameenphone_Corporate_Profile_2026.pdf"
+    },
     "projects": [
       {
         "id": "proj-bd-001-1",
@@ -8610,9 +8627,26 @@ export const INITIAL_COMPANY_LEADS: CompanyLead[] = [
         "email": "media@robi.com.bd",
         "whatsapp": "",
         "isPrimary": true,
-        "notes": "Target corporate procurement lead for Robi Axiata PLC"
+        "notes": "Target corporate procurement lead for Robi Axiata PLC",
+        "nidNo": "19782692810000889",
+        "passportNo": "BL8892102",
+        "passportExpiry": "2028-11-20",
+        "personalTinNo": "481920491829"
       }
     ],
+    "compliance": {
+      "tradeLicenseNo": "TRAD/DNCC/082731/2026",
+      "tradeLicenseExpiry": "2026-11-25",
+      "tradeLicenseFileName": "Robi_Trade_License_Renewal.pdf",
+      "tinNo": "392817263514",
+      "tinFileName": "Robi_Axiata_eTIN.pdf",
+      "binVatNo": "000293817-0102",
+      "binVatFileName": "Robi_BIN_Mushak_9.1.pdf",
+      "incorporationNo": "C-29381/95",
+      "incorporationFileName": "Robi_RJSC_Incorporation.pdf",
+      "bankSolvencyFileName": "Eastern_Bank_Solvency_Robi.pdf",
+      "companyProfileFileName": "Robi_Axiata_Corporate_Dossier.pdf"
+    },
     "projects": [
       {
         "id": "proj-bd-002-1",
@@ -23218,6 +23252,72 @@ export const INITIAL_DOCUMENTS: DocumentRecord[] = [
       "Personal Vault"
     ],
     "notes": "Official verified national passport record of Syed Akramul Hassan. Expiry Date: August 05, 2033.",
+    "uploadedBy": "Syed Akramul Hassan",
+    "version": "1.0",
+    "downloadCount": 0
+  },
+  {
+    "id": "doc-robi-trade-lic-renewal",
+    "title": "Robi Axiata PLC - Statutory Trade License 2025-2026",
+    "fileName": "Robi_Trade_License_Renewal.pdf",
+    "fileSize": "1.4 MB",
+    "fileType": "PDF",
+    "companyCode": "BIZMAN",
+    "category": "SUPPLIER_VENDOR_KYB",
+    "securityLevel": "CONFIDENTIAL",
+    "uploadDate": "2026-10-20",
+    "expiryDate": "2026-11-25",
+    "tags": [
+      "Robi Axiata",
+      "Trade License",
+      "Renewal Due",
+      "Statutory KYB"
+    ],
+    "notes": "Statutory trade license renewal for Robi Axiata PLC. DNCC License No: TRAD/DNCC/082731/2026. Expiry: 25 Nov 2026 (Renewal Due within 30 days).",
+    "uploadedBy": "Syed Akramul Hassan",
+    "version": "1.0",
+    "downloadCount": 1
+  },
+  {
+    "id": "doc-gp-trade-lic-kyb",
+    "title": "Grameenphone Ltd. - Trade License & Incorporation Dossier",
+    "fileName": "GP_Trade_License_2026_27.pdf",
+    "fileSize": "2.1 MB",
+    "fileType": "PDF",
+    "companyCode": "BIZMAN",
+    "category": "SUPPLIER_VENDOR_KYB",
+    "securityLevel": "CONFIDENTIAL",
+    "uploadDate": "2026-10-15",
+    "expiryDate": "2027-06-30",
+    "tags": [
+      "Grameenphone",
+      "Trade License",
+      "TIN",
+      "BIN",
+      "RJSC"
+    ],
+    "notes": "Verified corporate KYB package for Grameenphone Ltd. Trade License TRAD/DNCC/019284/2026, eTIN: 419827361928, BIN: 000182739-0101.",
+    "uploadedBy": "Syed Akramul Hassan",
+    "version": "1.0",
+    "downloadCount": 3
+  },
+  {
+    "id": "doc-contact-kyc-sample",
+    "title": "Contact KYC Dossier - Visiting Card & NID Verification",
+    "fileName": "Contact_Visiting_Card_and_NID_Dossier.pdf",
+    "fileSize": "840 KB",
+    "fileType": "PDF",
+    "companyCode": "BIZMAN",
+    "category": "CONTACT_KYC_DOSSIER",
+    "securityLevel": "RESTRICTED",
+    "uploadDate": "2026-10-25",
+    "tags": [
+      "Visiting Card",
+      "NID",
+      "Contact KYC",
+      "Procurement Manager"
+    ],
+    "notes": "Official business card front/back scan, certified National ID copy and personal tax certificate for client corporate contact.",
     "uploadedBy": "Syed Akramul Hassan",
     "version": "1.0",
     "downloadCount": 0

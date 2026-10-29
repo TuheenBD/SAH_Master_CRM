@@ -1266,6 +1266,8 @@ Attested: Syed Akramul Hassan`;
               <option value="BANKING_FINANCIAL">Banking & Financial</option>
               <option value="CORPORATE_GOVERNANCE">Corporate Governance</option>
               <option value="MARKETING_CATALOG">Catalogs & Blueprints</option>
+              <option value="SUPPLIER_VENDOR_KYB">Supplier & Buyer Profiles (KYB)</option>
+              <option value="CONTACT_KYC_DOSSIER">Contact KYC Dossiers & Cards</option>
               <option value="PERSONAL_VAULT">Personal Vault</option>
             </select>
           </div>
@@ -1847,6 +1849,8 @@ Attested: Syed Akramul Hassan`;
                     <option value="BANKING_FINANCIAL">Banking & Financial</option>
                     <option value="CORPORATE_GOVERNANCE">Corporate Governance</option>
                     <option value="MARKETING_CATALOG">Catalogs & Blueprints</option>
+                    <option value="SUPPLIER_VENDOR_KYB">Supplier & Buyer Profiles (KYB)</option>
+                    <option value="CONTACT_KYC_DOSSIER">Contact KYC Dossiers & Cards</option>
                     <option value="PERSONAL_VAULT">Personal Vault</option>
                   </select>
                 </div>
@@ -2004,6 +2008,8 @@ Attested: Syed Akramul Hassan`;
                     <option value="BANKING_FINANCIAL">Banking & Financial</option>
                     <option value="CORPORATE_GOVERNANCE">Corporate Governance</option>
                     <option value="MARKETING_CATALOG">Catalogs & Blueprints</option>
+                    <option value="SUPPLIER_VENDOR_KYB">Supplier & Buyer Profiles (KYB)</option>
+                    <option value="CONTACT_KYC_DOSSIER">Contact KYC Dossiers & Cards</option>
                     <option value="PERSONAL_VAULT">Personal Vault</option>
                   </select>
                 </div>

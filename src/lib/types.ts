@@ -110,6 +110,62 @@ export interface LeadContact {
   whatsapp?: string;
   isPrimary?: boolean;
   notes?: string;
+
+  // Visual & Identification KYC Dossier
+  photoUrl?: string;
+  visitingCardFrontUrl?: string;
+  visitingCardBackUrl?: string;
+  nidNo?: string;
+  nidDocUrl?: string;
+  passportNo?: string;
+  passportExpiry?: string;
+  passportDocUrl?: string;
+  personalTinNo?: string;
+  personalTinDocUrl?: string;
+}
+
+export interface SupplementaryDoc {
+  id: string;
+  title: string;
+  fileName: string;
+  fileSize?: string;
+  fileDataUrl: string;
+  uploadDate: string;
+  expiryDate?: string;
+}
+
+export interface CompanyComplianceDocs {
+  // Trade License (with Expiration Alert)
+  tradeLicenseNo?: string;
+  tradeLicenseExpiry?: string;
+  tradeLicenseDocUrl?: string;
+  tradeLicenseFileName?: string;
+
+  // e-TIN Certificate
+  tinNo?: string;
+  tinDocUrl?: string;
+  tinFileName?: string;
+
+  // BIN / VAT Registration Certificate
+  binVatNo?: string;
+  binVatDocUrl?: string;
+  binVatFileName?: string;
+
+  // Incorporation / RJSC Certificate
+  incorporationNo?: string;
+  incorporationDocUrl?: string;
+  incorporationFileName?: string;
+
+  // Bank Solvency Certificate
+  bankSolvencyDocUrl?: string;
+  bankSolvencyFileName?: string;
+
+  // Company Profile / Product Catalog
+  companyProfileDocUrl?: string;
+  companyProfileFileName?: string;
+
+  // Supplementary business / compliance documents
+  supplementaryDocs?: SupplementaryDoc[];
 }
 
 export interface ParallelProject {
@@ -157,6 +213,9 @@ export interface CompanyLead {
 
   // 1-to-Many: Parallel Commercial Projects under this Lead Company
   projects: ParallelProject[];
+
+  // Corporate Compliance & Statutory Documents Vault
+  compliance?: CompanyComplianceDocs;
 }
 
 export interface LeadItem {
@@ -282,6 +341,18 @@ export interface MasterContact {
   convertedLeadId?: string;
   tags: string[];
   createdAt: string;
+
+  // Visual & Identification KYC Dossier
+  photoUrl?: string;
+  visitingCardFrontUrl?: string;
+  visitingCardBackUrl?: string;
+  nidNo?: string;
+  nidDocUrl?: string;
+  passportNo?: string;
+  passportExpiry?: string;
+  passportDocUrl?: string;
+  personalTinNo?: string;
+  personalTinDocUrl?: string;
 }
 
 // ------------------------------------------------------------------------------
@@ -348,7 +419,9 @@ export type DocumentCategory =
   | 'CORPORATE_GOVERNANCE'
   | 'BANKING_FINANCIAL'
   | 'MARKETING_CATALOG'
-  | 'PERSONAL_VAULT';
+  | 'PERSONAL_VAULT'
+  | 'SUPPLIER_VENDOR_KYB'
+  | 'CONTACT_KYC_DOSSIER';
 
 export type DocumentSecurityLevel = 'CONFIDENTIAL' | 'RESTRICTED' | 'INTERNAL' | 'PUBLIC';
 
