@@ -130,17 +130,17 @@ export default function PersonalFinancePage() {
       {/* Net Worth & Cash Flow Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Net Worth - Royal Executive Green & Gold */}
-        <div className="rounded-xl border border-[#2C5240] bg-[#1F3A2E] p-5 shadow-md relative overflow-hidden text-white">
+        <div className="rounded-xl border border-[#2C5240] bg-[#1F3A2E] p-5 shadow-md relative overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-[#C8A96A] uppercase tracking-wider">Total Personal Net Worth</span>
             <div className="rounded-lg bg-black/20 p-2 text-[#C8A96A] border border-[#C8A96A]/30">
               <Landmark className="h-5 w-5" />
             </div>
           </div>
-          <div className="mt-3 text-2xl font-black text-white font-mono">
+          <div className="mt-3 text-2xl font-black text-[#FFFFF0] font-mono tracking-tight" style={{ color: '#FFFFF0' }}>
             ৳ {totalNetWorthBDT.toLocaleString()}
           </div>
-          <div className="mt-1.5 text-xs text-white/80">
+          <div className="mt-1.5 text-xs text-[#E2E8E4]">
             Includes <strong className="text-[#C8A96A]">${foreignUSD.toLocaleString()} USD</strong> offshore savings
           </div>
         </div>

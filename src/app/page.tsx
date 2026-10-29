@@ -109,8 +109,8 @@ export default function MasterDashboard() {
                   <div className="h-12 w-12 rounded-xl overflow-hidden border border-[#DDE3DD] bg-[#0D3B29] p-1 shadow-sm flex items-center justify-center">
                     <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-full w-full object-contain" />
                   </div>
-                  <div className="h-12 w-12 rounded-xl overflow-hidden border border-[#DDE3DD] bg-black shadow-sm flex items-center justify-center shrink-0">
-                    <img src="/logos/linda-icon.png" alt="Linda" className="h-full w-full object-contain" />
+                  <div className="h-12 px-2.5 rounded-xl overflow-hidden border border-[#DDE3DD] bg-black shadow-sm flex items-center justify-center shrink-0">
+                    <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-6 w-auto object-contain" />
                   </div>
                 </div>
               </div>

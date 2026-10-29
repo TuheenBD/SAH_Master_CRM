@@ -400,18 +400,32 @@ main .border-\[\#C8A96A\] {
   border-color: var(--main-brand-gold) !important;
 }
 
-/* Text Overrides for High Contrast Light Canvas */
-main p.text-white,
-main h1.text-white,
-main h2.text-white,
-main h3.text-white,
-main h4.text-white,
-main span.text-white:not([class*="bg-"]):not([class*="rounded"]):not([class*="badge"]),
-main td.text-white,
-main div.text-white:not([class*="bg-"]):not([class*="btn"]):not([class*="badge"]),
-main .text-slate-100,
-main .text-slate-200 {
+/* Text Overrides for High Contrast Light Canvas (Excluding Dark Cards/Containers) */
+main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-black"]) > p.text-white,
+main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-black"]) > h1.text-white,
+main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-black"]) > h2.text-white,
+main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-black"]) > h3.text-white,
+main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-black"]) > h4.text-white,
+main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-black"]) > span.text-white:not([class*="bg-"]):not([class*="rounded"]):not([class*="badge"]),
+main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-black"]) > td.text-white,
+main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-black"]) > div.text-white:not([class*="bg-"]):not([class*="btn"]):not([class*="badge"]),
+main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-black"]) > .text-slate-100,
+main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-black"]) > .text-slate-200 {
   color: var(--main-text) !important;
+}
+
+/* Explicit Ivory White Text preservation for Dark Executive Cards */
+main [class*="bg-[#1F3A2E]"] .text-white,
+main [class*="bg-[#1F3A2E]"] .text-\[\#FFFFF0\],
+main [class*="bg-[#1F3A2E]"] .text-\[\#FDFBF7\],
+main [class*="bg-[#1F3A2E]"] .text-ivory,
+main [class*="bg-[#1F3A2E]"] [class*="text-[#FFFFF0]"],
+main [class*="bg-[#1F3A2E]"] [class*="text-[#FDFBF7]"],
+main [class*="bg-[#1F3A2E]"] [class*="text-white"],
+main [class*="bg-[#0D3B29]"] .text-white,
+main [class*="bg-[#0A1628]"] .text-white,
+main [class*="bg-black"] .text-white {
+  color: #FFFFF0 !important;
 }
 
 main p.text-slate-300,

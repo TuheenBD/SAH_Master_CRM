@@ -130,7 +130,7 @@ export default function Header() {
                     <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-4 w-4 rounded object-contain shrink-0 shadow-xs" />
                   )}
                   {code === 'LINDA' && (
-                    <img src="/logos/linda-icon.png" alt="Linda Resort" className="h-4 w-4 rounded object-contain shrink-0 shadow-xs" />
+                    <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-4 w-auto max-w-[60px] object-contain shrink-0 shadow-xs" />
                   )}
                   <span>{code === 'CONSOLIDATED' ? 'ALL ENTITIES' : code === 'ARIELMC' ? 'ArielMC' : code === 'BIZMAN' ? 'Bizman' : 'Linda Resort'}</span>
                 </button>
