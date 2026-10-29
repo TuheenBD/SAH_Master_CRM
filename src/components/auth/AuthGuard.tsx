@@ -50,6 +50,47 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const [biometricSuccess, setBiometricSuccess] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isLoadingStorage, setIsLoadingStorage] = useState<boolean>(true);
+  const [lockoutRemaining, setLockoutRemaining] = useState<number>(0);
+
+  // Check lockout status every second
+  useEffect(() => {
+    const checkLockout = () => {
+      try {
+        const stored = localStorage.getItem('sah_lockout_until');
+        if (stored) {
+          const remaining = Math.max(0, Math.floor((parseInt(stored, 10) - Date.now()) / 1000));
+          setLockoutRemaining(remaining);
+        } else {
+          setLockoutRemaining(0);
+        }
+      } catch (e) {}
+    };
+    checkLockout();
+    const interval = setInterval(checkLockout, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // 10-Minute Inactivity Auto-Lock
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    let timer: NodeJS.Timeout;
+
+    const resetInactivity = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        lockVault();
+      }, 10 * 60 * 1000); // 10 minutes inactivity
+    };
+
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    events.forEach(evt => window.addEventListener(evt, resetInactivity, { passive: true }));
+    resetInactivity();
+
+    return () => {
+      clearTimeout(timer);
+      events.forEach(evt => window.removeEventListener(evt, resetInactivity));
+    };
+  }, [isAuthenticated]);
 
   // Check persistent session on mount
   useEffect(() => {
@@ -74,6 +115,12 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
   const unlockVault = () => {
     playClickSound();
+    try {
+      localStorage.removeItem('sah_failed_attempts');
+      localStorage.removeItem('sah_lockout_until');
+    } catch (e) {}
+    setLockoutRemaining(0);
+
     if (rememberDevice) {
       try {
         localStorage.setItem('sah_master_crm_auth_session', 'AUTHENTICATED');
@@ -84,6 +131,25 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     setTotpCode('');
     setPasswordInput('');
     setErrorMessage('');
+  };
+
+  const registerFailedAttempt = () => {
+    let currentFails = 1;
+    try {
+      currentFails = Number(localStorage.getItem('sah_failed_attempts') || '0') + 1;
+      localStorage.setItem('sah_failed_attempts', String(currentFails));
+    } catch (e) {}
+
+    if (currentFails >= 5) {
+      const lockoutTime = Date.now() + 15 * 60 * 1000; // 15 mins lockout
+      try {
+        localStorage.setItem('sah_lockout_until', String(lockoutTime));
+      } catch (e) {}
+      setLockoutRemaining(15 * 60);
+      setErrorMessage('SECURITY LOCKOUT: 5 failed attempts. System locked for 15 minutes.');
+    } else {
+      setErrorMessage(`Access Denied. ${5 - currentFails} attempt(s) remaining before system lockout.`);
+    }
   };
 
   const lockVault = () => {
@@ -100,6 +166,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
   // Handle Passcode (PIN keypad) Input
   const handlePinPress = (num: string) => {
+    if (lockoutRemaining > 0) return;
     playClickSound();
     setErrorMessage('');
     if (pinDigits.length < 6) {
@@ -108,23 +175,25 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
       if (nextDigits.length === 6) {
         const enteredPin = nextDigits.join('');
-        if (enteredPin === DEFAULT_PASSCODE || enteredPin === '197126' || enteredPin === '778899') {
+        if (enteredPin === DEFAULT_PASSCODE) {
           unlockVault();
         } else {
-          setErrorMessage('Invalid Passcode. Enter default (202600) or biometric.');
-          setTimeout(() => setPinDigits([]), 600);
+          registerFailedAttempt();
+          setTimeout(() => setPinDigits([]), 500);
         }
       }
     }
   };
 
   const handlePinDelete = () => {
+    if (lockoutRemaining > 0) return;
     playClickSound();
     setErrorMessage('');
     setPinDigits(prev => prev.slice(0, -1));
   };
 
   const handlePinClear = () => {
+    if (lockoutRemaining > 0) return;
     playClickSound();
     setErrorMessage('');
     setPinDigits([]);
@@ -133,6 +202,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   // Handle Authenticator TOTP Code
   const handleTotpSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (lockoutRemaining > 0) return;
     if (totpCode.length === 6) {
       unlockVault();
     } else {
@@ -170,10 +240,11 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   // Handle Password Submit
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (passwordInput === DEFAULT_PASSWORD || passwordInput === 'admin2026') {
+    if (lockoutRemaining > 0) return;
+    if (passwordInput === DEFAULT_PASSWORD) {
       unlockVault();
     } else {
-      setErrorMessage('Invalid master passphrase.');
+      registerFailedAttempt();
     }
   };
 
@@ -309,8 +380,24 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
               </button>
             </div>
 
+            {/* Security Lockout Banner */}
+            {lockoutRemaining > 0 && (
+              <div className="rounded-xl border border-rose-500/80 bg-rose-950/70 p-3 text-center space-y-1 animate-pulse">
+                <div className="flex items-center justify-center gap-1.5 text-xs font-black text-rose-400 uppercase tracking-wider">
+                  <AlertCircle className="h-4 w-4" />
+                  <span>SECURITY LOCKDOWN ACTIVE</span>
+                </div>
+                <div className="text-[11px] text-rose-200 font-mono">
+                  Max failed attempts reached. Vault locked for{' '}
+                  <strong className="text-white font-bold">
+                    {Math.floor(lockoutRemaining / 60)}:{(lockoutRemaining % 60).toString().padStart(2, '0')}
+                  </strong>
+                </div>
+              </div>
+            )}
+
             {/* Error Message Alert */}
-            {errorMessage && (
+            {errorMessage && lockoutRemaining === 0 && (
               <div className="flex items-center justify-center gap-1.5 text-xs text-rose-400 bg-rose-950/40 border border-rose-800/60 p-2 rounded-xl">
                 <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                 <span>{errorMessage}</span>
@@ -377,8 +464,8 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
                   </button>
                 </div>
 
-                <div className="text-[11px] text-[#6B7269] font-mono">
-                  Default Passcode: <strong className="text-[#C8A96A]">202600</strong>
+                <div className="text-[10px] text-[#4A6356] font-mono tracking-wider">
+                  ENTER 6-DIGIT SOVEREIGN EXECUTIVE PIN
                 </div>
               </div>
             )}
@@ -508,8 +595,8 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
                   <span>Authenticate Session</span>
                 </button>
 
-                <div className="text-[11px] text-[#6B7269] font-mono">
-                  Default Passphrase: <strong className="text-[#C8A96A]">tuheen@mastercrm2026</strong>
+                <div className="text-[10px] text-[#4A6356] font-mono tracking-wider">
+                  CONFIDENTIAL EXECUTIVE CLEARANCE
                 </div>
               </form>
             )}
