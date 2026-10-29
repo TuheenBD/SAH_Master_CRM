@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { 
   FolderKanban, 
+  FolderPlus,
   Upload, 
   Search, 
   Filter, 
@@ -618,9 +619,33 @@ Attested: Syed Akramul Hassan`;
       )}
 
       {/* =================================================================== */}
-      {/* 5. DOCUMENTS DISPLAY: GRID VIEW (Cards) */}
+      {/* 5. DOCUMENTS DISPLAY: EMPTY STATE */}
       {/* =================================================================== */}
-      {viewMode === 'GRID' && (
+      {filteredDocuments.length === 0 && (
+        <div className="rounded-2xl border border-dashed border-[#DDE3DD] bg-white p-12 text-center space-y-4 shadow-sm">
+          <div className="mx-auto w-14 h-14 rounded-2xl bg-[#F4F6F4] flex items-center justify-center text-[#1F3A2E] border border-[#DDE3DD]">
+            <FolderPlus className="h-7 w-7 text-[#C8A96A]" />
+          </div>
+          <div className="space-y-1">
+            <h2 className="text-base font-extrabold text-[#1F3A2E]">Document Vault is Clean</h2>
+            <p className="text-xs text-[#6B7269] max-w-md mx-auto">
+              No documents stored yet. Click &quot;Upload Document&quot; above to securely archive contracts, export LCs, and commercial agreements.
+            </p>
+          </div>
+          <button
+            onClick={handleOpenUpload}
+            className="inline-flex items-center gap-2 rounded-xl bg-[#1F3A2E] hover:bg-[#2C5240] text-white px-5 py-2.5 text-xs font-bold transition-all shadow-md mx-auto"
+          >
+            <Upload className="h-4 w-4 text-[#C8A96A]" />
+            <span>Upload First Document</span>
+          </button>
+        </div>
+      )}
+
+      {/* =================================================================== */}
+      {/* 6. DOCUMENTS DISPLAY: GRID VIEW (Cards) */}
+      {/* =================================================================== */}
+      {filteredDocuments.length > 0 && viewMode === 'GRID' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredDocuments.map((doc) => {
             const isSelected = selectedIds.includes(doc.id);
@@ -761,9 +786,9 @@ Attested: Syed Akramul Hassan`;
       )}
 
       {/* =================================================================== */}
-      {/* 6. DOCUMENTS DISPLAY: TABLE VIEW */}
+      {/* 7. DOCUMENTS DISPLAY: TABLE VIEW */}
       {/* =================================================================== */}
-      {viewMode === 'TABLE' && (
+      {filteredDocuments.length > 0 && viewMode === 'TABLE' && (
         <div className="rounded-xl border border-[#DDE3DD] bg-white overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
@@ -895,26 +920,8 @@ Attested: Syed Akramul Hassan`;
         </div>
       )}
 
-      {/* Empty State */}
-      {filteredDocuments.length === 0 && (
-        <div className="rounded-xl border border-dashed border-[#DDE3DD] bg-white p-12 text-center space-y-3">
-          <FolderKanban className="h-10 w-10 text-[#8FA899] mx-auto" />
-          <h3 className="text-base font-bold text-[#1F3A2E]">No documents found</h3>
-          <p className="text-xs text-[#6B7269] max-w-sm mx-auto">
-            No files match your current entity filter or search criteria. Upload a new document to this category.
-          </p>
-          <button
-            onClick={handleOpenUpload}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-[#1F3A2E] text-white px-3.5 py-1.5 text-xs font-bold shadow-sm"
-          >
-            <Upload className="h-3.5 w-3.5 text-[#C8A96A]" />
-            <span>Upload Document</span>
-          </button>
-        </div>
-      )}
-
       {/* =================================================================== */}
-      {/* 7. UPLOAD DOCUMENT MODAL */}
+      {/* 8. UPLOAD DOCUMENT MODAL */}
       {/* =================================================================== */}
       {isUploadModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">

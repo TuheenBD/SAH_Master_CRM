@@ -772,6 +772,19 @@ export default function LeadsPage() {
       {/* BIZMAN CRM VIEW: CORPORATE LEAD COMPANIES (COMPANIES & CONTACTS) */}
       {/* =================================================================== */}
       {viewMode === 'COMPANIES' && (
+        filteredCompanyLeads.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-[#DDE3DD] bg-white p-12 text-center space-y-4 shadow-sm">
+            <div className="mx-auto w-14 h-14 rounded-2xl bg-[#F4F6F4] flex items-center justify-center text-[#1F3A2E] border border-[#DDE3DD]">
+              <Building2 className="h-7 w-7 text-[#C8A96A]" />
+            </div>
+            <div className="space-y-1">
+              <h2 className="text-base font-extrabold text-[#1F3A2E]">Corporate Client Database is Clean</h2>
+              <p className="text-xs text-[#6B7269] max-w-md mx-auto">
+                No corporate accounts recorded yet. Click &quot;+ Create New Lead&quot; above to add your first real commercial client (e.g. Grameenphone, Unilever, Export Buyer).
+              </p>
+            </div>
+          </div>
+        ) : (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Left Column: Corporate Leads Roster (5 Cols) */}
           <div className="lg:col-span-5 space-y-3">
@@ -1336,12 +1349,26 @@ export default function LeadsPage() {
             </div>
           )}
         </div>
+        )
       )}
 
       {/* =================================================================== */}
       {/* VIEW 2: GRID VIEW (Two-Column Cards & Inspector) */}
       {/* =================================================================== */}
       {viewMode === 'GRID' && (
+        filteredLeads.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-[#DDE3DD] bg-white p-12 text-center space-y-4 shadow-sm">
+            <div className="mx-auto w-14 h-14 rounded-2xl bg-[#F4F6F4] flex items-center justify-center text-[#1F3A2E] border border-[#DDE3DD]">
+              <Layers className="h-7 w-7 text-[#C8A96A]" />
+            </div>
+            <div className="space-y-1">
+              <h2 className="text-base font-extrabold text-[#1F3A2E]">No Project Deals in Pipeline</h2>
+              <p className="text-xs text-[#6B7269] max-w-md mx-auto">
+                Deal pipeline is clean. Click &quot;+ Create New Lead&quot; above to log your first commercial project contract.
+              </p>
+            </div>
+          </div>
+        ) : (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Left Column: Opportunity List Cards (5 Cols) */}
           <div className="lg:col-span-5 space-y-3">
@@ -1883,6 +1910,7 @@ export default function LeadsPage() {
             </div>
           )}
         </div>
+        )
       )}
 
       {/* =================================================================== */}
@@ -1906,7 +1934,14 @@ export default function LeadsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#DDE3DD] font-mono text-[#1A1A1A]">
-                {filteredLeads.map((lead) => {
+                {filteredLeads.length === 0 ? (
+                  <tr>
+                    <td colSpan={9} className="py-12 text-center text-xs text-[#6B7269] font-sans">
+                      No project deals in pipeline yet. Click &quot;+ Create New Lead&quot; above to log your first contract.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredLeads.map((lead) => {
                   const stageCfg = STAGE_CONFIG[lead.stage] || STAGE_CONFIG.NEW_INQUIRY;
                   const commRate = lead.commissionRate || 10;
                   const commAmount = lead.commissionAmount || Math.round(lead.estimatedValue * (commRate / 100));
@@ -2029,7 +2064,7 @@ export default function LeadsPage() {
                       </td>
                     </tr>
                   );
-                })}
+                }))}
               </tbody>
             </table>
           </div>

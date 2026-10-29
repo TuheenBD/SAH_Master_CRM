@@ -278,7 +278,14 @@ export default function ExpensesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#DDE3DD]">
-              {filteredExpenses.map((exp) => (
+              {filteredExpenses.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="py-12 text-center text-xs text-[#6B7269]">
+                    No deal expenses logged yet. Click &quot;+ Record Deal Expense&quot; above to log your first expenditure.
+                  </td>
+                </tr>
+              ) : (
+                filteredExpenses.map((exp) => (
                 <tr key={exp.id} className="hover:bg-[#F4F6F4] transition-colors">
                   <td className="py-3.5 px-4 font-mono font-bold text-[#1F3A2E] text-xs whitespace-nowrap">
                     {exp.expenseNumber}
@@ -350,7 +357,7 @@ export default function ExpensesPage() {
                     )}
                   </td>
                 </tr>
-              ))}
+              )))}
             </tbody>
           </table>
         </div>

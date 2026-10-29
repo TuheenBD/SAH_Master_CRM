@@ -354,7 +354,27 @@ export default function ContactsPage() {
       {/* =================================================================== */}
       {viewMode === 'GRID' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredContacts.map((contact) => {
+          {filteredContacts.length === 0 ? (
+            <div className="col-span-full rounded-xl border border-dashed border-[#DDE3DD] bg-white p-12 text-center space-y-3">
+              <div className="mx-auto w-12 h-12 rounded-full bg-[#F4F6F4] flex items-center justify-center text-[#1F3A2E]">
+                <Contact className="h-6 w-6 text-[#C8A96A]" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm font-bold text-[#1F3A2E]">Rolodex is Clean</h3>
+                <p className="text-xs text-[#6B7269] max-w-sm mx-auto">
+                  No contacts found. Click &quot;Add Contact&quot; to begin building your real master directory.
+                </p>
+              </div>
+              <button
+                onClick={() => setIsNewModalOpen(true)}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-[#1F3A2E] hover:bg-[#2C5240] text-white px-3.5 py-2 text-xs font-bold transition-all shadow-sm mx-auto"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                <span>Add First Contact</span>
+              </button>
+            </div>
+          ) : (
+            filteredContacts.map((contact) => {
             const isChecked = selectedIds.includes(contact.id);
             return (
               <div
@@ -521,7 +541,7 @@ export default function ContactsPage() {
                 </div>
               </div>
             );
-          })}
+          }))}
         </div>
       )}
 
@@ -552,7 +572,14 @@ export default function ContactsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#DDE3DD]">
-                {filteredContacts.map((contact) => {
+                {filteredContacts.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="py-12 text-center text-xs text-[#6B7269]">
+                      No contacts found. Click &quot;Add Contact&quot; above to add your first contact.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredContacts.map((contact) => {
                   const isChecked = selectedIds.includes(contact.id);
                   return (
                     <tr
@@ -691,7 +718,7 @@ export default function ContactsPage() {
                       </td>
                     </tr>
                   );
-                })}
+                }))}
               </tbody>
             </table>
           </div>

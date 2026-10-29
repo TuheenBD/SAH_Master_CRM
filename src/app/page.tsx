@@ -375,81 +375,102 @@ export default function MasterDashboard() {
           </div>
 
           <div className="space-y-3">
-            {filteredLeads.map((lead) => {
-              const badgeCompany = lead.companyCode;
-              return (
-                <div
-                  key={lead.id}
-                  className="rounded-xl border border-[#DDE3DD] bg-white p-4 hover:border-[#C8A96A] transition-all shadow-sm"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <div className="flex items-center gap-2.5">
-                      <span className={`px-2 py-0.5 text-[10px] font-bold rounded ${
-                        badgeCompany === 'BIZMAN' ? 'bg-[#E8F0FA] text-[#1F5FA8] border border-[#BBD5F2]' :
-                        badgeCompany === 'LINDA' ? 'bg-[#FFF3D6] text-[#8A5A00] border border-[#FBE0A8]' :
-                        'bg-[#E4F3E9] text-[#1E6B3A] border border-[#B6E2C5]'
-                      }`}>
-                        {lead.companyCode === 'ARIELMC' ? 'ArielMC' : lead.companyCode === 'LINDA' ? 'Linda Resort' : lead.companyCode}
-                      </span>
-                      <span className="text-xs text-[#6B7269] font-mono">{lead.pipelineType}</span>
-                    </div>
-
-                    <div className="flex items-center gap-1.5">
-                      <a
-                        href={`tel:${lead.phone}`}
-                        title={`Call ${lead.contactPerson}`}
-                        className="flex items-center gap-1 rounded bg-[#E0F2FE] text-[#0369A1] hover:bg-[#0284C7] hover:text-white border border-[#BAE6FD] hover:border-[#0284C7] px-2.5 py-1 text-xs transition-all shadow-xs group"
-                      >
-                        <PhoneCall className="h-3 w-3 text-[#0369A1] group-hover:text-white transition-colors" />
-                        <span className="font-mono text-[11px] font-semibold">{lead.phone}</span>
-                      </a>
-
-                      <a
-                        href={`https://wa.me/${lead.whatsapp}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title="Chat via WhatsApp"
-                        className="flex items-center gap-1.5 rounded-lg bg-[#25D366] hover:bg-[#20BA5A] text-white px-2.5 py-1 text-xs border border-[#1EBE5D] transition-colors font-bold shadow-xs"
-                      >
-                        <MessageSquare className="h-3.5 w-3.5" />
-                        <span className="text-[11px]">WhatsApp</span>
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="mt-2.5">
-                    <h3 className="text-sm font-extrabold text-[#1F3A2E]">{lead.title}</h3>
-                    <p className="text-xs text-[#6B7269] mt-0.5">
-                      Client: <span className="font-bold text-[#1A1A1A]">{lead.customerName}</span> ({lead.contactPerson}) &bull; {lead.country}
-                    </p>
-                  </div>
-
-                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-[#DDE3DD] pt-2.5 text-xs">
-                    <div className="flex items-center gap-3">
-                      <div>
-                        <span className="text-[#6B7269]">Value: </span>
-                        <strong className="text-[#1F3A2E] font-mono font-bold">
-                          {lead.currency === 'USD' ? '$' : '৳'}{lead.estimatedValue.toLocaleString()}
-                        </strong>
-                      </div>
-                      <div>
-                        <span className="text-[#6B7269]">Target: </span>
-                        <span className="text-[#1A1A1A] font-mono">{lead.expectedCloseDate}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <span className="rounded bg-[#F4F6F4] text-[#1F3A2E] border border-[#DDE3DD] px-2 py-0.5 text-[11px] font-bold">
-                        {lead.stage.replace(/_/g, ' ')}
-                      </span>
-                      <span className="text-[11px] text-[#6B7269] font-mono font-semibold">
-                        {lead.probability}% Prob
-                      </span>
-                    </div>
-                  </div>
+            {filteredLeads.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-[#DDE3DD] bg-white p-8 text-center space-y-3">
+                <div className="mx-auto w-12 h-12 rounded-full bg-[#F4F6F4] flex items-center justify-center text-[#1F3A2E]">
+                  <Sparkles className="h-6 w-6 text-[#C8A96A]" />
                 </div>
-              );
-            })}
+                <div className="space-y-1">
+                  <h3 className="text-sm font-bold text-[#1F3A2E]">Clean Slate Ready</h3>
+                  <p className="text-xs text-[#6B7269] max-w-sm mx-auto">
+                    CRM is clean and primed for real operations. Click &quot;New Lead&quot; to begin logging transactions.
+                  </p>
+                </div>
+                <Link
+                  href={`/leads?company=${activeCompany}&action=new`}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-[#1F3A2E] hover:bg-[#2C5240] text-white px-3.5 py-2 text-xs font-bold transition-all shadow-sm"
+                >
+                  <FilePlus className="h-3.5 w-3.5" />
+                  <span>Create First Lead</span>
+                </Link>
+              </div>
+            ) : (
+              filteredLeads.map((lead) => {
+                const badgeCompany = lead.companyCode;
+                return (
+                  <div
+                    key={lead.id}
+                    className="rounded-xl border border-[#DDE3DD] bg-white p-4 hover:border-[#C8A96A] transition-all shadow-sm"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div className="flex items-center gap-2.5">
+                        <span className={`px-2 py-0.5 text-[10px] font-bold rounded ${
+                          badgeCompany === 'BIZMAN' ? 'bg-[#E8F0FA] text-[#1F5FA8] border border-[#BBD5F2]' :
+                          badgeCompany === 'LINDA' ? 'bg-[#FFF3D6] text-[#8A5A00] border border-[#FBE0A8]' :
+                          'bg-[#E4F3E9] text-[#1E6B3A] border border-[#B6E2C5]'
+                        }`}>
+                          {lead.companyCode === 'ARIELMC' ? 'ArielMC' : lead.companyCode === 'LINDA' ? 'Linda Resort' : lead.companyCode}
+                        </span>
+                        <span className="text-xs text-[#6B7269] font-mono">{lead.pipelineType}</span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5">
+                        <a
+                          href={`tel:${lead.phone}`}
+                          title={`Call ${lead.contactPerson}`}
+                          className="flex items-center gap-1 rounded bg-[#E0F2FE] text-[#0369A1] hover:bg-[#0284C7] hover:text-white border border-[#BAE6FD] hover:border-[#0284C7] px-2.5 py-1 text-xs transition-all shadow-xs group"
+                        >
+                          <PhoneCall className="h-3 w-3 text-[#0369A1] group-hover:text-white transition-colors" />
+                          <span className="font-mono text-[11px] font-semibold">{lead.phone}</span>
+                        </a>
+
+                        <a
+                          href={`https://wa.me/${lead.whatsapp}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="Chat via WhatsApp"
+                          className="flex items-center gap-1.5 rounded-lg bg-[#25D366] hover:bg-[#20BA5A] text-white px-2.5 py-1 text-xs border border-[#1EBE5D] transition-colors font-bold shadow-xs"
+                        >
+                          <MessageSquare className="h-3.5 w-3.5" />
+                          <span className="text-[11px]">WhatsApp</span>
+                        </a>
+                      </div>
+                    </div>
+
+                    <div className="mt-2.5">
+                      <h3 className="text-sm font-extrabold text-[#1F3A2E]">{lead.title}</h3>
+                      <p className="text-xs text-[#6B7269] mt-0.5">
+                        Client: <span className="font-bold text-[#1A1A1A]">{lead.customerName}</span> ({lead.contactPerson}) &bull; {lead.country}
+                      </p>
+                    </div>
+
+                    <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-[#DDE3DD] pt-2.5 text-xs">
+                      <div className="flex items-center gap-3">
+                        <div>
+                          <span className="text-[#6B7269]">Value: </span>
+                          <strong className="text-[#1F3A2E] font-mono font-bold">
+                            {lead.currency === 'USD' ? '$' : '৳'}{lead.estimatedValue.toLocaleString()}
+                          </strong>
+                        </div>
+                        <div>
+                          <span className="text-[#6B7269]">Target: </span>
+                          <span className="text-[#1A1A1A] font-mono">{lead.expectedCloseDate}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="rounded bg-[#F4F6F4] text-[#1F3A2E] border border-[#DDE3DD] px-2 py-0.5 text-[11px] font-bold">
+                          {lead.stage.replace(/_/g, ' ')}
+                        </span>
+                        <span className="text-[11px] text-[#6B7269] font-mono font-semibold">
+                          {lead.probability}% Prob
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
 
@@ -473,28 +494,34 @@ export default function MasterDashboard() {
             </div>
 
             <div className="mt-3 space-y-3">
-              {filteredExpenses.map((exp) => (
-                <div key={exp.id} className="rounded-lg border border-[#DDE3DD] bg-[#F9FAF9] p-3 text-xs">
-                  <div className="flex items-center justify-between font-mono text-[11px]">
-                    <span className="text-[#6B7269]">{exp.expenseNumber}</span>
-                    <strong className="text-[#B3261E]">
-                      -{exp.currency === 'USD' ? '$' : '৳'}{exp.amount.toLocaleString()}
-                    </strong>
-                  </div>
-                  <div className="mt-1 font-bold text-[#1A1A1A]">{exp.description}</div>
-                  
-                  {exp.leadTitle && (
-                    <div className="mt-1.5 rounded bg-[#EDF1ED] border border-[#DDE3DD] px-2 py-0.5 text-[10px] text-[#1F3A2E] font-medium truncate">
-                      Deal: {exp.leadTitle}
-                    </div>
-                  )}
-
-                  <div className="mt-1 flex items-center justify-between text-[10px] text-[#6B7269] pt-1">
-                    <span>Paid to: {exp.vendorRecipient}</span>
-                    <span className="font-mono">{exp.date}</span>
-                  </div>
+              {filteredExpenses.length === 0 ? (
+                <div className="rounded-lg border border-dashed border-[#DDE3DD] p-4 text-center text-xs text-[#6B7269]">
+                  No deal expenses logged yet. Click &quot;Log +&quot; above to record project outlays.
                 </div>
-              ))}
+              ) : (
+                filteredExpenses.map((exp) => (
+                  <div key={exp.id} className="rounded-lg border border-[#DDE3DD] bg-[#F9FAF9] p-3 text-xs">
+                    <div className="flex items-center justify-between font-mono text-[11px]">
+                      <span className="text-[#6B7269]">{exp.expenseNumber}</span>
+                      <strong className="text-[#B3261E]">
+                        -{exp.currency === 'USD' ? '$' : '৳'}{exp.amount.toLocaleString()}
+                      </strong>
+                    </div>
+                    <div className="mt-1 font-bold text-[#1A1A1A]">{exp.description}</div>
+                    
+                    {exp.leadTitle && (
+                      <div className="mt-1.5 rounded bg-[#EDF1ED] border border-[#DDE3DD] px-2 py-0.5 text-[10px] text-[#1F3A2E] font-medium truncate">
+                        Deal: {exp.leadTitle}
+                      </div>
+                    )}
+
+                    <div className="mt-1 flex items-center justify-between text-[10px] text-[#6B7269] pt-1">
+                      <span>Paid to: {exp.vendorRecipient}</span>
+                      <span className="font-mono">{exp.date}</span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
