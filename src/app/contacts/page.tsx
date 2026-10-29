@@ -229,49 +229,53 @@ export default function ContactsPage() {
   return (
     <div className="space-y-6">
       {/* Top Header & New Contact Button */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#DDE3DD] pb-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-indigo-400">
-            <Contact className="h-4 w-4" />
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#C8A96A]">
+            <Contact className="h-4 w-4 text-[#C8A96A]" />
             <span>Master Rolodex & Directory</span>
           </div>
-          <h1 className="mt-1 text-2xl font-extrabold text-white">
+          <h1 className="mt-1 text-2xl font-black text-[#1F3A2E] tracking-tight">
             Master Contact Database
           </h1>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-[#6B7269] font-medium">
             Clients, foreign buyers, raw material suppliers, 50+/70+ billboard vendors, team members, and personal contacts
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           {/* Grid vs Table View Switcher */}
-          <div className="flex items-center rounded-lg bg-slate-900 border border-slate-800 p-1 text-xs">
+          <div className="flex items-center rounded-xl bg-white border border-[#DDE3DD] p-1 text-xs shadow-xs">
             <button
               onClick={() => setViewMode('GRID')}
               title="Grid Card View"
-              className={`p-1.5 rounded-md transition-all flex items-center gap-1.5 ${
-                viewMode === 'GRID' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 font-bold text-xs ${
+                viewMode === 'GRID' 
+                  ? 'bg-[#1F3A2E] text-[#C8A96A] border border-[#1F3A2E] shadow-sm' 
+                  : 'text-[#556055] hover:text-[#1F3A2E] hover:bg-[#F4F6F4]'
               }`}
             >
               <LayoutGrid className="h-4 w-4" />
-              <span className="hidden md:inline font-semibold text-[11px]">Grid</span>
+              <span>Grid</span>
             </button>
             <button
               onClick={() => setViewMode('TABLE')}
               title="Table View"
-              className={`p-1.5 rounded-md transition-all flex items-center gap-1.5 ${
-                viewMode === 'TABLE' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 font-bold text-xs ${
+                viewMode === 'TABLE' 
+                  ? 'bg-[#1F3A2E] text-[#C8A96A] border border-[#1F3A2E] shadow-sm' 
+                  : 'text-[#556055] hover:text-[#1F3A2E] hover:bg-[#F4F6F4]'
               }`}
             >
               <TableIcon className="h-4 w-4" />
-              <span className="hidden md:inline font-semibold text-[11px]">Table</span>
+              <span>Table</span>
             </button>
           </div>
 
           {/* New Contact Action */}
           <button
             onClick={handleOpenCreate}
-            className="flex items-center gap-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-2 text-xs font-semibold shadow-lg shadow-indigo-600/30 transition-all"
+            className="flex items-center gap-2 rounded-xl bg-[#1F3A2E] hover:bg-[#2C5240] text-[#C8A96A] px-4 py-2 text-xs font-bold border border-[#1F3A2E] shadow-sm transition-all"
           >
             <Plus className="h-4 w-4" />
             <span>New Entry</span>

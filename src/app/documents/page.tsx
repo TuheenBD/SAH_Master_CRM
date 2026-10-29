@@ -341,30 +341,30 @@ Attested: Syed Akramul Hassan`;
 
         <div className="flex items-center gap-2.5">
           {/* Grid vs Table View Toggle */}
-          <div className="flex items-center rounded-lg bg-white border border-[#DDE3DD] p-1 shadow-xs">
+          <div className="flex items-center rounded-xl bg-white border border-[#DDE3DD] p-1 text-xs shadow-xs">
             <button
               onClick={() => setViewMode('GRID')}
               title="Grid Card View"
-              className={`p-1.5 rounded-md transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 font-bold text-xs ${
                 viewMode === 'GRID' 
-                  ? 'bg-[#1F3A2E] text-white shadow-xs' 
-                  : 'text-[#6B7269] hover:text-[#1F3A2E] hover:bg-[#F4F6F4]'
+                  ? 'bg-[#1F3A2E] text-[#C8A96A] border border-[#1F3A2E] shadow-sm' 
+                  : 'text-[#556055] hover:text-[#1F3A2E] hover:bg-[#F4F6F4]'
               }`}
             >
               <LayoutGrid className="h-4 w-4" />
-              <span className="hidden md:inline font-semibold text-[11px]">Grid</span>
+              <span>Grid</span>
             </button>
             <button
               onClick={() => setViewMode('TABLE')}
               title="Table View"
-              className={`p-1.5 rounded-md transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 font-bold text-xs ${
                 viewMode === 'TABLE' 
-                  ? 'bg-[#1F3A2E] text-white shadow-xs' 
-                  : 'text-[#6B7269] hover:text-[#1F3A2E] hover:bg-[#F4F6F4]'
+                  ? 'bg-[#1F3A2E] text-[#C8A96A] border border-[#1F3A2E] shadow-sm' 
+                  : 'text-[#556055] hover:text-[#1F3A2E] hover:bg-[#F4F6F4]'
               }`}
             >
               <TableIcon className="h-4 w-4" />
-              <span className="hidden md:inline font-semibold text-[11px]">Table</span>
+              <span>Table</span>
             </button>
           </div>
 
