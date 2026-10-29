@@ -20,7 +20,8 @@ import {
   Calendar,
   Sparkles,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  BarChart3
 } from 'lucide-react';
 import { CompanyCode, COMPANIES } from '@/lib/types';
 import { INITIAL_LEADS, INITIAL_EXPENSES } from '@/lib/mock-data';
