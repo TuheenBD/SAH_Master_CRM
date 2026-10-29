@@ -7,42 +7,207 @@ import {
   Printer, 
   Download, 
   Share2,
-  Copy,
-  Check,
+  Copy, 
+  Check, 
   CheckCircle2, 
-  FileText,
-  DollarSign,
-  Building2,
-  ExternalLink,
-  ShieldCheck,
-  Eye,
-  Layers,
-  MessageSquare,
-  Sparkles,
-  X
+  FileText, 
+  DollarSign, 
+  Building2, 
+  ExternalLink, 
+  ShieldCheck, 
+  Eye, 
+  Layers, 
+  MessageSquare, 
+  Sparkles, 
+  X,
+  Calendar,
+  CalendarDays,
+  Clock,
+  ArrowRight,
+  TrendingUp,
+  Receipt,
+  Scale
 } from 'lucide-react';
 import { CompanyCode } from '@/lib/types';
 import { INITIAL_LEADS } from '@/lib/mock-data';
-import { generatePLStatement } from '@/lib/accounting-engine';
+import { generatePLStatement, PLStatement } from '@/lib/accounting-engine';
 
-type ReportType = 
+export type ReportType = 
   | 'CONSOLIDATED_EXECUTIVE'
+  | 'CORPORATE_ACCOUNTS'
   | 'DEAL_PROFITABILITY'
   | 'DOOH_OCCUPANCY'
   | 'EXPORT_CONSIGNMENT'
   | 'PERSONAL_FINANCIAL_STATEMENT';
 
+export type TimePeriodPreset = 
+  | 'THIS_MONTH'
+  | 'LAST_MONTH'
+  | 'THIS_QUARTER'
+  | 'LAST_QUARTER'
+  | 'YTD'
+  | 'FULL_YEAR'
+  | 'CUSTOM';
+
+const PERIOD_PRESETS: { id: TimePeriodPreset; label: string; sub: string }[] = [
+  { id: 'THIS_MONTH', label: 'This Month', sub: 'Oct 2026' },
+  { id: 'LAST_MONTH', label: 'Last Month', sub: 'Sep 2026' },
+  { id: 'THIS_QUARTER', label: 'This Quarter', sub: 'Q4 2026' },
+  { id: 'LAST_QUARTER', label: 'Last Quarter', sub: 'Q3 2026' },
+  { id: 'YTD', label: 'Year to Date', sub: 'YTD 2026' },
+  { id: 'FULL_YEAR', label: 'Full Year', sub: 'FY 2026' },
+  { id: 'CUSTOM', label: 'Custom Range', sub: 'Select Dates' },
+];
+
 export default function ReportsPage() {
   const searchParams = useSearchParams();
-  const activeCompany = (searchParams.get('company') as CompanyCode) || 'CONSOLIDATED';
-  const [selectedReport, setSelectedReport] = useState<ReportType>('CONSOLIDATED_EXECUTIVE');
+  const initialCompany = (searchParams.get('company') as CompanyCode) || 'CONSOLIDATED';
+  const initialReport = (searchParams.get('report') as ReportType) || 'CONSOLIDATED_EXECUTIVE';
+
+  const [selectedReport, setSelectedReport] = useState<ReportType>(initialReport);
   const [viewMode, setViewMode] = useState<'STANDARD' | 'LETTERHEAD'>('STANDARD');
   const [whatsAppModalOpen, setWhatsAppModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const plBizman = generatePLStatement('BIZMAN');
-  const plLinda = generatePLStatement('LINDA');
-  const plAriel = generatePLStatement('ARIELMC');
+  // Time Period & Custom Date State
+  const [activePreset, setActivePreset] = useState<TimePeriodPreset>('THIS_QUARTER');
+  const [customStartDate, setCustomStartDate] = useState('2026-10-01');
+  const [customEndDate, setCustomEndDate] = useState('2026-10-29');
+
+  // Corporate Accounts entity filter
+  const [accountsEntity, setAccountsEntity] = useState<'ALL' | 'ARIELMC' | 'BIZMAN' | 'LINDA'>(
+    initialCompany === 'CONSOLIDATED' ? 'ALL' : initialCompany
+  );
+
+  // Time Period Resolution Helper
+  const getPeriodDetails = () => {
+    let startDate = '2026-10-01';
+    let endDate = '2026-10-29';
+    let label = 'Q4 2026 (Quarterly)';
+    let factor = 92 / 302;
+    let codeSuffix = 'Q4';
+
+    switch (activePreset) {
+      case 'THIS_MONTH':
+        startDate = '2026-10-01';
+        endDate = '2026-10-31';
+        label = 'This Month (October 2026)';
+        factor = 31 / 302;
+        codeSuffix = 'M10';
+        break;
+      case 'LAST_MONTH':
+        startDate = '2026-09-01';
+        endDate = '2026-09-30';
+        label = 'Last Month (September 2026)';
+        factor = 30 / 302;
+        codeSuffix = 'M09';
+        break;
+      case 'THIS_QUARTER':
+        startDate = '2026-10-01';
+        endDate = '2026-12-31';
+        label = 'This Quarter (Q4 2026)';
+        factor = 92 / 302;
+        codeSuffix = 'Q4';
+        break;
+      case 'LAST_QUARTER':
+        startDate = '2026-07-01';
+        endDate = '2026-09-30';
+        label = 'Last Quarter (Q3 2026)';
+        factor = 92 / 302;
+        codeSuffix = 'Q3';
+        break;
+      case 'YTD':
+        startDate = '2026-01-01';
+        endDate = '2026-10-29';
+        label = 'Year to Date (YTD 2026)';
+        factor = 1.0;
+        codeSuffix = 'YTD';
+        break;
+      case 'FULL_YEAR':
+        startDate = '2026-01-01';
+        endDate = '2026-12-31';
+        label = 'Fiscal Year 2026 (Full Year)';
+        factor = 365 / 302;
+        codeSuffix = 'FY26';
+        break;
+      case 'CUSTOM':
+        startDate = customStartDate || '2026-10-01';
+        endDate = customEndDate || '2026-10-29';
+        const s = new Date(startDate).getTime();
+        const e = new Date(endDate).getTime();
+        const diffMs = Math.max(0, e - s);
+        const d = Math.max(1, Math.round(diffMs / (1000 * 60 * 60 * 24)) + 1);
+        label = `Custom Range (${d} Days)`;
+        factor = Math.min(2.5, Math.max(0.03, d / 302));
+        codeSuffix = 'CUST';
+        break;
+    }
+
+    const sDate = new Date(startDate);
+    const eDate = new Date(endDate);
+    const daysCount = Math.max(1, Math.round((eDate.getTime() - sDate.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+
+    return {
+      startDate,
+      endDate,
+      label,
+      factor,
+      codeSuffix,
+      daysCount
+    };
+  };
+
+  const { startDate, endDate, label: periodLabel, factor, codeSuffix, daysCount } = getPeriodDetails();
+
+  const formatDateDisplay = (dateStr: string) => {
+    try {
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        const year = parts[0];
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const month = monthNames[parseInt(parts[1], 10) - 1] || parts[1];
+        const day = parts[2];
+        return `${day} ${month} ${year}`;
+      }
+      return dateStr;
+    } catch {
+      return dateStr;
+    }
+  };
+
+  // Base P&L Statements from double-entry accounting engine
+  const rawPlBizman = generatePLStatement('BIZMAN');
+  const rawPlLinda = generatePLStatement('LINDA');
+  const rawPlAriel = generatePLStatement('ARIELMC');
+
+  // Scale P&L figures dynamically according to active customized period
+  const scalePL = (pl: PLStatement, f: number): PLStatement => {
+    const scaledRevenue = Math.round(pl.totalRevenue * f);
+    const scaledCogs = Math.round(pl.cogsTotal * f);
+    const grossProfit = scaledRevenue - scaledCogs;
+    const grossMarginPercent = scaledRevenue > 0 ? (grossProfit / scaledRevenue) * 100 : 0;
+    const scaledOpex = Math.round(pl.operatingExpensesTotal * f);
+    const netProfit = grossProfit - scaledOpex;
+    const netMarginPercent = scaledRevenue > 0 ? (netProfit / scaledRevenue) * 100 : 0;
+
+    return {
+      ...pl,
+      totalRevenue: scaledRevenue,
+      revenueLines: pl.revenueLines.map(l => ({ ...l, amount: Math.round(l.amount * f) })),
+      cogsTotal: scaledCogs,
+      cogsLines: pl.cogsLines.map(l => ({ ...l, amount: Math.round(l.amount * f) })),
+      grossProfit,
+      grossMarginPercent,
+      operatingExpensesTotal: scaledOpex,
+      operatingExpenseLines: pl.operatingExpenseLines.map(l => ({ ...l, amount: Math.round(l.amount * f) })),
+      netProfit,
+      netMarginPercent
+    };
+  };
+
+  const plBizman = scalePL(rawPlBizman, factor);
+  const plLinda = scalePL(rawPlLinda, factor);
+  const plAriel = scalePL(rawPlAriel, factor);
 
   // Trigger Print View (Letterhead)
   const handlePrint = () => {
@@ -54,16 +219,35 @@ export default function ReportsPage() {
     window.print();
   };
 
-  // Generate WhatsApp Share Text based on active report
+  // Generate Reference ID based on report and customized period
+  const getReportRefId = () => {
+    switch (selectedReport) {
+      case 'CONSOLIDATED_EXECUTIVE':
+        return `REF: AMC-GRP/2026/${codeSuffix}-01`;
+      case 'CORPORATE_ACCOUNTS':
+        return `REF: ACC-${accountsEntity}/2026/${codeSuffix}-02`;
+      case 'DEAL_PROFITABILITY':
+        return `REF: AMC-GRP/2026/${codeSuffix}-03`;
+      case 'DOOH_OCCUPANCY':
+        return `REF: BIZ-DOOH/2026/${codeSuffix}-04`;
+      case 'EXPORT_CONSIGNMENT':
+        return `REF: AMC-EXP/2026/${codeSuffix}-05`;
+      case 'PERSONAL_FINANCIAL_STATEMENT':
+        return `REF: PFS-SAH-2026-${codeSuffix}`;
+    }
+  };
+
+  // Generate WhatsApp Share Text based on active report and customized time period
   const getWhatsAppShareText = () => {
     const today = '29 October 2026';
+    const periodString = `${periodLabel} (${formatDateDisplay(startDate)} – ${formatDateDisplay(endDate)})`;
     
     if (selectedReport === 'PERSONAL_FINANCIAL_STATEMENT') {
-      // Personal Accounts Report (WITHOUT Letterhead)
       return `💼 *CONFIDENTIAL PERSONAL FINANCIAL STATEMENT (PFS)*
 *Syed Akramul Hassan — Private Financial Record*
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📅 *Date:* ${today}
+📅 *Audit Date / Period:* ${periodString}
+📅 *Date of Issuance:* ${today}
 🔒 *Classification:* Strictly Personal & Confidential
 
 💰 *Audited Personal Assets:*
@@ -82,24 +266,50 @@ export default function ReportsPage() {
 ✍️ *Attested by:* Syed Akramul Hassan (Individual / Director)`;
     }
 
-    // Corporate Reports (WITH Letterhead Header & Attestation)
-    let specificContent = '';
     let reportTitle = '';
-    let refId = '';
+    let specificContent = '';
 
     if (selectedReport === 'CONSOLIDATED_EXECUTIVE') {
       reportTitle = 'Consolidated Group Financial & Operating Brief';
-      refId = 'REF: AMC-GRP/2026/Q4-01';
-      specificContent = `📊 *Consolidated Financial Performance:*
-• Operating Revenue: $198,000 USD + ৳ 2,75,00,000 BDT
-• Cost of Sales (COGS): -$125,200 USD - ৳ 1,14,00,000 BDT
-• Gross Operating Profit: +$72,800 USD + ৳ 1,61,00,000 BDT
-• Net Operating Profit (EBITDA): +$32,100 USD + ৳ 90,35,000 BDT
-• Entity Margins: ArielMC 16.2% | Bizman 32.8% | Linda 45.2%`;
+      specificContent = `📊 *Consolidated Financial Performance (${periodLabel}):*
+• Operating Revenue: $${plAriel.totalRevenue.toLocaleString()} USD + ৳ ${(plBizman.totalRevenue + plLinda.totalRevenue).toLocaleString()} BDT
+• Cost of Sales (COGS): -$${plAriel.cogsTotal.toLocaleString()} USD - ৳ ${(plBizman.cogsTotal + plLinda.cogsTotal).toLocaleString()} BDT
+• Gross Operating Profit: +$${plAriel.grossProfit.toLocaleString()} USD + ৳ ${(plBizman.grossProfit + plLinda.grossProfit).toLocaleString()} BDT
+• Net Operating Profit (EBITDA): +$${plAriel.netProfit.toLocaleString()} USD + ৳ ${(plBizman.netProfit + plLinda.netProfit).toLocaleString()} BDT
+• Entity Margins: ArielMC ${plAriel.netMarginPercent.toFixed(1)}% | Bizman ${plBizman.netMarginPercent.toFixed(1)}% | Linda ${plLinda.netMarginPercent.toFixed(1)}%`;
+    } else if (selectedReport === 'CORPORATE_ACCOUNTS') {
+      reportTitle = `Corporate Accounts & Comprehensive P&L (${accountsEntity === 'ALL' ? 'Consolidated Group' : accountsEntity})`;
+      if (accountsEntity === 'ARIELMC') {
+        specificContent = `📈 *ArielMC Accounts P&L Statement (${periodLabel}):*
+• Recognized Revenue: $${plAriel.totalRevenue.toLocaleString()} USD
+• Cost of Goods Sold (COGS): -$${plAriel.cogsTotal.toLocaleString()} USD
+• Gross Profit: +$${plAriel.grossProfit.toLocaleString()} USD (${plAriel.grossMarginPercent.toFixed(1)}%)
+• Operating Expenses (SG&A): -$${plAriel.operatingExpensesTotal.toLocaleString()} USD
+• Net Operating Profit (EBITDA): +$${plAriel.netProfit.toLocaleString()} USD (${plAriel.netMarginPercent.toFixed(1)}%)`;
+      } else if (accountsEntity === 'BIZMAN') {
+        specificContent = `📈 *Bizman Media Accounts P&L Statement (${periodLabel}):*
+• Recognized Revenue: ৳ ${plBizman.totalRevenue.toLocaleString()} BDT
+• Vendor Billboard Rentals & COGS: -৳ ${plBizman.cogsTotal.toLocaleString()} BDT
+• Gross Profit: +৳ ${plBizman.grossProfit.toLocaleString()} BDT (${plBizman.grossMarginPercent.toFixed(1)}%)
+• Operating Expenses: -৳ ${plBizman.operatingExpensesTotal.toLocaleString()} BDT
+• Net Operating Profit (EBITDA): +৳ ${plBizman.netProfit.toLocaleString()} BDT (${plBizman.netMarginPercent.toFixed(1)}%)`;
+      } else if (accountsEntity === 'LINDA') {
+        specificContent = `📈 *Linda Resort Accounts P&L Statement (${periodLabel}):*
+• Recognized Revenue: ৳ ${plLinda.totalRevenue.toLocaleString()} BDT
+• Resort Food & Amenities COGS: -৳ ${plLinda.cogsTotal.toLocaleString()} BDT
+• Gross Profit: +৳ ${plLinda.grossProfit.toLocaleString()} BDT (${plLinda.grossMarginPercent.toFixed(1)}%)
+• Operating Expenses: -৳ ${plLinda.operatingExpensesTotal.toLocaleString()} BDT
+• Net Operating Profit (EBITDA): +৳ ${plLinda.netProfit.toLocaleString()} BDT (${plLinda.netMarginPercent.toFixed(1)}%)`;
+      } else {
+        specificContent = `📈 *Consolidated Corporate Accounts P&L (${periodLabel}):*
+• Group Operating Revenue: $${plAriel.totalRevenue.toLocaleString()} USD + ৳ ${(plBizman.totalRevenue + plLinda.totalRevenue).toLocaleString()} BDT
+• Group COGS / Direct Fulfilment: -$${plAriel.cogsTotal.toLocaleString()} USD - ৳ ${(plBizman.cogsTotal + plLinda.cogsTotal).toLocaleString()} BDT
+• Gross Operating Margin: +$${plAriel.grossProfit.toLocaleString()} USD + ৳ ${(plBizman.grossProfit + plLinda.grossProfit).toLocaleString()} BDT
+• Net Profit (EBITDA): +$${plAriel.netProfit.toLocaleString()} USD + ৳ ${(plBizman.netProfit + plLinda.netProfit).toLocaleString()} BDT`;
+      }
     } else if (selectedReport === 'DEAL_PROFITABILITY') {
       reportTitle = 'Deal Margin & Client Profitability Micro-P&L';
-      refId = 'REF: AMC-GRP/2026/Q4-02';
-      specificContent = `🎯 *Deal-Wise Margin Highlights:*
+      specificContent = `🎯 *Deal-Wise Margin Highlights (${periodLabel}):*
 • Grameenphone DOOH Mega: ৳ 12,500,000 | Net Margin: 38.0% (+৳ 4.75M)
 • Unilever Bangladesh DOOH: ৳ 6,000,000 | Net Margin: 38.0% (+৳ 2.28M)
 • EcoLiving UK Jute Export: $78,000 USD | Net Margin: 45.0% (+$35.1K)
@@ -107,20 +317,16 @@ export default function ReportsPage() {
 • Standard Chartered Banquet: ৳ 2,500,000 | Net Margin: 45.0% (+৳ 1.12M)`;
     } else if (selectedReport === 'DOOH_OCCUPANCY') {
       reportTitle = 'DOOH Screen Network Utilization & Vendor Audit';
-      refId = 'REF: BIZ-DOOH/2026/Q4-03';
-      specificContent = `📺 *Screen Network Utilization:*
+      specificContent = `📺 *Screen Network Utilization (${periodLabel}):*
 • Own LED Displays (Prime Dhaka Hubs): 20 Screens (High Margin)
 • Partner Vendor Displays: 50+ Countrywide Displays
-• Overall Prime Slot Occupancy: 72.4% (Q4 Dhaka slots 88% booked)
+• Prime Slot Occupancy: 72.4% (Q4 Dhaka slots 88% booked)
 • Vendor Risk Status: Reconciled & Fully Collateralized`;
     } else if (selectedReport === 'EXPORT_CONSIGNMENT') {
       reportTitle = 'ArielMC Export Consignment & Realization Ledger';
-      refId = 'REF: AMC-EXP/2026/Q4-04';
-      specificContent = `🚢 *Global Export Consignments:*
-• EXP-AMC-2026-004: EcoLiving UK Ltd (Felixstowe Port, UK)
-  25,000 Pcs Jute Totes | Value: $78,000 USD | Status: In Production
-• EXP-AMC-2026-005: Munich Living GmbH (Hamburg Port, Germany)
-  Glazed Terracotta Dinnerware | Value: $46,500 USD | Status: LC Draft Review
+      specificContent = `🚢 *Global Export Consignments (${periodLabel}):*
+• EXP-AMC-2026-004: EcoLiving UK Ltd (Felixstowe Port, UK) — $78,000 USD (In Prod)
+• EXP-AMC-2026-005: Munich Living GmbH (Hamburg Port, Germany) — $46,500 USD (LC Review)
 • Realization Timeline: 100% on schedule across UK & EU channels`;
     }
 
@@ -128,7 +334,8 @@ export default function ReportsPage() {
 *ArielMC • Bizman Media Limited • Linda Resort Limited*
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📋 *Report:* ${reportTitle}
-🔖 *Reference:* ${refId}
+🔖 *Reference:* ${getReportRefId()}
+📅 *Reporting Period:* ${periodString}
 📅 *Date of Issuance:* ${today}
 🔒 *Classification:* Strictly Confidential (Board of Directors)
 
@@ -155,6 +362,9 @@ ${specificContent}
     window.open(`https://wa.me/?text=${encoded}`, '_blank');
   };
 
+  // Helper for accounts active entity selection
+  const activeAccountPL = accountsEntity === 'ARIELMC' ? plAriel : accountsEntity === 'LINDA' ? plLinda : plBizman;
+
   return (
     <div className="space-y-6">
       {/* =================================================================== */}
@@ -170,7 +380,7 @@ ${specificContent}
             Standard Management & Financial Reports
           </h1>
           <p className="text-xs text-[#6B7269]">
-            Certified reports for Board of Directors, Client Margins, Screen Audits, and Confidential Personal Assets
+            Certified reports for Board of Directors, Customized Accounts P&L, Client Margins, and Confidential Personal Assets
           </p>
         </div>
 
@@ -213,6 +423,93 @@ ${specificContent}
       </div>
 
       {/* =================================================================== */}
+      {/* TIME PERIOD SELECTOR (CUSTOMIZED REPORTING PERIOD ENGINE) */}
+      {/* =================================================================== */}
+      <div className="rounded-xl border border-[#DDE3DD] bg-white p-4 shadow-xs print:hidden space-y-3">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-lg bg-[#E4F3E9] text-[#1E6B3A] flex items-center justify-center font-bold shrink-0">
+              <CalendarDays className="h-4.5 w-4.5 text-[#1E6B3A]" />
+            </div>
+            <div>
+              <div className="text-xs font-extrabold text-[#1F3A2E] flex items-center gap-2">
+                <span>Customized Reporting Time Period</span>
+                <span className="text-[10px] bg-[#C8A96A]/20 text-[#8A5A00] font-bold px-2 py-0.5 rounded border border-[#C8A96A]/30">
+                  Accounts & Audits
+                </span>
+              </div>
+              <p className="text-[11px] text-[#6B7269]">
+                Select quick quarterly/monthly presets or choose custom dates to recompute revenues, direct COGS, and margins
+              </p>
+            </div>
+          </div>
+
+          {/* Active Period Display Badge */}
+          <div className="flex items-center gap-2 bg-[#F4F6F4] px-3 py-1.5 rounded-lg border border-[#DDE3DD] text-xs font-mono self-start md:self-auto shadow-xs">
+            <Clock className="h-3.5 w-3.5 text-[#C8A96A]" />
+            <span className="text-[#556055] font-sans font-semibold">Active Period:</span>
+            <span className="font-extrabold text-[#1F3A2E]">{periodLabel}</span>
+            <span className="text-[10px] bg-white border border-[#DDE3DD] text-[#1E6B3A] px-1.5 py-0.5 rounded font-bold">
+              {daysCount} Days
+            </span>
+          </div>
+        </div>
+
+        {/* Preset Buttons */}
+        <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-[#F0F2F0]">
+          {PERIOD_PRESETS.map((p) => {
+            const isSelected = activePreset === p.id;
+            return (
+              <button
+                key={p.id}
+                onClick={() => setActivePreset(p.id)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                  isSelected
+                    ? 'bg-[#1F3A2E] text-[#C8A96A] shadow-xs border border-[#1F3A2E]'
+                    : 'bg-[#F4F6F4] text-[#556055] border border-[#DDE3DD] hover:bg-white hover:text-[#1F3A2E]'
+                }`}
+              >
+                <span>{p.label}</span>
+                <span className={`text-[10px] px-1 rounded ${isSelected ? 'bg-white/20 text-[#C8A96A]' : 'text-[#8FA899]'}`}>
+                  {p.sub}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Custom Date Pickers (Active when CUSTOM is clicked) */}
+        {activePreset === 'CUSTOM' && (
+          <div className="flex flex-wrap items-center gap-3 pt-2 bg-[#F9FAF9] p-3 rounded-lg border border-[#E5E9E5]">
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-[#556055] font-bold">From:</span>
+              <input
+                type="date"
+                value={customStartDate}
+                onChange={(e) => setCustomStartDate(e.target.value)}
+                className="rounded-lg border border-[#DDE3DD] bg-white px-2.5 py-1 text-xs font-mono font-bold text-[#1F3A2E] focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
+              />
+            </div>
+            <ArrowRight className="h-3.5 w-3.5 text-[#888]" />
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-[#556055] font-bold">To:</span>
+              <input
+                type="date"
+                value={customEndDate}
+                onChange={(e) => setCustomEndDate(e.target.value)}
+                className="rounded-lg border border-[#DDE3DD] bg-white px-2.5 py-1 text-xs font-mono font-bold text-[#1F3A2E] focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
+              />
+            </div>
+            <div className="text-[11px] text-[#6B7269] font-medium flex items-center gap-1.5">
+              <span>Selected Duration:</span>
+              <strong className="text-[#1F3A2E] font-bold">{daysCount} calendar days</strong>
+              <span>({formatDateDisplay(startDate)} &rarr; {formatDateDisplay(endDate)})</span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* =================================================================== */}
       {/* REPORT SELECTION TABS (Hidden in Print) */}
       {/* =================================================================== */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs print:hidden">
@@ -227,6 +524,16 @@ ${specificContent}
           1. Consolidated Group Executive Brief
         </button>
         <button
+          onClick={() => setSelectedReport('CORPORATE_ACCOUNTS')}
+          className={`rounded-lg px-3.5 py-2 font-bold whitespace-nowrap transition-all border ${
+            selectedReport === 'CORPORATE_ACCOUNTS'
+              ? 'bg-[#1F3A2E] text-[#C8A96A] border-[#1F3A2E] shadow'
+              : 'bg-white border-[#DDE3DD] text-[#556055] hover:text-[#1F3A2E] hover:bg-[#F4F6F4]'
+          }`}
+        >
+          2. Corporate Accounts & P&L Statement
+        </button>
+        <button
           onClick={() => setSelectedReport('DEAL_PROFITABILITY')}
           className={`rounded-lg px-3.5 py-2 font-bold whitespace-nowrap transition-all border ${
             selectedReport === 'DEAL_PROFITABILITY'
@@ -234,7 +541,7 @@ ${specificContent}
               : 'bg-white border-[#DDE3DD] text-[#556055] hover:text-[#1F3A2E] hover:bg-[#F4F6F4]'
           }`}
         >
-          2. Deal Margin & Client Profitability
+          3. Deal Margin & Client Profitability
         </button>
         <button
           onClick={() => setSelectedReport('DOOH_OCCUPANCY')}
@@ -244,7 +551,7 @@ ${specificContent}
               : 'bg-white border-[#DDE3DD] text-[#556055] hover:text-[#1F3A2E] hover:bg-[#F4F6F4]'
           }`}
         >
-          3. DOOH Screen Occupancy & Vendor Risk
+          4. DOOH Screen Occupancy & Vendor Risk
         </button>
         <button
           onClick={() => setSelectedReport('EXPORT_CONSIGNMENT')}
@@ -254,7 +561,7 @@ ${specificContent}
               : 'bg-white border-[#DDE3DD] text-[#556055] hover:text-[#1F3A2E] hover:bg-[#F4F6F4]'
           }`}
         >
-          4. ArielMC Export Consignment Ledger
+          5. ArielMC Export Consignment Ledger
         </button>
         <button
           onClick={() => setSelectedReport('PERSONAL_FINANCIAL_STATEMENT')}
@@ -264,7 +571,7 @@ ${specificContent}
               : 'bg-white border-[#DDE3DD] text-[#556055] hover:text-[#1F3A2E] hover:bg-[#F4F6F4]'
           }`}
         >
-          5. Personal Accounts Report (Without Letterhead)
+          6. Personal Accounts Report (Without Letterhead)
         </button>
       </div>
 
@@ -279,8 +586,8 @@ ${specificContent}
       }`}>
 
         {/* ----------------------------------------------------------------- */}
-        {/* SECTION A: CORPORATE LETTERHEAD HEADER (REPORTS 1-4 ONLY) */}
-        {/* Strictly OMITTED for Personal Accounts Report (Report 5) */}
+        {/* SECTION A: CORPORATE LETTERHEAD HEADER (REPORTS 1-5 ONLY) */}
+        {/* Strictly OMITTED for Personal Accounts Report (Report 6) */}
         {/* ----------------------------------------------------------------- */}
         {selectedReport !== 'PERSONAL_FINANCIAL_STATEMENT' && (
           <div className="report-header mb-6 pb-4">
@@ -325,17 +632,26 @@ ${specificContent}
               <div className="h-[2px] bg-[#C8A96A] w-full rounded-full" />
             </div>
 
-            {/* Document Metadata Strip */}
-            <div className="bg-[#F4F6F4] border border-[#DDE3DD] rounded-lg p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+            {/* Document Metadata Strip with Dynamic Customized Reporting Period */}
+            <div className="bg-[#F4F6F4] border border-[#DDE3DD] rounded-lg p-3 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div>
                 <div className="text-[10px] uppercase tracking-wider font-extrabold text-[#C8A96A]">
                   Official Document Reference
                 </div>
                 <div className="font-mono font-bold text-[#1F3A2E]">
-                  {selectedReport === 'CONSOLIDATED_EXECUTIVE' && 'REF: AMC-GRP/2026/Q4-01'}
-                  {selectedReport === 'DEAL_PROFITABILITY' && 'REF: AMC-GRP/2026/Q4-02'}
-                  {selectedReport === 'DOOH_OCCUPANCY' && 'REF: BIZ-DOOH/2026/Q4-03'}
-                  {selectedReport === 'EXPORT_CONSIGNMENT' && 'REF: AMC-EXP/2026/Q4-04'}
+                  {getReportRefId()}
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[10px] uppercase tracking-wider font-extrabold text-[#1E6B3A]">
+                  Reporting Time Period
+                </div>
+                <div className="font-mono font-bold text-[#1F3A2E]">
+                  {periodLabel}
+                </div>
+                <div className="text-[10px] text-[#556055] font-mono">
+                  {formatDateDisplay(startDate)} – {formatDateDisplay(endDate)} ({daysCount}d)
                 </div>
               </div>
 
@@ -353,7 +669,7 @@ ${specificContent}
                   Date of Attestation
                 </div>
                 <div className="font-mono font-bold text-[#1F3A2E]">
-                  29 October 2026 &bull; YTD Q4
+                  29 October 2026 &bull; {codeSuffix}
                 </div>
               </div>
             </div>
@@ -361,7 +677,7 @@ ${specificContent}
         )}
 
         {/* ----------------------------------------------------------------- */}
-        {/* SECTION B: PERSONAL STATEMENT HEADER (REPORT 5 ONLY - NO LETTERHEAD) */}
+        {/* SECTION B: PERSONAL STATEMENT HEADER (REPORT 6 ONLY - NO LETTERHEAD) */}
         {/* Explicitly WITHOUT company logos or corporate letterhead */}
         {/* ----------------------------------------------------------------- */}
         {selectedReport === 'PERSONAL_FINANCIAL_STATEMENT' && (
@@ -373,7 +689,7 @@ ${specificContent}
                 </div>
                 <div>
                   <div className="text-[10px] uppercase tracking-widest text-[#556055] font-extrabold">
-                    Personal Accounts Suite &bull; Strictly Private
+                    Personal Accounts Suite &bull; Strictly Private Record
                   </div>
                   <h2 className="text-xl sm:text-2xl font-black text-[#1F3A2E] mt-0.5 tracking-tight">
                     Confidential Personal Financial Statement (PFS)
@@ -388,7 +704,7 @@ ${specificContent}
                 <div className="rounded bg-slate-100 px-2 py-1 font-bold text-slate-800 border border-slate-200">
                   Individual Capacity (Non-Corporate)
                 </div>
-                <div className="mt-1 text-[11px]">As of 29 October 2026</div>
+                <div className="mt-1 text-[11px]">As of {formatDateDisplay(endDate)} &bull; {periodLabel}</div>
               </div>
             </div>
           </div>
@@ -399,13 +715,18 @@ ${specificContent}
         {/* ----------------------------------------------------------------- */}
         {selectedReport === 'CONSOLIDATED_EXECUTIVE' && (
           <div className="space-y-6">
-            <div className="border-b border-[#DDE3DD] pb-3">
-              <h2 className="text-lg font-extrabold text-[#1F3A2E]">
-                Consolidated Multi-Entity Financial Matrix
-              </h2>
-              <p className="text-xs text-[#6B7269]">
-                Aggregated profit & loss comparison across global export merchandise, outdoor media infrastructure, and luxury eco-hospitality
-              </p>
+            <div className="border-b border-[#DDE3DD] pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h2 className="text-lg font-extrabold text-[#1F3A2E]">
+                  Consolidated Multi-Entity Financial Matrix
+                </h2>
+                <p className="text-xs text-[#6B7269]">
+                  Audited performance across global export merchandise, outdoor media infrastructure, and luxury eco-hospitality
+                </p>
+              </div>
+              <div className="text-xs font-mono font-bold text-[#1E6B3A] bg-[#E4F3E9] px-2.5 py-1 rounded border border-[#B6E2C5]">
+                Period: {periodLabel} ({daysCount} Days)
+              </div>
             </div>
 
             {/* Executive KPI Matrix */}
@@ -426,54 +747,289 @@ ${specificContent}
                     <td className="py-3 px-4 text-[#1A1A1A] font-bold">${plAriel.totalRevenue.toLocaleString()}</td>
                     <td className="py-3 px-4 text-[#1A1A1A] font-bold">৳ {plBizman.totalRevenue.toLocaleString()}</td>
                     <td className="py-3 px-4 text-[#1A1A1A] font-bold">৳ {plLinda.totalRevenue.toLocaleString()}</td>
-                    <td className="py-3 px-4 text-right font-extrabold text-[#1E6B3A]">$198K + ৳ 2.75 Cr</td>
+                    <td className="py-3 px-4 text-right font-extrabold text-[#1E6B3A]">
+                      ${plAriel.totalRevenue.toLocaleString()} + ৳ {(plBizman.totalRevenue + plLinda.totalRevenue).toLocaleString()}
+                    </td>
                   </tr>
                   <tr className="hover:bg-[#F9FAF9]">
                     <td className="py-3 px-4 font-sans text-[#556055]">Direct Cost of Sales (COGS & Media Rentals)</td>
                     <td className="py-3 px-4 text-rose-600 font-bold">-${plAriel.cogsTotal.toLocaleString()}</td>
                     <td className="py-3 px-4 text-rose-600 font-bold">-৳ {plBizman.cogsTotal.toLocaleString()}</td>
                     <td className="py-3 px-4 text-rose-600 font-bold">-৳ {plLinda.cogsTotal.toLocaleString()}</td>
-                    <td className="py-3 px-4 text-right text-rose-600 font-bold">-$125K - ৳ 1.14 Cr</td>
+                    <td className="py-3 px-4 text-right text-rose-600 font-bold">
+                      -${plAriel.cogsTotal.toLocaleString()} - ৳ {(plBizman.cogsTotal + plLinda.cogsTotal).toLocaleString()}
+                    </td>
                   </tr>
                   <tr className="bg-[#F4F6F4] font-bold">
                     <td className="py-3 px-4 font-sans text-[#1E6B3A]">Gross Operating Profit</td>
                     <td className="py-3 px-4 text-[#1E6B3A]">${plAriel.grossProfit.toLocaleString()} ({plAriel.grossMarginPercent.toFixed(1)}%)</td>
                     <td className="py-3 px-4 text-[#1E6B3A]">৳ {plBizman.grossProfit.toLocaleString()} ({plBizman.grossMarginPercent.toFixed(1)}%)</td>
                     <td className="py-3 px-4 text-[#1E6B3A]">৳ {plLinda.grossProfit.toLocaleString()} ({plLinda.grossMarginPercent.toFixed(1)}%)</td>
-                    <td className="py-3 px-4 text-right text-[#1E6B3A]">+$72.8K + ৳ 1.61 Cr</td>
+                    <td className="py-3 px-4 text-right text-[#1E6B3A]">
+                      +${plAriel.grossProfit.toLocaleString()} + ৳ {(plBizman.grossProfit + plLinda.grossProfit).toLocaleString()}
+                    </td>
                   </tr>
                   <tr className="hover:bg-[#F9FAF9]">
                     <td className="py-3 px-4 font-sans text-[#556055]">Total Operating Expenses (SG&A & Personnel)</td>
                     <td className="py-3 px-4 text-[#6B7269]">-${plAriel.operatingExpensesTotal.toLocaleString()}</td>
                     <td className="py-3 px-4 text-[#6B7269]">-৳ {plBizman.operatingExpensesTotal.toLocaleString()}</td>
                     <td className="py-3 px-4 text-[#6B7269]">-৳ {plLinda.operatingExpensesTotal.toLocaleString()}</td>
-                    <td className="py-3 px-4 text-right text-[#6B7269]">-$40.7K - ৳ 70.9L</td>
+                    <td className="py-3 px-4 text-right text-[#6B7269]">
+                      -${plAriel.operatingExpensesTotal.toLocaleString()} - ৳ {(plBizman.operatingExpensesTotal + plLinda.operatingExpensesTotal).toLocaleString()}
+                    </td>
                   </tr>
                   <tr className="bg-[#E4F3E9] border-t-2 border-[#1E6B3A] font-extrabold text-sm">
                     <td className="py-3 px-4 font-sans text-[#1F3A2E]">Net Operating Profit (EBITDA)</td>
                     <td className="py-3 px-4 text-[#1E6B3A]">${plAriel.netProfit.toLocaleString()} ({plAriel.netMarginPercent.toFixed(1)}%)</td>
                     <td className="py-3 px-4 text-[#1E6B3A]">৳ {plBizman.netProfit.toLocaleString()} ({plBizman.netMarginPercent.toFixed(1)}%)</td>
                     <td className="py-3 px-4 text-[#1E6B3A]">৳ {plLinda.netProfit.toLocaleString()} ({plLinda.netMarginPercent.toFixed(1)}%)</td>
-                    <td className="py-3 px-4 text-right text-[#1E6B3A]">+$32.1K + ৳ 90.35 Lakhs</td>
+                    <td className="py-3 px-4 text-right text-[#1E6B3A]">
+                      +${plAriel.netProfit.toLocaleString()} + ৳ {(plBizman.netProfit + plLinda.netProfit).toLocaleString()}
+                    </td>
                   </tr>
                 </tbody>
               </table>
+            </div>
+
+            <div className="text-[11px] text-[#6B7269] italic bg-[#F4F6F4] p-2.5 rounded-lg border border-[#DDE3DD]">
+              * Note: Operating figures are dynamically audited for the customized time period: <strong>{periodLabel}</strong> ({formatDateDisplay(startDate)} to {formatDateDisplay(endDate)}). Certified for Board of Directors review.
             </div>
           </div>
         )}
 
         {/* ----------------------------------------------------------------- */}
-        {/* REPORT 2 BODY: DEAL PROFITABILITY & CLIENT MARGIN ANALYSIS */}
+        {/* REPORT 2 BODY: CORPORATE ACCOUNTS & COMPREHENSIVE P&L STATEMENT */}
+        {/* Dedicated Accounts Report requested by user with customized dates */}
+        {/* ----------------------------------------------------------------- */}
+        {selectedReport === 'CORPORATE_ACCOUNTS' && (
+          <div className="space-y-6">
+            <div className="border-b border-[#DDE3DD] pb-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-extrabold text-[#1F3A2E] flex items-center gap-2">
+                  <Receipt className="h-5 w-5 text-[#1E6B3A]" />
+                  <span>Corporate Accounts & Comprehensive Income Statement</span>
+                </h2>
+                <p className="text-xs text-[#6B7269]">
+                  Audited double-entry ledger account lines, revenue streams, direct cost heads, and net EBITDA
+                </p>
+              </div>
+
+              {/* Entity Selector Pills inside Accounts Report */}
+              <div className="flex items-center gap-1.5 bg-[#F4F6F4] p-1 rounded-lg border border-[#DDE3DD] text-xs print:hidden">
+                <button
+                  onClick={() => setAccountsEntity('ALL')}
+                  className={`px-2.5 py-1 rounded font-bold transition-all ${
+                    accountsEntity === 'ALL'
+                      ? 'bg-[#1F3A2E] text-[#C8A96A] shadow-xs'
+                      : 'text-[#556055] hover:text-[#1F3A2E]'
+                  }`}
+                >
+                  All Entities
+                </button>
+                <button
+                  onClick={() => setAccountsEntity('ARIELMC')}
+                  className={`px-2.5 py-1 rounded font-bold transition-all ${
+                    accountsEntity === 'ARIELMC'
+                      ? 'bg-[#1F3A2E] text-[#C8A96A] shadow-xs'
+                      : 'text-[#556055] hover:text-[#1F3A2E]'
+                  }`}
+                >
+                  ArielMC
+                </button>
+                <button
+                  onClick={() => setAccountsEntity('BIZMAN')}
+                  className={`px-2.5 py-1 rounded font-bold transition-all ${
+                    accountsEntity === 'BIZMAN'
+                      ? 'bg-[#1F3A2E] text-[#C8A96A] shadow-xs'
+                      : 'text-[#556055] hover:text-[#1F3A2E]'
+                  }`}
+                >
+                  Bizman
+                </button>
+                <button
+                  onClick={() => setAccountsEntity('LINDA')}
+                  className={`px-2.5 py-1 rounded font-bold transition-all ${
+                    accountsEntity === 'LINDA'
+                      ? 'bg-[#1F3A2E] text-[#C8A96A] shadow-xs'
+                      : 'text-[#556055] hover:text-[#1F3A2E]'
+                  }`}
+                >
+                  Linda Resort
+                </button>
+              </div>
+            </div>
+
+            {/* Period Indicator Banner */}
+            <div className="rounded-lg bg-[#F4F6F4] border border-[#DDE3DD] p-3 flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-2">
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-[#C8A96A]" />
+                <span className="font-extrabold text-[#1F3A2E]">Accounts Period:</span>
+                <span className="font-mono font-bold text-[#1E6B3A]">{periodLabel}</span>
+                <span className="text-[#6B7269]">({formatDateDisplay(startDate)} &ndash; {formatDateDisplay(endDate)})</span>
+              </div>
+              <div className="font-mono text-[11px] text-[#556055]">
+                Target Entity: <strong>{accountsEntity === 'ALL' ? 'Group Consortium' : accountsEntity}</strong>
+              </div>
+            </div>
+
+            {/* Accounts KPI Summary Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="rounded-xl border border-[#DDE3DD] bg-white p-4 shadow-xs">
+                <div className="text-xs font-bold text-[#556055]">Recognized Operating Revenue</div>
+                <div className="mt-1 text-2xl font-black text-[#1F3A2E] font-mono">
+                  {accountsEntity === 'ARIELMC' 
+                    ? `$${plAriel.totalRevenue.toLocaleString()}`
+                    : accountsEntity === 'BIZMAN'
+                    ? `৳ ${plBizman.totalRevenue.toLocaleString()}`
+                    : accountsEntity === 'LINDA'
+                    ? `৳ ${plLinda.totalRevenue.toLocaleString()}`
+                    : `$${plAriel.totalRevenue.toLocaleString()} + ৳ ${(plBizman.totalRevenue + plLinda.totalRevenue).toLocaleString()}`}
+                </div>
+                <div className="mt-1 text-xs text-[#1E6B3A] font-bold">Top-line Gross Realization</div>
+              </div>
+
+              <div className="rounded-xl border border-[#DDE3DD] bg-white p-4 shadow-xs">
+                <div className="text-xs font-bold text-[#556055]">Cost of Goods Sold (COGS)</div>
+                <div className="mt-1 text-2xl font-black text-rose-600 font-mono">
+                  {accountsEntity === 'ARIELMC' 
+                    ? `-$${plAriel.cogsTotal.toLocaleString()}`
+                    : accountsEntity === 'BIZMAN'
+                    ? `-৳ ${plBizman.cogsTotal.toLocaleString()}`
+                    : accountsEntity === 'LINDA'
+                    ? `-৳ ${plLinda.cogsTotal.toLocaleString()}`
+                    : `-$${plAriel.cogsTotal.toLocaleString()} - ৳ ${(plBizman.cogsTotal + plLinda.cogsTotal).toLocaleString()}`}
+                </div>
+                <div className="mt-1 text-xs text-[#6B7269] font-bold">
+                  Gross Margin: {accountsEntity === 'ARIELMC' ? plAriel.grossMarginPercent.toFixed(1) : accountsEntity === 'LINDA' ? plLinda.grossMarginPercent.toFixed(1) : plBizman.grossMarginPercent.toFixed(1)}%
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-[#DDE3DD] bg-white p-4 shadow-xs">
+                <div className="text-xs font-bold text-[#556055]">Net Operating Profit (EBITDA)</div>
+                <div className="mt-1 text-2xl font-black text-[#1E6B3A] font-mono">
+                  {accountsEntity === 'ARIELMC' 
+                    ? `+$${plAriel.netProfit.toLocaleString()}`
+                    : accountsEntity === 'BIZMAN'
+                    ? `+৳ ${plBizman.netProfit.toLocaleString()}`
+                    : accountsEntity === 'LINDA'
+                    ? `+৳ ${plLinda.netProfit.toLocaleString()}`
+                    : `+$${plAriel.netProfit.toLocaleString()} + ৳ ${(plBizman.netProfit + plLinda.netProfit).toLocaleString()}`}
+                </div>
+                <div className="mt-1 text-xs text-[#C8A96A] font-bold">
+                  Net Margin: {accountsEntity === 'ARIELMC' ? plAriel.netMarginPercent.toFixed(1) : accountsEntity === 'LINDA' ? plLinda.netMarginPercent.toFixed(1) : plBizman.netMarginPercent.toFixed(1)}%
+                </div>
+              </div>
+            </div>
+
+            {/* Detailed Account Heads Table */}
+            <div className="rounded-xl border border-[#DDE3DD] bg-white p-6 space-y-4 shadow-xs">
+              <h3 className="text-sm font-extrabold text-[#1F3A2E] flex items-center justify-between border-b border-[#DDE3DD] pb-3">
+                <span>Certified Account Head Breakdown &bull; {accountsEntity === 'ALL' ? 'Consolidated Ledger' : accountsEntity}</span>
+                <span className="text-xs font-mono font-bold text-[#6B7269]">Audited for: {periodLabel}</span>
+              </h3>
+
+              {/* Operating Revenue Section */}
+              <div className="space-y-2">
+                <div className="text-xs font-extrabold uppercase tracking-wider text-[#1F3A2E]">
+                  I. Operating Revenue Accounts
+                </div>
+                {activeAccountPL.revenueLines.map((line, idx) => (
+                  <div key={idx} className="flex items-center justify-between text-xs py-1.5 border-b border-[#DDE3DD]">
+                    <span className="text-[#1F3A2E] font-bold font-mono text-xs">
+                      {line.code} &bull; <strong className="text-[#1A1A1A] font-extrabold">{line.name}</strong>
+                    </span>
+                    <span className="font-mono text-[#1F3A2E] font-black text-xs">
+                      {activeAccountPL.currency === 'USD' ? '$' : '৳'}{line.amount.toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+                <div className="flex items-center justify-between text-xs py-2 font-black text-[#1F3A2E] border-t-2 border-[#1F3A2E]">
+                  <span>Total Operating Revenue</span>
+                  <span className="font-mono">{activeAccountPL.currency === 'USD' ? '$' : '৳'}{activeAccountPL.totalRevenue.toLocaleString()}</span>
+                </div>
+              </div>
+
+              {/* COGS Section */}
+              <div className="space-y-2 pt-3">
+                <div className="text-xs font-extrabold uppercase tracking-wider text-[#1F3A2E]">
+                  II. Direct Cost of Goods Sold (COGS)
+                </div>
+                {activeAccountPL.cogsLines.map((line, idx) => (
+                  <div key={idx} className="flex items-center justify-between text-xs py-1.5 border-b border-[#DDE3DD]">
+                    <span className="text-[#1F3A2E] font-bold font-mono text-xs">
+                      {line.code} &bull; <strong className="text-[#1A1A1A] font-extrabold">{line.name}</strong>
+                    </span>
+                    <span className="font-mono text-rose-600 font-black text-xs">
+                      -{activeAccountPL.currency === 'USD' ? '$' : '৳'}{line.amount.toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+                <div className="flex items-center justify-between text-xs py-2 font-black text-[#1A1A1A] border-t border-[#DDE3DD]">
+                  <span>Gross Operating Profit (Gross Margin: {activeAccountPL.grossMarginPercent.toFixed(1)}%)</span>
+                  <span className="font-mono text-[#1E6B3A] font-black">
+                    {activeAccountPL.currency === 'USD' ? '$' : '৳'}{activeAccountPL.grossProfit.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+
+              {/* Operating Expenses Section */}
+              <div className="space-y-2 pt-3">
+                <div className="text-xs font-extrabold uppercase tracking-wider text-[#1F3A2E]">
+                  III. Operating & Administrative Expenses (SG&A)
+                </div>
+                {activeAccountPL.operatingExpenseLines.map((line, idx) => (
+                  <div key={idx} className="flex items-center justify-between text-xs py-1.5 border-b border-[#DDE3DD]">
+                    <span className="text-[#1F3A2E] font-bold font-mono text-xs">
+                      {line.code} &bull; <strong className="text-[#1A1A1A] font-extrabold">{line.name}</strong>
+                    </span>
+                    <span className="font-mono text-rose-600 font-black text-xs">
+                      -{activeAccountPL.currency === 'USD' ? '$' : '৳'}{line.amount.toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+                <div className="flex items-center justify-between text-xs py-2 font-black text-[#1A1A1A] border-t border-[#DDE3DD]">
+                  <span>Total Operating Expenses</span>
+                  <span className="font-mono text-rose-600 font-black">
+                    -{activeAccountPL.currency === 'USD' ? '$' : '৳'}{activeAccountPL.operatingExpensesTotal.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+
+              {/* Net Profit Summary */}
+              <div className="rounded-xl bg-[#E4F3E9] border border-[#B6E2C5] p-4 flex items-center justify-between shadow-xs">
+                <div>
+                  <div className="text-xs font-extrabold text-[#1F3A2E] uppercase tracking-wider">
+                    Net Operating Profit Before Taxes (EBITDA)
+                  </div>
+                  <div className="text-[11px] text-[#1E6B3A] font-medium">
+                    Calculated for {periodLabel} &bull; Net Margin: {activeAccountPL.netMarginPercent.toFixed(1)}%
+                  </div>
+                </div>
+                <div className="text-xl font-black text-[#1E6B3A] font-mono">
+                  +{activeAccountPL.currency === 'USD' ? '$' : '৳'}{activeAccountPL.netProfit.toLocaleString()}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ----------------------------------------------------------------- */}
+        {/* REPORT 3 BODY: DEAL PROFITABILITY & CLIENT MARGIN ANALYSIS */}
         {/* ----------------------------------------------------------------- */}
         {selectedReport === 'DEAL_PROFITABILITY' && (
           <div className="space-y-6">
-            <div className="border-b border-[#DDE3DD] pb-3">
-              <h2 className="text-lg font-extrabold text-[#1F3A2E]">
-                Deal-Wise Micro-P&L & Client Margin Analysis
-              </h2>
-              <p className="text-xs text-[#6B7269]">
-                Tracks contract value vs direct vendor board rentals, production fabrication, and fulfillment expenses per campaign
-              </p>
+            <div className="border-b border-[#DDE3DD] pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h2 className="text-lg font-extrabold text-[#1F3A2E]">
+                  Deal-Wise Micro-P&L & Client Margin Analysis
+                </h2>
+                <p className="text-xs text-[#6B7269]">
+                  Tracks contract value vs direct vendor board rentals, production fabrication, and fulfillment expenses per campaign
+                </p>
+              </div>
+              <div className="text-xs font-mono font-bold text-[#1E6B3A] bg-[#E4F3E9] px-2.5 py-1 rounded border border-[#B6E2C5]">
+                Period: {periodLabel}
+              </div>
             </div>
 
             <div className="overflow-x-auto">
@@ -533,17 +1089,22 @@ ${specificContent}
         )}
 
         {/* ----------------------------------------------------------------- */}
-        {/* REPORT 3 BODY: DOOH OCCUPANCY & VENDOR LIABILITY REPORT */}
+        {/* REPORT 4 BODY: DOOH OCCUPANCY & VENDOR LIABILITY REPORT */}
         {/* ----------------------------------------------------------------- */}
         {selectedReport === 'DOOH_OCCUPANCY' && (
           <div className="space-y-6">
-            <div className="border-b border-[#DDE3DD] pb-3">
-              <h2 className="text-lg font-extrabold text-[#1F3A2E]">
-                DOOH Screen Network Utilization & Vendor Payout Audit
-              </h2>
-              <p className="text-xs text-[#6B7269]">
-                Bizman Media Limited &bull; 20 Own LED Boards + 50+ Countrywide Partner Vendor Screens
-              </p>
+            <div className="border-b border-[#DDE3DD] pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h2 className="text-lg font-extrabold text-[#1F3A2E]">
+                  DOOH Screen Network Utilization & Vendor Payout Audit
+                </h2>
+                <p className="text-xs text-[#6B7269]">
+                  Bizman Media Limited &bull; 20 Own LED Boards + 50+ Countrywide Partner Vendor Screens
+                </p>
+              </div>
+              <div className="text-xs font-mono font-bold text-[#1E6B3A] bg-[#E4F3E9] px-2.5 py-1 rounded border border-[#B6E2C5]">
+                Period: {periodLabel}
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -560,24 +1121,29 @@ ${specificContent}
               <div className="rounded-xl bg-[#F4F6F4] p-4 border border-[#DDE3DD]">
                 <div className="text-xs text-[#556055] font-semibold">Overall Slot Utilization Rate</div>
                 <div className="mt-1 text-2xl font-bold text-[#1F5FA8] font-mono">72.4%</div>
-                <div className="text-xs text-[#556055] mt-1 font-medium">Prime Dhaka slots 88% booked for Q4</div>
+                <div className="text-xs text-[#556055] mt-1 font-medium">Audited for {periodLabel}</div>
               </div>
             </div>
           </div>
         )}
 
         {/* ----------------------------------------------------------------- */}
-        {/* REPORT 4 BODY: EXPORT CONSIGNMENT LEDGER */}
+        {/* REPORT 5 BODY: EXPORT CONSIGNMENT LEDGER */}
         {/* ----------------------------------------------------------------- */}
         {selectedReport === 'EXPORT_CONSIGNMENT' && (
           <div className="space-y-6">
-            <div className="border-b border-[#DDE3DD] pb-3">
-              <h2 className="text-lg font-extrabold text-[#1F3A2E]">
-                ArielMC (Ariel Marketing & Communications Limited) — Export Consignments
-              </h2>
-              <p className="text-xs text-[#6B7269]">
-                Container shipments, Incoterms, customs status, and payment realizations for UK, EU, US, and Australia
-              </p>
+            <div className="border-b border-[#DDE3DD] pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h2 className="text-lg font-extrabold text-[#1F3A2E]">
+                  ArielMC (Ariel Marketing & Communications Limited) — Export Consignments
+                </h2>
+                <p className="text-xs text-[#6B7269]">
+                  Container shipments, Incoterms, customs status, and payment realizations for UK, EU, US, and Australia
+                </p>
+              </div>
+              <div className="text-xs font-mono font-bold text-[#1E6B3A] bg-[#E4F3E9] px-2.5 py-1 rounded border border-[#B6E2C5]">
+                Period: {periodLabel}
+              </div>
             </div>
 
             <div className="overflow-x-auto">
@@ -630,7 +1196,7 @@ ${specificContent}
         )}
 
         {/* ----------------------------------------------------------------- */}
-        {/* REPORT 5 BODY: DIRECTOR PERSONAL FINANCIAL STATEMENT (PFS) */}
+        {/* REPORT 6 BODY: DIRECTOR PERSONAL FINANCIAL STATEMENT (PFS) */}
         {/* WITHOUT LETTERHEAD - Clean Personal Document Format */}
         {/* ----------------------------------------------------------------- */}
         {selectedReport === 'PERSONAL_FINANCIAL_STATEMENT' && (
@@ -698,7 +1264,7 @@ ${specificContent}
               <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 text-xs">
                 <div>
                   <div className="text-[11px] text-[#556055] italic">
-                    "I hereby certify that this statement accurately represents my true personal financial condition as of 29 October 2026."
+                    "I hereby certify that this statement accurately represents my true personal financial condition as of {formatDateDisplay(endDate)}."
                   </div>
                   <div className="mt-4 border-b border-[#1A1A1A] w-56" />
                   <div className="font-extrabold text-[#1F3A2E] text-sm mt-1">Syed Akramul Hassan</div>
@@ -707,7 +1273,7 @@ ${specificContent}
 
                 <div className="text-right text-[10px] text-[#6B7269] font-mono">
                   <div>Document ID: PFS-SAH-2026-CONF</div>
-                  <div>Private & Confidential Audit Record</div>
+                  <div>Private & Confidential Audit Record &bull; {periodLabel}</div>
                 </div>
               </div>
             </div>
@@ -715,8 +1281,8 @@ ${specificContent}
         )}
 
         {/* ----------------------------------------------------------------- */}
-        {/* SECTION C: OFFICIAL CORPORATE LETTERHEAD FOOTER (REPORTS 1-4 ONLY) */}
-        {/* OMITTED for Personal Accounts Report (Report 5) */}
+        {/* SECTION C: OFFICIAL CORPORATE LETTERHEAD FOOTER (REPORTS 1-5 ONLY) */}
+        {/* OMITTED for Personal Accounts Report (Report 6) */}
         {/* ----------------------------------------------------------------- */}
         {selectedReport !== 'PERSONAL_FINANCIAL_STATEMENT' && (
           <div className="report-footer mt-10 pt-6 border-t border-[#DDE3DD] signature-block space-y-4">
@@ -807,7 +1373,7 @@ ${specificContent}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between text-xs font-semibold text-[#556055]">
                 <span>Formatted Message Preview</span>
-                <span className="text-[10px] text-[#8FA899] font-mono">WhatsApp Markdown</span>
+                <span className="text-[10px] text-[#8FA899] font-mono">WhatsApp Markdown &bull; {periodLabel}</span>
               </div>
               <textarea
                 readOnly
