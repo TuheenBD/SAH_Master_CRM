@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import Sidebar from '@/components/Sidebar';
+import Header from '@/components/Header';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -22,8 +23,14 @@ export default function RootLayout({
             <Sidebar />
           </Suspense>
 
-          {/* Main Content Area (offset by sidebar width on desktop) */}
+          {/* Main Area: Top Header Panel + Page Content */}
           <div className="flex-1 lg:pl-64 flex flex-col min-w-0">
+            {/* Sticky Header Panel */}
+            <Suspense fallback={<div className="h-16 border-b border-slate-800 bg-slate-950" />}>
+              <Header />
+            </Suspense>
+
+            {/* Page Body */}
             <main className="flex-1 px-4 sm:px-6 lg:px-8 py-6 max-w-7xl w-full mx-auto">
               <Suspense fallback={<div className="flex justify-center py-20 text-slate-500 text-sm">Loading Executive Console...</div>}>
                 {children}
