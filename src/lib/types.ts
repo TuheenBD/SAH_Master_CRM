@@ -295,10 +295,21 @@ export interface PersonalAccount {
   accountName: string;
   institution: string;
   accountType: PersonalAccountType;
-  currency: 'BDT' | 'USD';
+  currency: 'BDT' | 'USD' | 'GBP';
   currentBalance: number;
   accountNumberMasked: string;
   isLiability?: boolean;
+  branch?: string;
+  accountNumberFull?: string;
+  routingNo?: string;
+  swiftCode?: string;
+  debitCardNumberMasked?: string;
+  debitCardExp?: string;
+  debitCardCvr?: string;
+  iban?: string;
+  sortCode?: string;
+  bic?: string;
+  notes?: string;
 }
 
 export type PersonalTxCategory = 
@@ -322,7 +333,7 @@ export interface PersonalTransaction {
   date: string;
   type: 'INCOME' | 'EXPENSE' | 'TRANSFER';
   amount: number;
-  currency: 'BDT' | 'USD';
+  currency: 'BDT' | 'USD' | 'GBP';
   category: PersonalTxCategory;
   description: string;
   accountId: string;

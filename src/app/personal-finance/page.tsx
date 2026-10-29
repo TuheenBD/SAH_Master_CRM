@@ -47,12 +47,16 @@ export default function PersonalFinancePage() {
     .filter(a => !a.isLiability && a.currency === 'USD')
     .reduce((sum, a) => sum + a.currentBalance, 0);
 
+  const foreignGBP = accounts
+    .filter(a => !a.isLiability && a.currency === 'GBP')
+    .reduce((sum, a) => sum + a.currentBalance, 0);
+
   const liabilitiesBDT = accounts
     .filter(a => a.isLiability)
     .reduce((sum, a) => sum + a.currentBalance, 0);
 
-  // Exchange rate assumption for Net Worth: 1 USD = 120 BDT
-  const totalNetWorthBDT = (liquidBDT + termDepositsBDT + (foreignUSD * 120)) - liabilitiesBDT;
+  // Exchange rate assumption for Net Worth: 1 USD = 120 BDT, 1 GBP = 155 BDT
+  const totalNetWorthBDT = (liquidBDT + termDepositsBDT + (foreignUSD * 120) + (foreignGBP * 155)) - liabilitiesBDT;
 
   // Monthly Cash Flow
   const monthlyInflowBDT = transactions
@@ -225,9 +229,37 @@ export default function PersonalFinancePage() {
                   <div className="text-xs text-[#1A1A1A] font-semibold">{acc.accountName}</div>
                   <div className={`font-mono font-black text-sm ${acc.isLiability ? 'text-rose-600' : 'text-[#1E6B3A]'}`}>
                     {acc.isLiability && '-'}
-                    {acc.currency === 'USD' ? '$' : '৳'}{acc.currentBalance.toLocaleString()}
+                    {acc.currency === 'USD' ? '$' : acc.currency === 'GBP' ? '£' : '৳'}{acc.currentBalance.toLocaleString()}
                   </div>
                 </div>
+
+                {/* Secure Banking & Card Metadata */}
+                {(acc.branch || acc.routingNo || acc.swiftCode || acc.debitCardNumberMasked || acc.iban || acc.sortCode || acc.notes) && (
+                  <div className="text-[10.5px] bg-[#F8FAF8] p-2.5 rounded-lg border border-[#E2E8E2] text-[#445044] space-y-1 font-sans">
+                    {acc.branch && <div><span className="text-[#888]">Branch:</span> <strong className="text-[#1F3A2E]">{acc.branch}</strong></div>}
+                    {(acc.routingNo || acc.swiftCode) && (
+                      <div className="flex items-center gap-3 font-mono text-[10px]">
+                        {acc.routingNo && <span><span className="text-[#888]">Routing:</span> {acc.routingNo}</span>}
+                        {acc.swiftCode && <span><span className="text-[#888]">SWIFT:</span> {acc.swiftCode}</span>}
+                      </div>
+                    )}
+                    {acc.debitCardNumberMasked && (
+                      <div className="flex items-center justify-between text-[10px] font-mono bg-white px-2 py-1 rounded border border-[#E2E8E2]">
+                        <span className="text-[#1F3A2E] font-bold">💳 {acc.debitCardNumberMasked}</span>
+                        {acc.debitCardExp && <span className="text-[#6B7269]">Exp: {acc.debitCardExp}</span>}
+                        {acc.debitCardCvr && <span className="text-[#8A5A00] font-bold">CVR/CVV: {acc.debitCardCvr}</span>}
+                      </div>
+                    )}
+                    {acc.iban && (
+                      <div className="font-mono text-[10px]">
+                        <span className="text-[#888]">IBAN:</span> {acc.iban}
+                        {acc.sortCode && <span className="ml-2"><span className="text-[#888]">Sort Code:</span> {acc.sortCode}</span>}
+                        {acc.bic && <span className="ml-2"><span className="text-[#888]">BIC:</span> {acc.bic}</span>}
+                      </div>
+                    )}
+                    {acc.notes && <div className="text-[9.5px] text-[#6B7269] italic">{acc.notes}</div>}
+                  </div>
+                )}
 
                 <div className="text-[11px] text-[#556055] flex items-center justify-between pt-2 border-t border-[#DDE3DD]">
                   <span className={`rounded-md px-2 py-0.5 text-[10px] font-bold font-mono shadow-xs ${
