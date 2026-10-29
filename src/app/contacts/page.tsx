@@ -444,16 +444,16 @@ export default function ContactsPage() {
                       </span>
                     )}
                   </h3>
-                  <div className="text-xs text-[#556055] font-semibold">{contact.designation}</div>
+                  <div className="text-xs text-[#1A1A1A] font-bold">{contact.designation}</div>
                   
                   {/* COMPANY - High Visibility */}
                   <div className="text-xs flex items-center gap-1.5 pt-0.5">
                     <Building2 className="h-3.5 w-3.5 text-[#1F3A2E] shrink-0" />
-                    <span className="font-extrabold text-[#1F3A2E] text-xs tracking-tight">{contact.organization}</span>
+                    <span className="font-black text-[#1F3A2E] text-xs tracking-tight">{contact.organization}</span>
                   </div>
 
                   {/* LOCATION - High Visibility */}
-                  <div className="text-xs flex items-center gap-1.5 text-[#1A1A1A] font-semibold">
+                  <div className="text-xs flex items-center gap-1.5 text-[#2C4A3B] font-bold">
                     <MapPin className="h-3.5 w-3.5 text-[#C8A96A] shrink-0" />
                     <span>{contact.city}, {contact.country}</span>
                   </div>
@@ -698,18 +698,18 @@ export default function ContactsPage() {
       {/* 3. NEW ENTRY / EDIT CONTACT MODAL */}
       {/* =================================================================== */}
       {(isNewModalOpen || editingContact) && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
-          <div className="w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+          <div className="w-full max-w-lg rounded-2xl border border-[#DDE3DD] bg-white p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-[#DDE3DD] pb-3">
               <div className="flex items-center gap-2">
-                <Contact className="h-5 w-5 text-indigo-400" />
-                <h2 className="text-base font-bold text-white">
+                <Contact className="h-5 w-5 text-[#1F3A2E]" />
+                <h2 className="text-base font-extrabold text-[#1F3A2E]">
                   {editingContact ? `Edit Contact: ${editingContact.fullName}` : 'Add New Master Contact'}
                 </h2>
               </div>
               <button
                 onClick={() => { setIsNewModalOpen(false); setEditingContact(null); }}
-                className="text-slate-400 hover:text-white text-xs"
+                className="text-[#6B7269] hover:text-[#1F3A2E] text-xs font-bold p-1 rounded hover:bg-[#F4F6F4]"
               >
                 ✕
               </button>
@@ -718,48 +718,48 @@ export default function ContactsPage() {
             <form onSubmit={handleSaveContact} className="space-y-4 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-slate-400 block mb-1">Full Name *</label>
+                  <label className="text-[#1F3A2E] font-bold block mb-1">Full Name *</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. Sajjad Hossain"
                     value={formData.fullName}
                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-slate-200 focus:outline-none focus:border-indigo-500"
+                    className="w-full rounded-lg border border-[#DDE3DD] bg-[#F8F9F8] p-2 text-[#1A1A1A] focus:outline-none focus:border-[#1F3A2E] focus:bg-white transition-all font-medium"
                   />
                 </div>
 
                 <div>
-                  <label className="text-slate-400 block mb-1">Organization / Company *</label>
+                  <label className="text-[#1F3A2E] font-bold block mb-1">Organization / Company *</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. Grameenphone / EcoLiving UK"
                     value={formData.organization}
                     onChange={(e) => setFormData({ ...formData, organization: e.target.value })}
-                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-slate-200 focus:outline-none focus:border-indigo-500"
+                    className="w-full rounded-lg border border-[#DDE3DD] bg-[#F8F9F8] p-2 text-[#1A1A1A] focus:outline-none focus:border-[#1F3A2E] focus:bg-white transition-all font-medium"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-slate-400 block mb-1">Designation / Role</label>
+                  <label className="text-[#1F3A2E] font-bold block mb-1">Designation / Role</label>
                   <input
                     type="text"
                     placeholder="e.g. Head of Media / Merchandiser"
                     value={formData.designation}
                     onChange={(e) => setFormData({ ...formData, designation: e.target.value })}
-                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-slate-200 focus:outline-none focus:border-indigo-500"
+                    className="w-full rounded-lg border border-[#DDE3DD] bg-[#F8F9F8] p-2 text-[#1A1A1A] focus:outline-none focus:border-[#1F3A2E] focus:bg-white transition-all font-medium"
                   />
                 </div>
 
                 <div>
-                  <label className="text-slate-400 block mb-1">Contact Category *</label>
+                  <label className="text-[#1F3A2E] font-bold block mb-1">Contact Category *</label>
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
-                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-slate-200 focus:outline-none focus:border-indigo-500"
+                    className="w-full rounded-lg border border-[#DDE3DD] bg-[#F8F9F8] p-2 text-[#1A1A1A] focus:outline-none focus:border-[#1F3A2E] focus:bg-white transition-all font-medium"
                   >
                     <option value="BUYER_CLIENT">Buyer / Corporate Client</option>
                     <option value="SUPPLIER_RAW_MATERIAL">Supplier (Jute/Leather/Ceramics)</option>
@@ -773,71 +773,71 @@ export default function ContactsPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-slate-400 block mb-1">Primary Phone *</label>
+                  <label className="text-[#1F3A2E] font-bold block mb-1">Primary Phone *</label>
                   <input
                     type="text"
                     required
                     placeholder="+88017..."
                     value={formData.primaryPhone}
                     onChange={(e) => setFormData({ ...formData, primaryPhone: e.target.value })}
-                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-slate-200 font-mono focus:outline-none focus:border-indigo-500"
+                    className="w-full rounded-lg border border-[#DDE3DD] bg-[#F8F9F8] p-2 text-[#1A1A1A] font-mono focus:outline-none focus:border-[#1F3A2E] focus:bg-white transition-all"
                   />
                 </div>
 
                 <div>
-                  <label className="text-slate-400 block mb-1">WhatsApp Number</label>
+                  <label className="text-[#1F3A2E] font-bold block mb-1">WhatsApp Number</label>
                   <input
                     type="text"
                     placeholder="88017... (without +)"
                     value={formData.whatsappNumber}
                     onChange={(e) => setFormData({ ...formData, whatsappNumber: e.target.value })}
-                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-slate-200 font-mono focus:outline-none focus:border-indigo-500"
+                    className="w-full rounded-lg border border-[#DDE3DD] bg-[#F8F9F8] p-2 text-[#1A1A1A] font-mono focus:outline-none focus:border-[#1F3A2E] focus:bg-white transition-all"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="text-slate-400 block mb-1">Email Address</label>
+                  <label className="text-[#1F3A2E] font-bold block mb-1">Email Address</label>
                   <input
                     type="email"
                     placeholder="name@company.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-slate-200 focus:outline-none focus:border-indigo-500"
+                    className="w-full rounded-lg border border-[#DDE3DD] bg-[#F8F9F8] p-2 text-[#1A1A1A] focus:outline-none focus:border-[#1F3A2E] focus:bg-white transition-all"
                   />
                 </div>
 
                 <div>
-                  <label className="text-slate-400 block mb-1">City</label>
+                  <label className="text-[#1F3A2E] font-bold block mb-1">City</label>
                   <input
                     type="text"
                     placeholder="Dhaka / London"
                     value={formData.city}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-slate-200 focus:outline-none focus:border-indigo-500"
+                    className="w-full rounded-lg border border-[#DDE3DD] bg-[#F8F9F8] p-2 text-[#1A1A1A] focus:outline-none focus:border-[#1F3A2E] focus:bg-white transition-all font-medium"
                   />
                 </div>
 
                 <div>
-                  <label className="text-slate-400 block mb-1">Country</label>
+                  <label className="text-[#1F3A2E] font-bold block mb-1">Country</label>
                   <input
                     type="text"
                     placeholder="Bangladesh / UK"
                     value={formData.country}
                     onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-slate-200 focus:outline-none focus:border-indigo-500"
+                    className="w-full rounded-lg border border-[#DDE3DD] bg-[#F8F9F8] p-2 text-[#1A1A1A] focus:outline-none focus:border-[#1F3A2E] focus:bg-white transition-all font-medium"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-slate-400 block mb-1">Company Affiliation</label>
+                  <label className="text-[#1F3A2E] font-bold block mb-1">Company Affiliation</label>
                   <select
                     value={formData.companyAffiliation}
                     onChange={(e) => setFormData({ ...formData, companyAffiliation: e.target.value as any })}
-                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-slate-200 focus:outline-none focus:border-indigo-500"
+                    className="w-full rounded-lg border border-[#DDE3DD] bg-[#F8F9F8] p-2 text-[#1A1A1A] focus:outline-none focus:border-[#1F3A2E] focus:bg-white transition-all font-medium"
                   >
                     <option value="ARIELMC">ArielMC (Ariel Marketing & Communications)</option>
                     <option value="BIZMAN">Bizman Media Limited</option>
@@ -848,39 +848,39 @@ export default function ContactsPage() {
                 </div>
 
                 <div>
-                  <label className="text-slate-400 block mb-1">Tags (Comma Separated)</label>
+                  <label className="text-[#1F3A2E] font-bold block mb-1">Tags (Comma Separated)</label>
                   <input
                     type="text"
                     placeholder="e.g. High-Value, DOOH, Jute, Buyer"
                     value={formData.tags}
                     onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-slate-200 focus:outline-none focus:border-indigo-500"
+                    className="w-full rounded-lg border border-[#DDE3DD] bg-[#F8F9F8] p-2 text-[#1A1A1A] focus:outline-none focus:border-[#1F3A2E] focus:bg-white transition-all font-medium"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-slate-400 block mb-1">Relationship Notes & Commercial Context</label>
+                <label className="text-[#1F3A2E] font-bold block mb-1">Relationship Notes & Commercial Context</label>
                 <textarea
                   rows={3}
                   placeholder="Key background, past campaigns, supplier terms, personal interests..."
                   value={formData.relationshipNotes}
                   onChange={(e) => setFormData({ ...formData, relationshipNotes: e.target.value })}
-                  className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-slate-200 focus:outline-none focus:border-indigo-500 font-mono text-[11px]"
+                  className="w-full rounded-lg border border-[#DDE3DD] bg-[#F8F9F8] p-2 text-[#1A1A1A] focus:outline-none focus:border-[#1F3A2E] focus:bg-white transition-all font-mono text-[11px]"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#DDE3DD]">
                 <button
                   type="button"
                   onClick={() => { setIsNewModalOpen(false); setEditingContact(null); }}
-                  className="rounded-lg border border-slate-700 px-3 py-1.5 text-slate-300 hover:bg-slate-800"
+                  className="rounded-lg border border-[#DDE3DD] px-3.5 py-1.5 text-[#556055] hover:text-[#1F3A2E] hover:bg-[#F4F6F4] font-semibold transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded-lg bg-indigo-600 px-4 py-1.5 font-semibold text-white hover:bg-indigo-500 shadow"
+                  className="rounded-lg bg-[#1F3A2E] hover:bg-[#2C5240] px-4 py-1.5 font-bold text-[#C8A96A] border border-[#1F3A2E] shadow-sm transition-all"
                 >
                   {editingContact ? 'Save Changes' : 'Create Contact'}
                 </button>
@@ -894,16 +894,16 @@ export default function ContactsPage() {
       {/* 4. TURN CONTACT TO ACTIVE LEAD MODAL */}
       {/* =================================================================== */}
       {convertingContact && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+          <div className="w-full max-w-md rounded-2xl border border-[#DDE3DD] bg-white p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-[#DDE3DD] pb-3">
               <div className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-indigo-400" />
-                <h2 className="text-base font-bold text-white">Convert Contact Into Active Lead</h2>
+                <Sparkles className="h-5 w-5 text-[#C8A96A]" />
+                <h2 className="text-base font-extrabold text-[#1F3A2E]">Convert Contact Into Active Lead</h2>
               </div>
               <button
                 onClick={() => setConvertingContact(null)}
-                className="text-slate-400 hover:text-white text-xs"
+                className="text-[#6B7269] hover:text-[#1F3A2E] text-xs font-bold p-1 rounded hover:bg-[#F4F6F4]"
               >
                 ✕
               </button>
@@ -911,26 +911,26 @@ export default function ContactsPage() {
 
             {conversionSuccess ? (
               <div className="py-6 text-center space-y-2">
-                <div className="h-10 w-10 mx-auto rounded-full bg-emerald-950 border border-emerald-800 flex items-center justify-center text-emerald-400">
+                <div className="h-10 w-10 mx-auto rounded-full bg-[#E4F3E9] border border-[#B6E2C5] flex items-center justify-center text-[#1E6B3A]">
                   <CheckCircle2 className="h-6 w-6" />
                 </div>
-                <h3 className="text-sm font-bold text-white">Lead Successfully Created!</h3>
-                <p className="text-xs text-slate-400">Routing directly to {targetCompany} pipeline...</p>
+                <h3 className="text-sm font-extrabold text-[#1F3A2E]">Lead Successfully Created!</h3>
+                <p className="text-xs text-[#556055]">Routing directly to {targetCompany} pipeline...</p>
               </div>
             ) : (
               <form onSubmit={handleExecuteConvert} className="space-y-4 text-xs">
-                <div className="rounded-lg bg-slate-950 p-3 border border-slate-800 space-y-1">
-                  <div className="text-slate-400">Contact Person:</div>
-                  <div className="font-bold text-white">{convertingContact.fullName} ({convertingContact.organization})</div>
-                  <div className="text-[11px] text-slate-500">{convertingContact.primaryPhone} &bull; {convertingContact.email}</div>
+                <div className="rounded-xl bg-[#F8F9F8] p-3 border border-[#DDE3DD] space-y-1">
+                  <div className="text-[#6B7269] text-[11px] font-semibold">Contact Person:</div>
+                  <div className="font-extrabold text-[#1F3A2E] text-xs">{convertingContact.fullName} ({convertingContact.organization})</div>
+                  <div className="text-[11px] text-[#556055] font-mono">{convertingContact.primaryPhone} &bull; {convertingContact.email}</div>
                 </div>
 
                 <div>
-                  <label className="text-slate-400 block mb-1">Target Business Entity</label>
+                  <label className="text-[#1F3A2E] font-bold block mb-1">Target Business Entity</label>
                   <select
                     value={targetCompany}
                     onChange={(e) => setTargetCompany(e.target.value as any)}
-                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-slate-200 focus:outline-none focus:border-indigo-500"
+                    className="w-full rounded-lg border border-[#DDE3DD] bg-[#F8F9F8] p-2 text-[#1A1A1A] focus:outline-none focus:border-[#1F3A2E] focus:bg-white transition-all font-medium"
                   >
                     <option value="ARIELMC">ArielMC (Ariel Marketing & Communications - Global Export)</option>
                     <option value="BIZMAN">Bizman Media Limited (DOOH / Static / Events)</option>
@@ -939,23 +939,23 @@ export default function ContactsPage() {
                 </div>
 
                 <div>
-                  <label className="text-slate-400 block mb-1">Deal Title</label>
+                  <label className="text-[#1F3A2E] font-bold block mb-1">Deal Title</label>
                   <input
                     type="text"
                     required
                     value={dealTitle}
                     onChange={(e) => setDealTitle(e.target.value)}
-                    className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-slate-200 focus:outline-none focus:border-indigo-500"
+                    className="w-full rounded-lg border border-[#DDE3DD] bg-[#F8F9F8] p-2 text-[#1A1A1A] focus:outline-none focus:border-[#1F3A2E] focus:bg-white transition-all font-medium"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-slate-400 block mb-1">Pipeline Domain</label>
+                    <label className="text-[#1F3A2E] font-bold block mb-1">Pipeline Domain</label>
                     <select
                       value={pipelineType}
                       onChange={(e) => setPipelineType(e.target.value)}
-                      className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-slate-200 focus:outline-none focus:border-indigo-500"
+                      className="w-full rounded-lg border border-[#DDE3DD] bg-[#F8F9F8] p-2 text-[#1A1A1A] focus:outline-none focus:border-[#1F3A2E] focus:bg-white transition-all font-medium"
                     >
                       <option value="DOOH_MEDIA_SLOT">DOOH Screen Slot Booking</option>
                       <option value="EVENT_ACTIVATION">Event / Roadshow Activation</option>
@@ -967,33 +967,33 @@ export default function ContactsPage() {
                   </div>
 
                   <div>
-                    <label className="text-slate-400 block mb-1">Estimated Value</label>
+                    <label className="text-[#1F3A2E] font-bold block mb-1">Estimated Value</label>
                     <div className="relative">
                       <input
                         type="number"
                         required
                         value={dealValue}
                         onChange={(e) => setDealValue(e.target.value)}
-                        className="w-full rounded-lg border border-slate-700 bg-slate-950 p-2 pr-12 text-slate-200 font-mono focus:outline-none focus:border-indigo-500"
+                        className="w-full rounded-lg border border-[#DDE3DD] bg-[#F8F9F8] p-2 pr-12 text-[#1A1A1A] font-mono font-bold focus:outline-none focus:border-[#1F3A2E] focus:bg-white transition-all"
                       />
-                      <span className="absolute right-2 top-2 text-slate-500 font-mono">
+                      <span className="absolute right-2 top-2 text-[#1F3A2E] font-mono font-bold">
                         {targetCompany === 'ARIELMC' ? 'USD' : 'BDT'}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#DDE3DD]">
                   <button
                     type="button"
                     onClick={() => setConvertingContact(null)}
-                    className="rounded-lg border border-slate-700 px-3 py-1.5 text-slate-300 hover:bg-slate-800"
+                    className="rounded-lg border border-[#DDE3DD] px-3.5 py-1.5 text-[#556055] hover:text-[#1F3A2E] hover:bg-[#F4F6F4] font-semibold transition-all"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="rounded-lg bg-indigo-600 px-4 py-1.5 font-semibold text-white hover:bg-indigo-500 shadow"
+                    className="rounded-lg bg-[#1F3A2E] hover:bg-[#2C5240] px-4 py-1.5 font-bold text-[#C8A96A] border border-[#1F3A2E] shadow-sm transition-all"
                   >
                     Create Lead & Open Pipeline
                   </button>
