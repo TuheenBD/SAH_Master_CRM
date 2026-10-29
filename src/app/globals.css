@@ -373,14 +373,23 @@ main .border-slate-700 {
 }
 
 /* Text Overrides for High Contrast Light Canvas */
-main .text-white,
+main p.text-white,
+main h1.text-white,
+main h2.text-white,
+main h3.text-white,
+main h4.text-white,
+main span.text-white:not([class*="bg-"]):not([class*="rounded"]):not([class*="badge"]),
+main td.text-white,
+main div.text-white:not([class*="bg-"]):not([class*="btn"]):not([class*="badge"]),
 main .text-slate-100,
 main .text-slate-200 {
   color: var(--main-text) !important;
 }
 
-main .text-slate-300,
-main .text-slate-400,
+main p.text-slate-300,
+main p.text-slate-400,
+main span.text-slate-400,
+main div.text-slate-400,
 main .text-slate-500 {
   color: var(--main-muted) !important;
 }
@@ -389,6 +398,89 @@ main h1,
 main h2,
 main h3 {
   color: var(--main-brand-green) !important;
+}
+
+/* High Contrast Financial Indicators on Light Canvas */
+main .text-emerald-400 {
+  color: #1E6B3A !important;
+}
+
+main .text-rose-400 {
+  color: #C5221F !important;
+}
+
+main .text-indigo-400 {
+  color: #4338CA !important;
+}
+
+main .text-orange-400 {
+  color: #C25E00 !important;
+}
+
+main .text-amber-400 {
+  color: #8A5A00 !important;
+}
+
+/* Ensure buttons and badges with dark backgrounds keep white or gold text */
+main button.text-white,
+main button[class*="text-white"],
+main a.text-white,
+main a[class*="text-white"],
+main button.bg-indigo-600,
+main button[class*="bg-indigo-600"],
+main button[class*="bg-emerald"],
+main button[class*="bg-[#1F3A2E]"] {
+  color: #FFFFFF !important;
+}
+
+main button[class*="bg-[#C8A96A]"] {
+  color: #1F3A2E !important;
+}
+
+/* Executive Badges in Light Canvas - Clean Pastel Backgrounds with High Contrast Deep Text */
+main .bg-emerald-950 {
+  background-color: #E4F3E9 !important;
+  border-color: #B6E2C5 !important;
+  color: #1E6B3A !important;
+}
+main .bg-emerald-950 * {
+  color: #1E6B3A !important;
+}
+
+main .bg-blue-950 {
+  background-color: #E8F0FA !important;
+  border-color: #BBD5F2 !important;
+  color: #1F5FA8 !important;
+}
+main .bg-blue-950 * {
+  color: #1F5FA8 !important;
+}
+
+main .bg-amber-950 {
+  background-color: #FFF3D6 !important;
+  border-color: #FBE0A8 !important;
+  color: #8A5A00 !important;
+}
+main .bg-amber-950 * {
+  color: #8A5A00 !important;
+}
+
+main .bg-rose-950 {
+  background-color: #FEE8E8 !important;
+  border-color: #F8B4B4 !important;
+  color: #C5221F !important;
+}
+main .bg-rose-950 * {
+  color: #C5221F !important;
+}
+
+main .bg-indigo-950 {
+  background-color: #EEF2FF !important;
+  border-color: #C7D2FE !important;
+  color: #4338CA !important;
+}
+main .bg-indigo-950 * {
+  color: #4338CA !important;
 }
 
 /* Tables in Light Canvas */
@@ -414,6 +506,19 @@ main .bg-indigo-600 {
 
 main .bg-indigo-600:hover {
   opacity: 0.9;
+}
+
+/* Secondary Buttons */
+main button.bg-slate-800,
+main button[class*="bg-slate-800"] {
+  background-color: #FFFFFF !important;
+  color: var(--main-text) !important;
+  border: 1px solid var(--main-border) !important;
+}
+
+main button.bg-slate-800:hover,
+main button[class*="bg-slate-800"]:hover {
+  background-color: var(--main-card-sub) !important;
 }
 
 /* Inputs, Textareas & Selects in Light Canvas */
@@ -446,4 +551,83 @@ main select:focus {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #A0B2A0;
+}
+
+/* ==============================================================================
+   PRINT & VECTOR PDF EXPORT STYLES (A4 LETTERHEAD)
+   ============================================================================== */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm 12mm 12mm 12mm;
+  }
+
+  html, body {
+    background: #FFFFFF !important;
+    color: #1A1A1A !important;
+    font-size: 10pt !important;
+    line-height: 1.35 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Hide navigation, toolbars, sidebars, headers & action buttons on print */
+  aside,
+  header,
+  nav,
+  .print\:hidden,
+  button,
+  .no-print {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    background: #FFFFFF !important;
+  }
+
+  /* Letterhead Print Sheet */
+  .letterhead-sheet {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    background: #FFFFFF !important;
+  }
+
+  /* Table readability in print */
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+  }
+
+  th, td {
+    padding: 6px 8px !important;
+    border-color: #DDE3DD !important;
+  }
+
+  th {
+    background-color: #F4F6F4 !important;
+    color: #1F3A2E !important;
+    font-weight: 700 !important;
+  }
+
+  /* Force exact color reproduction for logos and badges */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Avoid page breaks inside key report tables and signature blocks */
+  .report-section,
+  .signature-block,
+  tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
 }
