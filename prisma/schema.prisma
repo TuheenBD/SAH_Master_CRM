@@ -1,0 +1,807 @@
+// ==============================================================================
+// MASTER CRM - Multi-Company Personal Business & Financial Operating System
+// Companies Managed:
+//   1. Bizman Media Limited (DOOH, LED Installation, Events, Billboards, Gifts)
+//   2. Adpro Communications Limited (DOOH, LED, Static Billboards, Activations)
+//   3. Ariel Marketing & Communications Limited (Global B2B/B2C Export: UK/EU/AU/US)
+// ==============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ------------------------------------------------------------------------------
+// 1. AUTHENTICATION & MULTI-COMPANY TENANCY
+// ------------------------------------------------------------------------------
+
+enum UserRole {
+  OWNER_SUPERADMIN
+  DIRECTOR
+  MANAGER
+  FINANCE_OFFICER
+  VIEWER
+}
+
+enum CompanyCode {
+  BIZMAN  // Bizman Media Limited
+  ADPRO   // Adpro Communications Limited
+  ARIELMC // Ariel Marketing & Communications Limited
+}
+
+enum IndustryDomain {
+  DOOH_MEDIA_ADVERTISING // Bizman & Adpro
+  GLOBAL_TRADE_EXPORT     // ArielMC
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  name          String
+  passwordHash  String
+  phone         String?
+  avatarUrl     String?
+  role          UserRole       @default(OWNER_SUPERADMIN)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  // Multi-Company access & preferences
+  companyUsers  CompanyUser[]
+  journalEntries JournalEntry[]
+  auditLogs     AuditLog[]
+  quickNotes    QuickNotePad[]
+}
+
+model Company {
+  id              String         @id @default(uuid())
+  code            CompanyCode    @unique
+  name            String
+  legalName       String
+  roleTitle       String         // e.g. "Director & CEO" (Bizman), "General Manager" (Adpro), "Managing Director" (ArielMC)
+  industry        IndustryDomain
+  baseCurrency    String         @default("BDT") // "BDT" for Bizman/Adpro, "USD" for ArielMC
+  secondaryCurrency String?      // e.g. "USD", "EUR", "GBP" for ArielMC
+  address         String?
+  phone           String?
+  email           String?
+  taxRegistration String?
+  logoUrl         String?
+  settings        Json?          // Dynamic configuration (invoice prefixes, default payment terms)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  // Relationships
+  companyUsers    CompanyUser[]
+  customers       Customer[]
+  leads           Lead[]
+  orders          Order[]
+  expenses        Expense[]
+  billboards      BillboardAsset[]
+  products        ProductItem[]
+  accounts        Account[]
+  journalEntries  JournalEntry[]
+  invoices        Invoice[]
+  tasks           TaskAndCalendar[]
+  emailSequences  EmailSequence[]
+  quickNotes      QuickNotePad[]
+}
+
+model CompanyUser {
+  id         String   @id @default(uuid())
+  userId     String
+  companyId  String
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, companyId])
+}
+
+// ------------------------------------------------------------------------------
+// 2. CUSTOMER & POLYMORPHIC LEAD MANAGEMENT
+// ------------------------------------------------------------------------------
+
+enum CustomerType {
+  CORPORATE_CLIENT    // Local corporate brand for DOOH/Events
+  ADVERTISING_AGENCY  // Media buying agency
+  INTERNATIONAL_BUYER // Foreign importer/distributor for ArielMC
+  RETAIL_CONSUMER     // B2C foreign buyer
+  VENDOR_PARTNER      // Billboard vendor or raw material supplier
+}
+
+model Customer {
+  id              String       @id @default(uuid())
+  companyId       String
+  customerType    CustomerType @default(CORPORATE_CLIENT)
+  companyName     String
+  contactPerson   String
+  email           String?
+  phone           String?
+  whatsappNumber  String?
+  country         String       @default("Bangladesh") // "Bangladesh", "United Kingdom", "Germany", "United States", "Australia"
+  city            String?
+  streetAddress   String?
+  taxIdNumber     String?
+  website         String?
+  notes           String?
+  creditLimit     Decimal?     @db.Decimal(14, 2)
+  isActive        Boolean      @default(true)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  company         Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  leads           Lead[]
+  orders          Order[]
+  invoices        Invoice[]
+  interactions    Interaction[]
+  tasks           TaskAndCalendar[]
+
+  @@index([companyId, customerType])
+}
+
+enum PipelineType {
+  DOOH_MEDIA_SLOT      // Screen advertising slot booking
+  STATIC_BILLBOARD     // Traditional outdoor hoarding
+  EVENT_ACTIVATION     // Corporate events & roadshows
+  GIFT_MERCHANDISE     // Corporate gifting
+  EXPORT_JUTE          // ArielMC: Jute-based goods
+  EXPORT_LEATHER       // ArielMC: Leather items
+  EXPORT_HOME_TEXTILE  // ArielMC: Home textiles
+  EXPORT_CERAMICS      // ArielMC: Ceramics & Porcelain
+  EXPORT_POTTERY       // ArielMC: Clay & Terracotta pottery
+  GENERAL_SERVICE      // Generic pipeline
+}
+
+enum LeadStage {
+  NEW_INQUIRY
+  CONTACTED
+  MEETING_DEMO_SCHEDULED
+  PROPOSAL_QUOTATION_SENT
+  COMMERCIAL_NEGOTIATION
+  CONTRACT_WON
+  CLOSED_LOST
+}
+
+model Lead {
+  id                  String       @id @default(uuid())
+  companyId           String
+  customerId          String?      // Optional existing customer
+  pipelineType        PipelineType
+  stage               LeadStage    @default(NEW_INQUIRY)
+  title               String       // e.g. "Grameenphone Q3 Dhanmondi LED Campaign" or "UK Buyer 5000pcs Jute Tote Bags"
+  contactName         String
+  contactEmail        String?
+  contactPhone        String?
+  whatsappNumber      String?
+  country             String       @default("Bangladesh")
+
+  // Financial Estimates
+  estimatedDealValue  Decimal      @default(0) @db.Decimal(14, 2)
+  currency            String       @default("BDT") // BDT, USD, EUR, GBP
+  dealProbability     Int          @default(30)    // 0-100%
+  expectedCloseDate   DateTime?
+
+  // Domain-Specific Details (Stored in structured JSON for infinite agility)
+  // For Bizman/Adpro: { durationDays: 30, slotCount: 10, targetScreens: ["Dhanmondi-01", "Gulshan-02"], ownVsVendorRatio: "60/40" }
+  // For ArielMC: { exportPort: "Chittagong", incoterm: "FOB", targetMarket: "UK", sampleApproved: true, containerSize: "20ft" }
+  customDealMetadata  Json?
+
+  // Autosaving Markdown Notepad for this Lead (Feature 5.D)
+  notepadMarkdown     String?      @db.Text
+
+  // Pipeline Metrics
+  lostReason          String?
+  sourceChannel       String?      // Referral, Cold Call, WhatsApp, Trade Fair, Website
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  // Relationships
+  company             Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customer            Customer?    @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  interactions        Interaction[]
+  tasks               TaskAndCalendar[]
+  expenses            Expense[]    // Expenses tagged directly to this lead for deal cost analysis
+  orders              Order[]
+  sequenceEnrollments LeadSequenceEnrollment[]
+  journalLines        JournalLine[] // Financial lines tagged to this lead
+
+  @@index([companyId, stage])
+  @@index([companyId, pipelineType])
+}
+
+// ------------------------------------------------------------------------------
+// 3. INVENTORY & ASSET CATALOGS (BIZMAN / ADPRO / ARIELMC)
+// ------------------------------------------------------------------------------
+
+enum BillboardType {
+  OWN_LED_BOARD        // Bizman has 20, Adpro has 1
+  VENDOR_LED_BOARD     // Bizman has 50+, Adpro has 70+
+  STATIC_BILLBOARD     // Traditional mega sign / rooftop
+  UNIPOLE
+  EVENT_ASSET_LIGHTING
+}
+
+enum AssetStatus {
+  ACTIVE_AVAILABLE
+  PARTIALLY_BOOKED
+  FULLY_OCCUPIED
+  UNDER_MAINTENANCE
+  INACTIVE
+}
+
+// Bizman Media & Adpro Communications: Outdoor Asset Inventory
+model BillboardAsset {
+  id                  String        @id @default(uuid())
+  companyId           String
+  boardCode           String        // e.g. "BZ-LED-DHN-01" or "AD-LED-MOT-01"
+  name                String        // e.g. "Dhanmondi 27 Bridge Facing Screen"
+  type                BillboardType
+  location            String        // Detailed intersection/address
+  district            String        // Dhaka, Chittagong, Sylhet, etc.
+  division            String        // Countrywide coverage
+  latitude            Float?
+  longitude           Float?
+
+  // Technical Specs
+  dimensions          String?       // e.g. "30ft x 15ft"
+  pixelResolution     String?       // e.g. "1920x1080 P6 Outdoor"
+  dailyTrafficCount   Int?          // Impression metric
+
+  // Slot Capacity & Rates
+  totalSlotsPerLoop   Int           @default(10) // Standard 10-12 slots per cycle
+  availableSlots      Int           @default(10)
+  slotDurationSeconds Int           @default(10) // 10-second spot
+  monthlyRatePerSlot  Decimal       @db.Decimal(12, 2)
+  dailyRatePerSlot    Decimal       @db.Decimal(12, 2)
+
+  // Third-Party Vendor Tracking (Crucial for 50+ & 70+ vendor boards)
+  vendorName          String?       // e.g. "Vendor Outdoor Ltd"
+  vendorContactPhone  String?
+  vendorCostPerMonth  Decimal?      @db.Decimal(12, 2) // Our wholesale cost
+
+  status              AssetStatus   @default(ACTIVE_AVAILABLE)
+  photoUrls           String[]
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  company             Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  orderItems          OrderItem[]
+
+  @@unique([companyId, boardCode])
+  @@index([companyId, type, status])
+}
+
+enum ProductCategory {
+  JUTE_BASED
+  LEATHER_GOODS
+  HOME_TEXTILE
+  CERAMICS
+  POTTERY
+  HANDICRAFTS
+}
+
+// Ariel Marketing & Communications: Global Product Inventory
+model ProductItem {
+  id              String          @id @default(uuid())
+  companyId       String
+  sku             String          // e.g. "AMC-JUTE-BAG-04"
+  name            String          // "Handcrafted Eco Jute Shopping Tote"
+  category        ProductCategory
+  description     String?         @db.Text
+  hsCode          String?         // Harmonized System Code for customs
+  unitOfMeasure   String          @default("PCS") // PCS, SET, METER, KG
+
+  // Multi-Currency Pricing
+  costPriceBdt    Decimal         @db.Decimal(12, 2) // Manufacturing/Procurement cost
+  exportPriceUsd  Decimal         @db.Decimal(12, 2) // Quoted export FOB price
+  exportPriceEur  Decimal?        @db.Decimal(12, 2)
+  exportPriceGbp  Decimal?        @db.Decimal(12, 2)
+
+  // Logistics & Export Metrics
+  minimumOrderQty Int             @default(500)
+  productionDays  Int             @default(25)
+  weightKg        Decimal?        @db.Decimal(8, 3)
+  cbmVolume       Decimal?        @db.Decimal(8, 4)
+  imageUrl        String?
+  isActive        Boolean         @default(true)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  company         Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  orderItems      OrderItem[]
+
+  @@unique([companyId, sku])
+  @@index([companyId, category])
+}
+
+// ------------------------------------------------------------------------------
+// 4. ORDERS, BOOKINGS & EXECUTION
+// ------------------------------------------------------------------------------
+
+enum OrderType {
+  MEDIA_CAMPAIGN     // DOOH / Static Billboard run
+  EVENT_ACTIVATION   // On-ground event/activation project
+  EXPORT_SHIPMENT    // ArielMC international container shipment
+  GIFT_MERCHANDISE   // Promotional gifts production
+}
+
+enum OrderStatus {
+  DRAFT
+  CONFIRMED
+  IN_EXECUTION       // Campaign active or production running
+  READY_TO_SHIP      // Export cargo packed
+  DELIVERED_COMPLETED
+  CANCELLED
+}
+
+model Order {
+  id                  String        @id @default(uuid())
+  companyId           String
+  customerId          String
+  leadId              String?
+  orderNumber         String        // e.g. "ORD-BIZ-2026-0042"
+  orderType           OrderType
+  status              OrderStatus   @default(DRAFT)
+
+  // Campaign or Shipment Dates
+  startDate           DateTime?
+  endDate             DateTime?
+  deliveryDeadline    DateTime?
+
+  // Financial Totals
+  currency            String        @default("BDT")
+  subTotal            Decimal       @db.Decimal(14, 2)
+  taxAmount           Decimal       @default(0) @db.Decimal(14, 2)
+  discountAmount      Decimal       @default(0) @db.Decimal(14, 2)
+  grandTotal          Decimal       @db.Decimal(14, 2)
+
+  // Export Specific Fields (ArielMC)
+  shippingPort        String?
+  incoterm            String?       // "FOB", "CIF", "EXW"
+  bolNumber           String?       // Bill of Lading
+
+  notes               String?       @db.Text
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  // Relationships
+  company             Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customer            Customer      @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  lead                Lead?         @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  items               OrderItem[]
+  expenses            Expense[]     // Every execution expense directly charged to this Order
+  invoices            Invoice[]
+  journalLines        JournalLine[] // Financial lines tagged to this Order
+
+  @@unique([companyId, orderNumber])
+  @@index([companyId, status])
+}
+
+model OrderItem {
+  id                String          @id @default(uuid())
+  orderId           String
+  billboardAssetId  String?         // Filled if DOOH/Billboard campaign
+  productItemId     String?         // Filled if ArielMC export item
+  description       String          // Line item description
+  quantity          Decimal         @default(1) @db.Decimal(10, 2)
+  unitPrice         Decimal         @db.Decimal(14, 2)
+  totalPrice        Decimal         @db.Decimal(14, 2)
+
+  // Campaign specific schedule per screen
+  slotCount         Int?            @default(1)
+  campaignStartDate DateTime?
+  campaignEndDate   DateTime?
+
+  order             Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  billboardAsset    BillboardAsset? @relation(fields: [billboardAssetId], references: [id], onDelete: SetNull)
+  productItem       ProductItem?    @relation(fields: [productItemId], references: [id], onDelete: SetNull)
+}
+
+// ------------------------------------------------------------------------------
+// 5. DUAL-ENTRY ACCOUNTING ENGINE (CoA, Journals, Ledgers, P&L, Balance Sheet)
+// ------------------------------------------------------------------------------
+
+enum AccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  REVENUE
+  EXPENSE
+}
+
+enum AccountClassification {
+  // Assets
+  CASH_AND_BANK
+  ACCOUNTS_RECEIVABLE
+  INVENTORY_ASSET
+  FIXED_ASSET_EQUIPMENT
+  PREPAID_EXPENSES
+
+  // Liabilities
+  ACCOUNTS_PAYABLE
+  SHORT_TERM_BORROWING
+  TAXES_PAYABLE
+  ACCRUED_EXPENSES
+
+  // Equity
+  OWNER_CAPITAL
+  RETAINED_EARNINGS
+  DIVIDEND_DISTRIBUTION
+
+  // Revenue
+  DOOH_MEDIA_REVENUE
+  EVENT_ACTIVATION_REVENUE
+  EXPORT_SALES_REVENUE
+  OTHER_INCOME
+
+  // Expenses
+  COST_OF_GOODS_SOLD_VENDOR_BOARDS // Board rental to 3rd party vendors
+  COST_OF_GOODS_SOLD_MATERIALS     // Raw jute, leather, ceramics
+  COST_OF_GOODS_SOLD_FREIGHT       // International sea/air shipping
+  SALARIES_AND_WAGES
+  MARKETING_ENTERTAINMENT          // Client meetings, travel
+  OFFICE_RENT_UTILITIES
+  DEPRECIATION_MAINTENANCE
+  BANK_AND_EXCHANGE_FEES
+}
+
+model Account {
+  id              String                @id @default(uuid())
+  companyId       String
+  accountCode     String                // e.g. "1010" Cash, "1200" AR, "2010" AP, "4010" DOOH Sales
+  name            String                // e.g. "Dutch Bangla Bank - Bizman A/C", "HSBC USD - ArielMC"
+  type            AccountType
+  classification  AccountClassification
+  currency        String                @default("BDT")
+  description     String?
+  isSystemAccount Boolean               @default(false)
+  isActive        Boolean               @default(true)
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  company         Company               @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  journalLines    JournalLine[]
+  expensesDebited Expense[]             @relation("ExpenseCategoryAccount")
+  expensesPaid    Expense[]             @relation("PaymentSourceAccount")
+
+  @@unique([companyId, accountCode])
+  @@index([companyId, type])
+}
+
+enum JournalSourceType {
+  MANUAL_ENTRY
+  INVOICE_ISSUED
+  PAYMENT_RECEIVED
+  EXPENSE_LOGGED
+  VENDOR_BILL
+  YEAR_END_CLOSING
+}
+
+model JournalEntry {
+  id              String            @id @default(uuid())
+  companyId       String
+  entryNumber     String            // e.g. "JE-BIZ-2026-0001"
+  entryDate       DateTime          @default(now())
+  description     String
+  sourceType      JournalSourceType @default(MANUAL_ENTRY)
+  referenceId     String?           // Links to InvoiceId, ExpenseId, or OrderId
+  isPosted        Boolean           @default(true)
+  postedAt        DateTime?         @default(now())
+  createdById     String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  company         Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdBy       User?             @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  lines           JournalLine[]
+  expenses        Expense[]
+
+  @@unique([companyId, entryNumber])
+  @@index([companyId, entryDate])
+}
+
+model JournalLine {
+  id              String       @id @default(uuid())
+  journalEntryId  String
+  accountId       String
+
+  // Dual-Entry Principle: Exactly one will be > 0, sum(Debits) MUST EQUAL sum(Credits) in parent
+  debit           Decimal      @default(0) @db.Decimal(14, 2)
+  credit          Decimal      @default(0) @db.Decimal(14, 2)
+  description     String?
+
+  // Tagging lines to Deals & Orders for Micro-P&L Calculations
+  leadId          String?
+  orderId         String?
+
+  journalEntry    JournalEntry @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
+  account         Account      @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  lead            Lead?        @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  order           Order?       @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([accountId])
+  @@index([leadId])
+  @@index([orderId])
+}
+
+// ------------------------------------------------------------------------------
+// 6. DAILY EXPENSE TRACKER (MAPPED TO LEADS/ORDERS & DUAL-ENTRY COA)
+// ------------------------------------------------------------------------------
+
+enum ExpenseCategory {
+  VENDOR_BOARD_RENTAL      // Paying vendor for 50+/70+ DOOH boards
+  PRINTING_AND_STATIC_FLEX
+  EVENT_FABRICATION_LABOR
+  EXPORT_FREIGHT_LOGISTICS
+  CUSTOMS_CLEARING_CNF
+  PRODUCT_SAMPLE_DEV
+  CLIENT_ENTERTAINMENT_DINNER
+  TRAVEL_AND_CONVEYANCE
+  OFFICE_AND_ADMIN
+  EQUIPMENT_REPAIR_LED
+  MISCELLANEOUS
+}
+
+model Expense {
+  id                  String          @id @default(uuid())
+  companyId           String
+  expenseNumber       String          // e.g. "EXP-BIZ-2026-0105"
+  expenseDate         DateTime        @default(now())
+  amount              Decimal         @db.Decimal(14, 2)
+  currency            String          @default("BDT")
+  category            ExpenseCategory
+  description         String
+  vendorRecipient     String?         // Who received the cash/payment
+
+  // Deal Cost Tagging (Crucial for per-lead/per-order net profit margin calculation)
+  leadId              String?
+  orderId             String?
+
+  // Dual Entry Automated Mapping:
+  // Debits: expenseAccountId (e.g. 5100 Vendor Board Rental Expense)
+  // Credits: paymentAccountId (e.g. 1010 Petty Cash or Bank Account)
+  expenseAccountId    String
+  paymentAccountId    String
+  journalEntryId      String?         // Generated double-entry record
+
+  receiptImageUrl     String?
+  isVerified          Boolean         @default(true)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+
+  company             Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  lead                Lead?           @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  order               Order?          @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  expenseAccount      Account         @relation("ExpenseCategoryAccount", fields: [expenseAccountId], references: [id], onDelete: Restrict)
+  paymentAccount      Account         @relation("PaymentSourceAccount", fields: [paymentAccountId], references: [id], onDelete: Restrict)
+  journalEntry        JournalEntry?   @relation(fields: [journalEntryId], references: [id], onDelete: SetNull)
+
+  @@index([companyId, expenseDate])
+  @@index([leadId])
+  @@index([orderId])
+}
+
+// ------------------------------------------------------------------------------
+// 7. INVOICES & PAYMENTS (RECEIVABLES)
+// ------------------------------------------------------------------------------
+
+enum InvoiceStatus {
+  DRAFT
+  ISSUED_SENT
+  PARTIALLY_PAID
+  PAID_IN_FULL
+  CANCELLED_VOID
+}
+
+model Invoice {
+  id              String        @id @default(uuid())
+  companyId       String
+  customerId      String
+  orderId         String?
+  invoiceNumber   String        // e.g. "INV-BIZ-2026-0089"
+  issueDate       DateTime      @default(now())
+  dueDate         DateTime
+  currency        String        @default("BDT")
+
+  subTotal        Decimal       @db.Decimal(14, 2)
+  vatAmount       Decimal       @default(0) @db.Decimal(14, 2)
+  discountAmount  Decimal       @default(0) @db.Decimal(14, 2)
+  totalAmount     Decimal       @db.Decimal(14, 2)
+  paidAmount      Decimal       @default(0) @db.Decimal(14, 2)
+  status          InvoiceStatus @default(DRAFT)
+
+  paymentTerms    String?       // "Net 30", "50% Advance, 50% on Delivery"
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  company         Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customer        Customer      @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  order           Order?        @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  payments        PaymentReceipt[]
+
+  @@unique([companyId, invoiceNumber])
+  @@index([companyId, status])
+}
+
+model PaymentReceipt {
+  id              String        @id @default(uuid())
+  invoiceId       String
+  receiptNumber   String        // e.g. "RCT-BIZ-2026-0045"
+  amount          Decimal       @db.Decimal(14, 2)
+  paymentDate     DateTime      @default(now())
+  paymentMethod   String        // "Bank Transfer", "Cheque", "Cash", "LC"
+  bankReference   String?
+  notes           String?
+  createdAt       DateTime      @default(now())
+
+  invoice         Invoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+// ------------------------------------------------------------------------------
+// 8. PRODUCTIVITY: CALLING, WHATSAPP, EMAIL DRIPS, CALENDAR, NOTEPAD
+// ------------------------------------------------------------------------------
+
+enum InteractionType {
+  PHONE_CALL
+  WHATSAPP_MESSAGE
+  EMAIL_COMMUNICATION
+  IN_PERSON_MEETING
+  SITE_SURVEY
+}
+
+enum InteractionDirection {
+  OUTBOUND
+  INBOUND
+}
+
+model Interaction {
+  id              String               @id @default(uuid())
+  leadId          String?
+  customerId      String?
+  type            InteractionType
+  direction       InteractionDirection @default(OUTBOUND)
+  summary         String               // e.g. "Call via +88017... discussed Dhanmondi slot rates"
+  details         String?              @db.Text
+  occurredAt      DateTime             @default(now())
+  createdAt       DateTime             @default(now())
+
+  lead            Lead?                @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  customer        Customer?            @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([leadId])
+  @@index([customerId])
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  COMPLETED
+  POSTPONED
+}
+
+// Calendar Sync & Todo System (Feature 5.B)
+model TaskAndCalendar {
+  id              String       @id @default(uuid())
+  companyId       String
+  leadId          String?
+  customerId      String?
+  title           String       // "Follow up with Grameenphone media team"
+  description     String?      @db.Text
+  priority        TaskPriority @default(MEDIUM)
+  status          TaskStatus   @default(TODO)
+
+  // Calendar Event Attributes
+  isCalendarEvent Boolean      @default(false)
+  startDate       DateTime?
+  endDate         DateTime?
+  dueDate         DateTime?
+  reminderMinutes Int?         @default(15) // Minutes before event for alarm
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  company         Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  lead            Lead?        @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  customer        Customer?    @relation(fields: [customerId], references: [id], onDelete: SetNull)
+
+  @@index([companyId, status])
+  @@index([startDate, dueDate])
+}
+
+// Automated Email Sequences / Drip Campaigns (Feature 5.A)
+model EmailSequence {
+  id              String                   @id @default(uuid())
+  companyId       String
+  name            String                   // "New DOOH Inquiry 3-Step Follow-Up" or "European Jute Buyers Introduction"
+  pipelineType    PipelineType
+  triggerStage    LeadStage                // e.g. Trigger when stage becomes PROPOSAL_QUOTATION_SENT
+  isActive        Boolean                  @default(true)
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+
+  company         Company                  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  steps           EmailSequenceStep[]
+  enrollments     LeadSequenceEnrollment[]
+}
+
+model EmailSequenceStep {
+  id              String        @id @default(uuid())
+  sequenceId      String
+  stepNumber      Int           // 1, 2, 3
+  delayDays       Int           @default(2) // Wait X days after previous step
+  subjectTemplate String        // "Regarding your LED Billboard inquiry for {{companyName}}"
+  bodyTemplate    String        @db.Text // Supports mustache tokens like {{contactName}}, {{dealTitle}}
+  createdAt       DateTime      @default(now())
+
+  sequence        EmailSequence @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+
+  @@unique([sequenceId, stepNumber])
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  PAUSED
+  FINISHED
+  CANCELLED
+}
+
+model LeadSequenceEnrollment {
+  id                String           @id @default(uuid())
+  leadId            String
+  sequenceId        String
+  currentStep       Int              @default(1)
+  status            EnrollmentStatus @default(ACTIVE)
+  lastEmailSentAt   DateTime?
+  nextRunScheduledAt DateTime?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  lead              Lead             @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  sequence          EmailSequence    @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+
+  @@unique([leadId, sequenceId])
+}
+
+// Standalone Personal Autosaving Scratchpad / Quick Notes (Feature 5.D)
+model QuickNotePad {
+  id              String    @id @default(uuid())
+  companyId       String?   // Nullable for personal Master CRM global notes
+  userId          String
+  title           String    @default("Untitled Scratchpad")
+  contentMarkdown String    @default("") @db.Text
+  isPinned        Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  company         Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isPinned])
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  userId      String?
+  action      String   // "CREATE_EXPENSE", "POST_JOURNAL", "STAGE_UPDATE"
+  entityType  String   // "Expense", "JournalEntry", "Lead"
+  entityId    String
+  changesJson Json?
+  createdAt   DateTime @default(now())
+
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
