@@ -125,42 +125,18 @@ export default function Sidebar() {
               </span>
             </div>
 
-            {/* Active Company Selector */}
-            <div className="mt-4 space-y-1.5">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                Active Entity View
+            {/* Active Company Status Box */}
+            <div className="mt-4 rounded-xl bg-slate-900/80 border border-slate-800 p-2.5 space-y-1">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
+                <span>Selected Entity</span>
+                <span className={`h-2 w-2 rounded-full ${
+                  activeCompany === 'BIZMAN' ? 'bg-blue-500' :
+                  activeCompany === 'ADPRO' ? 'bg-orange-500' :
+                  activeCompany === 'ARIELMC' ? 'bg-emerald-500' : 'bg-indigo-500'
+                }`} />
               </div>
-
-              <div className="grid grid-cols-2 gap-1 bg-slate-900/90 p-1 rounded-lg border border-slate-800">
-                {(Object.keys(COMPANIES) as CompanyCode[]).map((code) => {
-                  const isSelected = activeCompany === code;
-                  return (
-                    <button
-                      key={code}
-                      onClick={() => {
-                        switchCompany(code);
-                        setMobileOpen(false);
-                      }}
-                      className={`rounded px-2 py-1 text-[11px] font-semibold transition-all flex items-center justify-center gap-1 ${
-                        isSelected
-                          ? code === 'CONSOLIDATED' ? 'bg-indigo-600 text-white shadow' :
-                            code === 'BIZMAN' ? 'bg-blue-600 text-white shadow' :
-                            code === 'ADPRO' ? 'bg-orange-600 text-white shadow' :
-                            'bg-emerald-600 text-white shadow'
-                          : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                      }`}
-                    >
-                      {code === 'CONSOLIDATED' ? 'ALL' : code}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Active Role Sub-banner */}
-              <div className="rounded bg-slate-900/40 border border-slate-800/60 p-2 text-[10px] mt-1.5 text-slate-300 flex items-center justify-between">
-                <span className="truncate">{currentMeta.role}</span>
-                <span className="font-mono text-indigo-400 font-bold shrink-0">{currentMeta.currency}</span>
-              </div>
+              <div className="font-bold text-xs text-white truncate">{currentMeta.name}</div>
+              <div className="text-[10px] text-slate-400 truncate">{currentMeta.role}</div>
             </div>
           </div>
 

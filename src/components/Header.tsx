@@ -7,7 +7,6 @@ import {
   Search, 
   Bell, 
   Plus, 
-  Sparkles, 
   Building2, 
   Tv2, 
   Globe2, 
@@ -16,9 +15,8 @@ import {
   Receipt, 
   Users, 
   Wallet,
-  Calendar,
-  ExternalLink,
-  ChevronDown
+  ChevronDown,
+  Sparkles
 } from 'lucide-react';
 import { CompanyCode, COMPANIES } from '@/lib/types';
 
@@ -29,72 +27,88 @@ export default function Header() {
   const activeCompany = (searchParams.get('company') as CompanyCode) || 'CONSOLIDATED';
   const meta = COMPANIES[activeCompany] || COMPANIES.CONSOLIDATED;
 
-  const [searchOpen, setSearchOpen] = useState(false);
   const [quickActionOpen, setQuickActionOpen] = useState(false);
+
+  const switchCompany = (code: CompanyCode) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('company', code);
+    router.push(`${pathname}?${params.toString()}`);
+  };
 
   // Derive human-readable page name
   const getPageTitle = () => {
     switch (pathname) {
-      case '/': return 'Executive Master Overview';
-      case '/contacts': return 'Master Contacts Directory';
-      case '/leads': return 'Leads & Polymorphic Pipelines';
-      case '/inventory': return 'Inventory & Export Catalogs';
-      case '/expenses': return 'Daily Deal Expenses';
-      case '/finance': return 'Dual-Entry Accounting & Ledger';
-      case '/personal-finance': return 'Personal Finance & Banking Vault';
-      case '/reports': return 'Executive Management Reports';
-      case '/automations': return 'Automated Email Drips';
-      case '/calendar': return 'Calendar & Action Agenda';
-      case '/scratchpad': return 'Executive Markdown Scratchpad';
-      default: return 'Master CRM Console';
+      case '/': return 'Executive Master';
+      case '/contacts': return 'Master Contacts';
+      case '/leads': return 'Leads & Pipelines';
+      case '/inventory': return 'Inventory & Catalog';
+      case '/expenses': return 'Deal Expenses';
+      case '/finance': return 'Accounting & P&L';
+      case '/personal-finance': return 'Personal Finance';
+      case '/reports': return 'Executive Reports';
+      case '/automations': return 'Email Drips';
+      case '/calendar': return 'Calendar & Tasks';
+      case '/scratchpad': return 'Executive Scratchpad';
+      default: return 'Console';
     }
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
-      <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Left: Breadcrumbs & Page Title */}
-        <div className="flex items-center gap-3 min-w-0">
+    <header className="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/85 backdrop-blur-md">
+      <div className="flex flex-col md:flex-row md:h-16 md:items-center justify-between px-4 sm:px-6 lg:px-8 py-2 md:py-0 gap-3">
+        {/* Left: Breadcrumb / Page Title */}
+        <div className="flex items-center gap-3 shrink-0">
           <div>
-            <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-mono">
+            <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-mono uppercase tracking-wider">
               <span>{meta.code === 'CONSOLIDATED' ? 'GROUP' : meta.code}</span>
               <span>/</span>
               <span className="text-indigo-400 font-semibold">{getPageTitle()}</span>
             </div>
-            <h1 className="text-base sm:text-lg font-extrabold text-white tracking-tight truncate">
+            <h1 className="text-sm sm:text-base font-extrabold text-white tracking-tight">
               {getPageTitle()}
             </h1>
           </div>
         </div>
 
-        {/* Center: Search & Quick Global Finder */}
-        <div className="hidden md:flex items-center flex-1 max-w-md mx-6">
-          <div className="relative w-full">
-            <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-slate-500" />
-            <input
-              type="text"
-              placeholder="Search leads, DOOH screens, buyers, expenses... (⌘K)"
-              className="w-full rounded-lg border border-slate-800 bg-slate-900/70 pl-9 pr-8 py-1.5 text-xs text-slate-200 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-            />
-            <span className="absolute right-2.5 top-2 rounded bg-slate-800 px-1.5 py-0.5 text-[9px] font-mono text-slate-400 border border-slate-700/60">
-              ⌘K
+        {/* Center: ACTIVE ENTITY VIEW (Placed directly in Header) */}
+        <div className="flex flex-wrap items-center gap-1.5 bg-slate-900/90 p-1 rounded-xl border border-slate-800 shadow-inner">
+          {(Object.keys(COMPANIES) as CompanyCode[]).map((code) => {
+            const isSelected = activeCompany === code;
+            let activeStyle = "bg-slate-900 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60";
+
+            if (isSelected) {
+              if (code === 'CONSOLIDATED') activeStyle = "bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/30 ring-1 ring-indigo-400";
+              if (code === 'BIZMAN') activeStyle = "bg-blue-600 text-white font-bold shadow-md shadow-blue-600/30 ring-1 ring-blue-400";
+              if (code === 'ADPRO') activeStyle = "bg-orange-600 text-white font-bold shadow-md shadow-orange-600/30 ring-1 ring-orange-400";
+              if (code === 'ARIELMC') activeStyle = "bg-emerald-600 text-white font-bold shadow-md shadow-emerald-600/30 ring-1 ring-emerald-400";
+            }
+
+            return (
+              <button
+                key={code}
+                onClick={() => switchCompany(code)}
+                className={`rounded-lg px-2.5 sm:px-3 py-1.5 text-xs transition-all whitespace-nowrap flex items-center gap-1.5 ${activeStyle}`}
+              >
+                {code === 'CONSOLIDATED' && <Layers className="h-3.5 w-3.5" />}
+                {code === 'BIZMAN' && <Tv2 className="h-3.5 w-3.5" />}
+                {code === 'ADPRO' && <Building2 className="h-3.5 w-3.5" />}
+                {code === 'ARIELMC' && <Globe2 className="h-3.5 w-3.5" />}
+                <span>{code === 'CONSOLIDATED' ? 'ALL ENTITIES' : code}</span>
+              </button>
+            );
+          })}
+
+          {/* Active Role & Currency Badge */}
+          <div className="hidden xl:flex items-center gap-2 border-l border-slate-800 pl-2.5 pr-1.5 text-[11px]">
+            <span className="text-slate-300 font-medium truncate max-w-[140px]">{meta.role}</span>
+            <span className="rounded bg-slate-800 px-1.5 py-0.5 font-mono font-bold text-indigo-400 text-[10px]">
+              {meta.currency}
             </span>
           </div>
         </div>
 
-        {/* Right: Quick Actions, Currency Ticker, Reminders & Profile */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          {/* Active Company Live Pill Indicator */}
-          <div className="hidden sm:flex items-center gap-1.5 rounded-lg bg-slate-900/90 border border-slate-800 px-2.5 py-1 text-xs">
-            {activeCompany === 'BIZMAN' && <Tv2 className="h-3.5 w-3.5 text-blue-400" />}
-            {activeCompany === 'ADPRO' && <Building2 className="h-3.5 w-3.5 text-orange-400" />}
-            {activeCompany === 'ARIELMC' && <Globe2 className="h-3.5 w-3.5 text-emerald-400" />}
-            {activeCompany === 'CONSOLIDATED' && <Layers className="h-3.5 w-3.5 text-indigo-400" />}
-            <span className="font-semibold text-slate-200 text-[11px] truncate max-w-[130px]">
-              {meta.name.split(' ')[0]}
-            </span>
-          </div>
-
+        {/* Right: Quick Action Dropdown & Reminders */}
+        <div className="flex items-center gap-2 shrink-0 self-end md:self-auto">
           {/* Quick Action Dropdown */}
           <div className="relative">
             <button
@@ -102,7 +116,7 @@ export default function Header() {
               className="flex items-center gap-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 text-xs font-semibold shadow-md shadow-indigo-600/20 transition-all"
             >
               <Plus className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Quick Action</span>
+              <span>Quick Action</span>
               <ChevronDown className="h-3 w-3 opacity-80" />
             </button>
 
@@ -153,10 +167,10 @@ export default function Header() {
             )}
           </div>
 
-          {/* Notifications Bell */}
+          {/* Agenda Reminder Bell */}
           <Link
             href={`/calendar?company=${activeCompany}`}
-            title="3 High Priority Actions Today"
+            title="Today's Priority Agenda"
             className="relative rounded-lg border border-slate-800 bg-slate-900 p-2 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
           >
             <Bell className="h-4 w-4" />
