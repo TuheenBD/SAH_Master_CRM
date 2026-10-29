@@ -109,6 +109,7 @@ export default function LeadsPage() {
   const [formData, setFormData] = useState({
     companyCode: (activeCompany === 'CONSOLIDATED' ? 'BIZMAN' : activeCompany) as 'ARIELMC' | 'BIZMAN' | 'LINDA',
     title: '',
+    projectName: '',
     customerName: '',
     contactPerson: '',
     phone: '',
@@ -118,6 +119,7 @@ export default function LeadsPage() {
     estimatedValue: 500000,
     currency: 'BDT' as 'USD' | 'BDT',
     commissionRate: 10,
+    directCustomerFee: 0,
     stage: 'NEW_INQUIRY' as PipelineStage,
     probability: 40,
     expectedCloseDate: '2026-11-30',
@@ -142,6 +144,7 @@ export default function LeadsPage() {
         l.title.toLowerCase().includes(q) ||
         l.customerName.toLowerCase().includes(q) ||
         l.contactPerson.toLowerCase().includes(q) ||
+        (l.projectName && l.projectName.toLowerCase().includes(q)) ||
         l.country.toLowerCase().includes(q)
       );
     });
@@ -187,7 +190,6 @@ export default function LeadsPage() {
   const handleUpdateCustomerPayment = (leadId: string, status: CustomerPaymentStatus) => {
     setLeads(prev => prev.map(l => {
       if (l.id === leadId) {
-        // If customer has fully paid, automatically make entity payout ready for settlement if not already settled
         const nextEntityPayout: EntityPayoutStatus = 
           status === 'RECEIVED' 
             ? (l.entityPayoutStatus === 'SETTLED' ? 'SETTLED' : 'READY_FOR_SETTLEMENT')
@@ -220,21 +222,61 @@ export default function LeadsPage() {
     }));
   };
 
+  const handleUpdateDirectCustomerPayment = (leadId: string, status: 'PENDING' | 'RECEIVED') => {
+    setLeads(prev => prev.map(l => {
+      if (l.id === leadId) {
+        const updated: LeadItem = {
+          ...l,
+          directCustomerPaymentStatus: status,
+        };
+        if (selectedLead?.id === leadId) setSelectedLead(updated);
+        return updated;
+      }
+      return l;
+    }));
+  };
+
+  const handleOpenParallelProjectModal = (parentLead: LeadItem) => {
+    setFormData({
+      companyCode: parentLead.companyCode,
+      title: '',
+      projectName: '',
+      customerName: parentLead.customerName,
+      contactPerson: '',
+      phone: '',
+      whatsapp: '',
+      email: '',
+      country: parentLead.country,
+      estimatedValue: 1200000,
+      currency: parentLead.currency as 'USD' | 'BDT',
+      commissionRate: parentLead.commissionRate || 10,
+      directCustomerFee: 0,
+      stage: 'NEW_INQUIRY',
+      probability: 50,
+      expectedCloseDate: '2026-12-15',
+      pipelineType: parentLead.pipelineType,
+      notepadMarkdown: `### Parallel Project for ${parentLead.customerName}\n- Dedicated Project Manager/Contact:\n- Agreed Commission Rate:\n- Extra Direct Customer Fee:`,
+    });
+    setIsCreateModalOpen(true);
+  };
+
   const handleCreateSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title || !formData.customerName) {
-      alert('Please enter Opportunity Title and Customer Name.');
+      alert('Please enter Opportunity / Project Title and Customer Name.');
       return;
     }
 
     const estVal = Number(formData.estimatedValue) || 100000;
     const commRate = Number(formData.commissionRate) || 10;
     const commAmount = Math.round(estVal * (commRate / 100));
+    const directFee = Number(formData.directCustomerFee) || 0;
 
     const newLead: LeadItem = {
       id: `lead-user-${Date.now()}`,
       companyCode: formData.companyCode,
       title: formData.title,
+      projectName: formData.projectName || formData.title,
       customerName: formData.customerName,
       contactPerson: formData.contactPerson || formData.customerName,
       phone: formData.phone || '+880 1711 000000',
@@ -245,6 +287,8 @@ export default function LeadsPage() {
       currency: formData.currency,
       commissionRate: commRate,
       commissionAmount: commAmount,
+      directCustomerFee: directFee,
+      directCustomerPaymentStatus: 'PENDING',
       customerPaymentStatus: 'PENDING',
       entityPayoutStatus: 'AWAITING_CUSTOMER_PAYMENT',
       payoutAmountReceived: 0,
@@ -252,9 +296,9 @@ export default function LeadsPage() {
       probability: Number(formData.probability) || 50,
       expectedCloseDate: formData.expectedCloseDate || '2026-11-30',
       pipelineType: formData.pipelineType || 'General Commercial Lead',
-      notepadMarkdown: formData.notepadMarkdown || `### Deal Brief: ${formData.title}\n- Client: ${formData.customerName}\n- Agreed Commission: ${commRate}%\n- Created via Master CRM Quick Action`,
+      notepadMarkdown: formData.notepadMarkdown || `### Project Brief: ${formData.title}\n- Client Organization: ${formData.customerName}\n- Project Contact: ${formData.contactPerson}\n- Agreed Commission: ${commRate}%\n- Direct Customer Contract Fee: ${formData.currency === 'USD' ? '$' : '৳'}${directFee.toLocaleString()}`,
       specifics: {
-        createdVia: 'Master CRM Quick Action',
+        createdVia: 'Master CRM Parallel Project Engine',
         assignedOwner: 'Syed Akramul Hassan',
       },
       createdAt: new Date().toISOString().split('T')[0],
@@ -269,6 +313,7 @@ export default function LeadsPage() {
     setFormData({
       companyCode: (activeCompany === 'CONSOLIDATED' ? 'BIZMAN' : activeCompany) as 'ARIELMC' | 'BIZMAN' | 'LINDA',
       title: '',
+      projectName: '',
       customerName: '',
       contactPerson: '',
       phone: '',
@@ -278,6 +323,7 @@ export default function LeadsPage() {
       estimatedValue: 500000,
       currency: 'BDT',
       commissionRate: 10,
+      directCustomerFee: 0,
       stage: 'NEW_INQUIRY',
       probability: 40,
       expectedCloseDate: '2026-11-30',
@@ -376,17 +422,19 @@ export default function LeadsPage() {
             <div className="text-[10px] text-[#6B7269] mt-0.5">{filteredLeads.length} Personal Project Deals</div>
           </div>
 
-          {/* My Expected Commission Pipeline */}
+          {/* My Total Personal Earnings Pipeline */}
           <div className="rounded-xl border border-[#C8A96A]/50 bg-[#FBF9F4] p-3 shadow-xs">
             <div className="text-[10px] font-bold uppercase tracking-wider text-[#8C6D2D]">
-              My Expected Commission
+              My Total Expected Yield
             </div>
             <div className="text-sm font-black font-mono text-[#8C6D2D] mt-1">
-              ৳ {filteredLeads.filter(l => l.currency === 'BDT').reduce((s, l) => s + (l.commissionAmount || Math.round(l.estimatedValue * ((l.commissionRate || 10) / 100))), 0).toLocaleString()}
+              ৳ {filteredLeads.filter(l => l.currency === 'BDT').reduce((s, l) => s + (l.commissionAmount || Math.round(l.estimatedValue * ((l.commissionRate || 10) / 100))) + (l.directCustomerFee || 0), 0).toLocaleString()}
               <span className="text-xs text-[#8C6D2D]/70 font-normal"> + </span>
-              ${filteredLeads.filter(l => l.currency === 'USD').reduce((s, l) => s + (l.commissionAmount || Math.round(l.estimatedValue * ((l.commissionRate || 10) / 100))), 0).toLocaleString()}
+              ${filteredLeads.filter(l => l.currency === 'USD').reduce((s, l) => s + (l.commissionAmount || Math.round(l.estimatedValue * ((l.commissionRate || 10) / 100))) + (l.directCustomerFee || 0), 0).toLocaleString()}
             </div>
-            <div className="text-[10px] text-[#8C6D2D] mt-0.5 font-semibold">Across Sourced Projects</div>
+            <div className="text-[10px] text-[#8C6D2D] mt-0.5 font-semibold">
+              Entity Comm % + Direct Cust Fees
+            </div>
           </div>
 
           {/* Ready for Entity Payout to Me */}
@@ -481,19 +529,24 @@ export default function LeadsPage() {
                       <strong className="text-[#1A1A1A]">{lead.customerName}</strong> &bull; {lead.country}
                     </div>
 
-                    {/* My Commission Strip */}
+                    {/* My Yield Strip (Entity Comm + Direct Cust Fee) */}
                     <div className="mt-2.5 rounded-lg bg-[#FBF9F4] border border-[#C8A96A]/40 p-2 flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="text-[10px] font-extrabold uppercase text-[#8C6D2D] bg-[#C8A96A]/20 px-1.5 py-0.5 rounded">
-                          My Comm ({commRate}%)
+                          Comm ({commRate}%)
                         </span>
                         <span className="font-mono font-black text-[#8C6D2D]">
                           {lead.currency === 'USD' ? '$' : '৳'}{commAmount.toLocaleString()}
                         </span>
+                        {(lead.directCustomerFee || 0) > 0 && (
+                          <span className="text-[10px] font-mono font-black text-[#166534] bg-[#DCFCE7] px-1.5 py-0.5 rounded border border-[#86EFAC]">
+                            + {lead.currency === 'USD' ? '$' : '৳'}{(lead.directCustomerFee || 0).toLocaleString()} Direct Cust
+                          </span>
+                        )}
                       </div>
 
                       {/* Customer Payment & Entity Settlement Badges */}
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 shrink-0">
                         <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${
                           lead.customerPaymentStatus === 'RECEIVED'
                             ? 'bg-[#DCFCE7] text-[#15803D] border-[#86EFAC]'
@@ -589,154 +642,287 @@ export default function LeadsPage() {
               </div>
 
               {/* =================================================================== */}
-              {/* DEDICATED SECTION: MY EXECUTIVE COMMISSION & ENTITY SETTLEMENT */}
+              {/* DEDICATED SECTION: MY EXECUTIVE COMMISSION & DIRECT CUSTOMER FEES */}
               {/* =================================================================== */}
               <div className="rounded-xl border-2 border-[#C8A96A] bg-gradient-to-br from-[#FBF9F4] to-white p-4 space-y-3.5 shadow-sm">
-                <div className="flex items-center justify-between border-b border-[#C8A96A]/30 pb-2">
+                <div className="flex flex-wrap items-center justify-between border-b border-[#C8A96A]/30 pb-2 gap-2">
                   <div className="flex items-center gap-2">
                     <div className="h-7 w-7 rounded-lg bg-[#1F3A2E] text-[#C8A96A] flex items-center justify-center font-bold shadow-xs">
                       <DollarSign className="h-4 w-4" />
                     </div>
                     <div>
                       <div className="text-xs font-black text-[#1F3A2E] uppercase tracking-wide">
-                        My Executive Project Commission & Settlement
+                        My Executive Project Earnings & Settlement Engine
                       </div>
                       <div className="text-[10px] text-[#6B7269]">
-                        Entity pays Syed Akramul Hassan upon Customer Payment receipt
+                        Dual-stream revenue: Entity Commission % + Direct Contractual Customer Fees
                       </div>
                     </div>
                   </div>
 
-                  <span className="text-[10.5px] font-mono font-extrabold text-[#8C6D2D] bg-[#C8A96A]/20 px-2.5 py-0.5 rounded-full border border-[#C8A96A]/40">
-                    Agreed Commission: {selectedLead.commissionRate || 10}%
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10.5px] font-mono font-extrabold text-[#8C6D2D] bg-[#C8A96A]/20 px-2.5 py-0.5 rounded-full border border-[#C8A96A]/40">
+                      Entity Comm: {selectedLead.commissionRate || 10}%
+                    </span>
+                    {(selectedLead.directCustomerFee || 0) > 0 && (
+                      <span className="text-[10.5px] font-mono font-extrabold text-[#1E6B3A] bg-[#DCFCE7] px-2.5 py-0.5 rounded-full border border-[#86EFAC]">
+                        + Direct Cust Fee
+                      </span>
+                    )}
+                  </div>
                 </div>
 
-                {/* Key Numbers Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                {/* Key Numbers Grid: 3 Streams */}
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5 text-xs">
+                  {/* Total Contract Value */}
                   <div className="bg-white p-2.5 rounded-lg border border-[#DDE3DD]">
-                    <div className="text-[10.5px] text-[#6B7269] font-medium">Total Contract Value:</div>
+                    <div className="text-[10px] text-[#6B7269] font-medium">Contract Valuation:</div>
                     <div className="text-sm font-black font-mono text-[#1F3A2E] mt-0.5">
                       {selectedLead.currency === 'USD' ? '$' : '৳'}{selectedLead.estimatedValue.toLocaleString()}
                     </div>
                   </div>
 
+                  {/* Entity Commission */}
                   <div className="bg-[#FAF5FF] p-2.5 rounded-lg border border-[#D8B4FE]">
-                    <div className="text-[10.5px] text-[#7E22CE] font-bold">My Commission Payout:</div>
+                    <div className="text-[10px] text-[#7E22CE] font-bold">Entity Commission:</div>
                     <div className="text-sm font-black font-mono text-[#7E22CE] mt-0.5">
                       {selectedLead.currency === 'USD' ? '$' : '৳'}
                       {(selectedLead.commissionAmount || Math.round(selectedLead.estimatedValue * ((selectedLead.commissionRate || 10) / 100))).toLocaleString()}
                     </div>
                   </div>
 
-                  <div className="bg-white p-2.5 rounded-lg border border-[#DDE3DD]">
-                    <div className="text-[10.5px] text-[#6B7269] font-medium">Entity Settlement Status:</div>
-                    <div className="text-xs font-extrabold mt-1">
-                      {selectedLead.entityPayoutStatus === 'SETTLED' ? (
-                        <span className="text-[#15803D] flex items-center gap-1">
-                          <CheckCircle2 className="h-3.5 w-3.5" /> 100% Settled to Me
-                        </span>
-                      ) : selectedLead.entityPayoutStatus === 'READY_FOR_SETTLEMENT' ? (
-                        <span className="text-[#7E22CE] font-black">
-                          ⚡ Ready for Entity Payout
-                        </span>
-                      ) : (
-                        <span className="text-[#64748B]">
-                          ⏳ Awaiting Customer Pay
-                        </span>
-                      )}
+                  {/* Extra Direct Customer Contract Fee */}
+                  <div className="bg-[#F0FDF4] p-2.5 rounded-lg border border-[#86EFAC]">
+                    <div className="text-[10px] text-[#166534] font-bold">Direct Customer Fee:</div>
+                    <div className="text-sm font-black font-mono text-[#166534] mt-0.5">
+                      {selectedLead.currency === 'USD' ? '$' : '৳'}
+                      {(selectedLead.directCustomerFee || 0).toLocaleString()}
+                    </div>
+                  </div>
+
+                  {/* Total Personal Yield */}
+                  <div className="bg-[#FBF9F4] p-2.5 rounded-lg border-2 border-[#C8A96A]">
+                    <div className="text-[10px] text-[#8C6D2D] font-black uppercase">My Total Project Yield:</div>
+                    <div className="text-sm font-black font-mono text-[#8C6D2D] mt-0.5">
+                      {selectedLead.currency === 'USD' ? '$' : '৳'}
+                      {((selectedLead.commissionAmount || Math.round(selectedLead.estimatedValue * ((selectedLead.commissionRate || 10) / 100))) + (selectedLead.directCustomerFee || 0)).toLocaleString()}
                     </div>
                   </div>
                 </div>
 
-                {/* Step 1: Customer Payment Status Controller */}
-                <div className="pt-1">
-                  <div className="flex items-center justify-between text-xs font-bold text-[#556055] mb-1.5">
-                    <span>Step 1: Has Customer / Lead Paid {selectedLead.companyCode === 'ARIELMC' ? 'ArielMC' : selectedLead.companyCode === 'LINDA' ? 'Linda Resort' : 'Bizman Media'}?</span>
-                    <span className="text-[10px] text-[#6B7269] font-mono">Current: {selectedLead.customerPaymentStatus || 'PENDING'}</span>
+                {/* Stream 1: Entity Payout Lifecycle (Customer Pays Entity -> Entity Pays Me) */}
+                <div className="pt-1 border-t border-[#C8A96A]/30 space-y-2">
+                  <div className="flex items-center justify-between text-xs font-bold text-[#556055]">
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#7E22CE]" />
+                      <span>Stream A: Entity Commission Payout ({selectedLead.commissionRate || 10}%)</span>
+                    </span>
+                    <span className="text-[10px] font-mono text-[#6B7269]">
+                      Customer: {selectedLead.customerPaymentStatus || 'PENDING'} &bull; Entity: {selectedLead.entityPayoutStatus || 'AWAITING_CUSTOMER_PAYMENT'}
+                    </span>
                   </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleUpdateCustomerPayment(selectedLead.id, 'PENDING')}
-                      className={`py-1.5 px-2 rounded-lg text-xs font-bold border transition-all text-center ${
-                        (selectedLead.customerPaymentStatus || 'PENDING') === 'PENDING'
-                          ? 'bg-[#FEF3C7] text-[#B45309] border-[#FDE68A] shadow-xs'
-                          : 'bg-white border-[#DDE3DD] text-[#6B7269] hover:bg-[#F4F6F4]'
-                      }`}
-                    >
-                      Pending Customer Pay
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleUpdateCustomerPayment(selectedLead.id, 'PARTIAL')}
-                      className={`py-1.5 px-2 rounded-lg text-xs font-bold border transition-all text-center ${
-                        selectedLead.customerPaymentStatus === 'PARTIAL'
-                          ? 'bg-[#E0F2FE] text-[#0369A1] border-[#BAE6FD] shadow-xs'
-                          : 'bg-white border-[#DDE3DD] text-[#6B7269] hover:bg-[#F4F6F4]'
-                      }`}
-                    >
-                      Partial Advance Received
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleUpdateCustomerPayment(selectedLead.id, 'RECEIVED')}
-                      className={`py-1.5 px-2 rounded-lg text-xs font-black border transition-all text-center ${
-                        selectedLead.customerPaymentStatus === 'RECEIVED'
-                          ? 'bg-[#DCFCE7] text-[#15803D] border-[#86EFAC] shadow-xs ring-1 ring-[#15803D]'
-                          : 'bg-white border-[#DDE3DD] text-[#6B7269] hover:bg-[#F4F6F4]'
-                      }`}
-                    >
-                      ✓ Customer Paid in Full
-                    </button>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    {/* Customer -> Entity */}
+                    <div className="bg-white p-2 rounded-lg border border-[#DDE3DD] space-y-1">
+                      <div className="text-[10.5px] font-bold text-[#6B7269]">1. Customer Payment to {selectedLead.companyCode === 'ARIELMC' ? 'ArielMC' : selectedLead.companyCode === 'LINDA' ? 'Linda Resort' : 'Bizman'}:</div>
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateCustomerPayment(selectedLead.id, 'PENDING')}
+                          className={`flex-1 py-1 px-1.5 rounded text-[10.5px] font-bold border ${
+                            (selectedLead.customerPaymentStatus || 'PENDING') === 'PENDING'
+                              ? 'bg-[#FEF3C7] text-[#B45309] border-[#FDE68A]'
+                              : 'bg-white text-[#6B7269] border-[#DDE3DD]'
+                          }`}
+                        >
+                          Pending
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateCustomerPayment(selectedLead.id, 'PARTIAL')}
+                          className={`flex-1 py-1 px-1.5 rounded text-[10.5px] font-bold border ${
+                            selectedLead.customerPaymentStatus === 'PARTIAL'
+                              ? 'bg-[#E0F2FE] text-[#0369A1] border-[#BAE6FD]'
+                              : 'bg-white text-[#6B7269] border-[#DDE3DD]'
+                          }`}
+                        >
+                          Partial
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateCustomerPayment(selectedLead.id, 'RECEIVED')}
+                          className={`flex-1 py-1 px-1.5 rounded text-[10.5px] font-black border ${
+                            selectedLead.customerPaymentStatus === 'RECEIVED'
+                              ? 'bg-[#DCFCE7] text-[#15803D] border-[#86EFAC]'
+                              : 'bg-white text-[#6B7269] border-[#DDE3DD]'
+                          }`}
+                        >
+                          ✓ Paid
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Entity -> Syed Akramul Hassan */}
+                    <div className="bg-white p-2 rounded-lg border border-[#DDE3DD] space-y-1">
+                      <div className="text-[10.5px] font-bold text-[#6B7269]">2. Entity Commission Payout to Me:</div>
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateEntityPayout(selectedLead.id, 'READY_FOR_SETTLEMENT')}
+                          className={`flex-1 py-1 px-1.5 rounded text-[10.5px] font-bold border ${
+                            selectedLead.entityPayoutStatus === 'READY_FOR_SETTLEMENT'
+                              ? 'bg-[#F3E8FF] text-[#7E22CE] border-[#D8B4FE]'
+                              : 'bg-white text-[#6B7269] border-[#DDE3DD]'
+                          }`}
+                        >
+                          Ready Due
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateEntityPayout(selectedLead.id, 'SETTLED')}
+                          className={`flex-1 py-1 px-1.5 rounded text-[10.5px] font-black border ${
+                            selectedLead.entityPayoutStatus === 'SETTLED'
+                              ? 'bg-[#15803D] text-white border-[#15803D]'
+                              : 'bg-[#DCFCE7] text-[#15803D] border-[#86EFAC]'
+                          }`}
+                        >
+                          ✓ Settled to Me
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Step 2: Entity Payout to Syed Akramul Hassan Controller */}
-                <div className="pt-1 border-t border-[#C8A96A]/20">
-                  <div className="flex items-center justify-between text-xs font-bold text-[#556055] mb-1.5">
-                    <span>Step 2: Entity Payout / Settlement to Syed Akramul Hassan:</span>
-                    {selectedLead.entityPayoutStatus === 'READY_FOR_SETTLEMENT' && (
-                      <span className="text-[10px] text-[#7E22CE] font-bold animate-pulse">
-                        Ready to disburse!
-                      </span>
-                    )}
+                {/* Stream 2: Direct Contractual Customer Payment to Syed Akramul Hassan */}
+                <div className="pt-2 border-t border-[#C8A96A]/20 space-y-2">
+                  <div className="flex items-center justify-between text-xs font-bold text-[#556055]">
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#166534]" />
+                      <span>Stream B: Extra Contractual Payment Directly from Customer</span>
+                    </span>
+                    <span className="font-mono font-black text-[#166534]">
+                      {selectedLead.currency === 'USD' ? '$' : '৳'}{(selectedLead.directCustomerFee || 0).toLocaleString()}
+                    </span>
                   </div>
+
+                  <div className="bg-white p-2.5 rounded-lg border border-[#DDE3DD] flex items-center justify-between text-xs">
+                    <div>
+                      <div className="font-bold text-[#1F3A2E]">
+                        Customer Direct Fee: <span className="font-mono font-black text-[#166534]">{selectedLead.currency === 'USD' ? '$' : '৳'}{(selectedLead.directCustomerFee || 0).toLocaleString()}</span>
+                      </div>
+                      <div className="text-[10px] text-[#6B7269]">
+                        Contracted fee/retainer paid directly to Syed Akramul Hassan
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateDirectCustomerPayment(selectedLead.id, 'PENDING')}
+                        className={`px-3 py-1 rounded text-xs font-bold border transition-all ${
+                          (selectedLead.directCustomerPaymentStatus || 'PENDING') === 'PENDING'
+                            ? 'bg-[#FEF3C7] text-[#B45309] border-[#FDE68A]'
+                            : 'bg-white text-[#6B7269] border-[#DDE3DD]'
+                        }`}
+                      >
+                        Pending Direct Pay
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateDirectCustomerPayment(selectedLead.id, 'RECEIVED')}
+                        className={`px-3 py-1 rounded text-xs font-black border transition-all ${
+                          selectedLead.directCustomerPaymentStatus === 'RECEIVED'
+                            ? 'bg-[#15803D] text-white border-[#15803D] shadow-xs'
+                            : 'bg-[#DCFCE7] text-[#15803D] border-[#86EFAC]'
+                        }`}
+                      >
+                        ✓ Received Directly
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* =================================================================== */}
+              {/* PARALLEL ACTIVE PROJECTS WITH THIS CLIENT ORGANIZATION */}
+              {/* =================================================================== */}
+              <div className="rounded-xl border border-[#DDE3DD] bg-white p-4 space-y-3 shadow-xs">
+                <div className="flex flex-wrap items-center justify-between border-b border-[#DDE3DD] pb-2 gap-2">
                   <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleUpdateEntityPayout(selectedLead.id, 'AWAITING_CUSTOMER_PAYMENT')}
-                      className={`py-1.5 px-3 rounded-lg text-xs font-bold border transition-all text-center flex-1 ${
-                        selectedLead.entityPayoutStatus === 'AWAITING_CUSTOMER_PAYMENT'
-                          ? 'bg-[#F1F5F9] text-[#64748B] border-[#CBD5E1] shadow-xs'
-                          : 'bg-white border-[#DDE3DD] text-[#6B7269] hover:bg-[#F4F6F4]'
-                      }`}
-                    >
-                      Awaiting Customer Pay
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleUpdateEntityPayout(selectedLead.id, 'READY_FOR_SETTLEMENT')}
-                      className={`py-1.5 px-3 rounded-lg text-xs font-extrabold border transition-all text-center flex-1 ${
-                        selectedLead.entityPayoutStatus === 'READY_FOR_SETTLEMENT'
-                          ? 'bg-[#F3E8FF] text-[#7E22CE] border-[#D8B4FE] shadow-xs ring-1 ring-[#7E22CE]'
-                          : 'bg-white border-[#DDE3DD] text-[#6B7269] hover:bg-[#F4F6F4]'
-                      }`}
-                    >
-                      Ready for Settlement
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleUpdateEntityPayout(selectedLead.id, 'SETTLED')}
-                      className={`py-1.5 px-3 rounded-lg text-xs font-black border transition-all text-center flex-1 ${
-                        selectedLead.entityPayoutStatus === 'SETTLED'
-                          ? 'bg-[#15803D] text-white border-[#15803D] shadow-sm'
-                          : 'bg-[#DCFCE7] text-[#15803D] border-[#86EFAC] hover:bg-[#15803D] hover:text-white'
-                      }`}
-                    >
-                      ✓ Mark Entity Paid Me
-                    </button>
+                    <Layers className="h-4 w-4 text-[#C8A96A]" />
+                    <h3 className="text-xs font-extrabold text-[#1F3A2E] uppercase tracking-wide">
+                      Parallel Active Projects for <span className="text-[#1F5FA8]">{selectedLead.customerName}</span>
+                    </h3>
+                    <span className="rounded-full bg-[#E8F0FA] text-[#1F5FA8] px-2 py-0.5 text-[10px] font-bold">
+                      {leads.filter(l => l.customerName === selectedLead.customerName).length} Projects Running
+                    </span>
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleOpenParallelProjectModal(selectedLead)}
+                    className="flex items-center gap-1.5 rounded-lg bg-[#1F3A2E] hover:bg-[#2C5240] text-[#C8A96A] px-2.5 py-1 text-[11px] font-bold transition-all shadow-xs"
+                    title={`Create another parallel project for ${selectedLead.customerName} with different contact person`}
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    <span>+ Add Parallel Project</span>
+                  </button>
+                </div>
+
+                {/* List of Parallel Projects for this Customer */}
+                <div className="space-y-2">
+                  {leads
+                    .filter(l => l.customerName === selectedLead.customerName)
+                    .map((proj) => {
+                      const isCurrent = proj.id === selectedLead.id;
+                      const projYield = (proj.commissionAmount || Math.round(proj.estimatedValue * ((proj.commissionRate || 10) / 100))) + (proj.directCustomerFee || 0);
+
+                      return (
+                        <div
+                          key={proj.id}
+                          onClick={() => handleSelectLead(proj)}
+                          className={`cursor-pointer rounded-lg p-2.5 transition-all border text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 ${
+                            isCurrent
+                              ? 'bg-[#F4F6F4] border-[#1F3A2E] ring-1 ring-[#1F3A2E]'
+                              : 'bg-white border-[#DDE3DD] hover:border-[#1F3A2E]'
+                          }`}
+                        >
+                          <div className="space-y-0.5 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-extrabold text-[#1F3A2E] truncate">
+                                {proj.projectName || proj.title}
+                              </span>
+                              {isCurrent && (
+                                <span className="text-[9px] font-black uppercase text-[#1F3A2E] bg-[#DDE3DD] px-1.5 py-0.2 rounded">
+                                  Current
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-[11px] text-[#6B7269]">
+                              Dedicated Contact: <strong className="text-[#1A1A1A]">{proj.contactPerson}</strong> &bull; {proj.phone}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-3 shrink-0">
+                            <div className="text-right">
+                              <div className="font-mono font-bold text-[11px] text-[#556055]">
+                                {proj.currency === 'USD' ? '$' : '৳'}{proj.estimatedValue.toLocaleString()}
+                              </div>
+                              <div className="font-mono font-black text-xs text-[#8C6D2D]">
+                                Yield: {proj.currency === 'USD' ? '$' : '৳'}{projYield.toLocaleString()}
+                              </div>
+                            </div>
+
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                              STAGE_CONFIG[proj.stage]?.badge || 'bg-gray-100'
+                            }`}>
+                              {STAGE_CONFIG[proj.stage]?.label || proj.stage}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
 
@@ -854,7 +1040,7 @@ export default function LeadsPage() {
                   <th className="py-3 px-4">Stage</th>
                   <th className="py-3 px-4">Contract Value</th>
                   <th className="py-3 px-4 text-center">Comm %</th>
-                  <th className="py-3 px-4">My Commission</th>
+                  <th className="py-3 px-4">My Total Yield</th>
                   <th className="py-3 px-4">Customer Pay</th>
                   <th className="py-3 px-4">Entity Payout</th>
                   <th className="py-3 px-4 text-right">Actions</th>
@@ -907,9 +1093,16 @@ export default function LeadsPage() {
                         </span>
                       </td>
 
-                      {/* My Commission */}
-                      <td className="py-3.5 px-4 font-mono font-black text-[#8C6D2D] text-xs">
-                        {lead.currency === 'USD' ? '$' : '৳'}{commAmount.toLocaleString()}
+                      {/* My Personal Yield (Comm + Direct Cust Fee) */}
+                      <td className="py-3.5 px-4 font-mono font-black text-xs">
+                        <div className="text-[#8C6D2D]">
+                          {lead.currency === 'USD' ? '$' : '৳'}{(commAmount + (lead.directCustomerFee || 0)).toLocaleString()}
+                        </div>
+                        {(lead.directCustomerFee || 0) > 0 && (
+                          <div className="text-[10px] text-[#166534] font-semibold">
+                            +{lead.currency === 'USD' ? '$' : '৳'}{(lead.directCustomerFee || 0).toLocaleString()} direct
+                          </div>
+                        )}
                       </td>
 
                       {/* Customer Payment Status */}
@@ -1053,12 +1246,19 @@ export default function LeadsPage() {
                               {lead.customerName}
                             </div>
 
-                            {/* My Commission Pill */}
+                            {/* My Yield Pill */}
                             <div className="rounded bg-[#FBF9F4] border border-[#C8A96A]/40 px-2 py-1 flex items-center justify-between text-[10px]">
-                              <span className="font-bold text-[#8C6D2D]">My Comm ({commRate}%):</span>
-                              <span className="font-mono font-black text-[#8C6D2D]">
-                                {lead.currency === 'USD' ? '$' : '৳'}{commAmount.toLocaleString()}
-                              </span>
+                              <span className="font-bold text-[#8C6D2D]">My Yield:</span>
+                              <div className="text-right">
+                                <span className="font-mono font-black text-[#8C6D2D]">
+                                  {lead.currency === 'USD' ? '$' : '৳'}{(commAmount + (lead.directCustomerFee || 0)).toLocaleString()}
+                                </span>
+                                {(lead.directCustomerFee || 0) > 0 && (
+                                  <span className="text-[9px] text-[#166534] font-bold block">
+                                    +{lead.currency === 'USD' ? '$' : '৳'}{(lead.directCustomerFee || 0).toLocaleString()} direct
+                                  </span>
+                                )}
+                              </div>
                             </div>
 
                             <div className="flex items-center justify-between border-t border-[#DDE3DD] pt-2 text-[10px]">
@@ -1342,17 +1542,53 @@ export default function LeadsPage() {
                   </div>
                 </div>
 
-                {/* Real-time Calculation Projection */}
-                <div className="rounded-lg bg-white border border-[#C8A96A]/40 p-2.5 flex items-center justify-between text-xs">
+                {/* Extra Direct Contractual Payment from Customer */}
+                <div className="pt-2 border-t border-[#C8A96A]/30">
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block font-black text-[#1F3A2E] text-xs">
+                      Extra Direct Contractual Payment from Customer (Optional)
+                    </label>
+                    <span className="text-[10px] text-[#166534] font-bold">
+                      Direct Retainer / Advisory Fee
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="0"
+                      value={formData.directCustomerFee}
+                      onChange={(e) => setFormData({ ...formData, directCustomerFee: Number(e.target.value) })}
+                      placeholder="e.g. 50000"
+                      className="w-full rounded-lg border border-[#DDE3DD] bg-white p-2 pr-12 text-xs font-mono font-bold text-[#166534] focus:outline-none focus:ring-1 focus:ring-[#166534]"
+                    />
+                    <span className="absolute right-3 top-2 text-[#6B7269] font-mono text-xs">
+                      {formData.currency}
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-[#6B7269] mt-0.5">
+                    Contracted fee or retainer paid directly by Customer to Syed Akramul Hassan (separate from entity commission).
+                  </p>
+                </div>
+
+                {/* Combined Total Personal Yield Box */}
+                <div className="rounded-lg bg-gradient-to-r from-[#FBF9F4] to-white border-2 border-[#C8A96A] p-3 flex items-center justify-between text-xs">
                   <div>
-                    <span className="text-[#6B7269] text-[11px]">My Projected Executive Commission:</span>
-                    <div className="font-mono font-black text-sm text-[#8C6D2D] mt-0.5">
+                    <span className="text-[#8C6D2D] font-extrabold text-[11px] uppercase tracking-wide">
+                      My Total Realizable Project Yield:
+                    </span>
+                    <div className="font-mono font-black text-base text-[#1F3A2E] mt-0.5">
                       {formData.currency === 'USD' ? '$' : '৳'}
-                      {Math.round((Number(formData.estimatedValue) || 0) * ((Number(formData.commissionRate) || 0) / 100)).toLocaleString()}
+                      {(
+                        Math.round((Number(formData.estimatedValue) || 0) * ((Number(formData.commissionRate) || 0) / 100)) +
+                        (Number(formData.directCustomerFee) || 0)
+                      ).toLocaleString()}
                     </div>
                   </div>
-                  <div className="text-[10px] text-[#6B7269] text-right max-w-[200px]">
-                    Payable to Syed Akramul Hassan once Customer payment is received
+                  <div className="text-[10px] text-right text-[#6B7269] space-y-0.5">
+                    <div>Entity Commission: <strong className="text-[#8C6D2D]">{formData.currency === 'USD' ? '$' : '৳'}{Math.round((Number(formData.estimatedValue) || 0) * ((Number(formData.commissionRate) || 0) / 100)).toLocaleString()}</strong></div>
+                    {(Number(formData.directCustomerFee) || 0) > 0 && (
+                      <div>Direct Cust Fee: <strong className="text-[#166534]">+{formData.currency === 'USD' ? '$' : '৳'}{(Number(formData.directCustomerFee) || 0).toLocaleString()}</strong></div>
+                    )}
                   </div>
                 </div>
               </div>

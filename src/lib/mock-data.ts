@@ -32,10 +32,14 @@ export const INITIAL_LEADS: LeadItem[] = [
     customerPaymentStatus: 'RECEIVED',
     entityPayoutStatus: 'READY_FOR_SETTLEMENT',
     payoutAmountReceived: 0,
+    directCustomerFee: 65000,
+    directCustomerPaymentStatus: 'RECEIVED',
+    projectName: 'Ramadan Nationwide DOOH Screens',
     notepadMarkdown: `### Grameenphone Campaign Brief
 - **Target Screens:** 15 Own LED screens in Dhaka (Dhanmondi, Gulshan, Banani, Uttara) + 25 Vendor screens in Chittagong & Sylhet.
 - **Duration:** 30 Days (Ramadan Festive Rush).
 - **Slot Requirements:** 10-sec spots every 2 minutes (720 impressions/day per screen).
+- **Direct Customer Contract:** ৳ 65,000 direct campaign advisory & monitoring fee contracted directly with Grameenphone media team.
 - **Meeting Note:** Sajjad requested 8% bundle discount if we include Gulshan-2 mega screen. Agreed tentatively pending vendor cost verification.`,
     specifics: {
       ownBoards: 15,
@@ -44,6 +48,43 @@ export const INITIAL_LEADS: LeadItem[] = [
       campaignDays: 30,
     },
     createdAt: '2026-10-18',
+  },
+  {
+    id: 'lead-biz-1b',
+    companyCode: 'BIZMAN',
+    title: 'Grameenphone Post-Eid 5G Launch Billboard Rollout',
+    customerName: 'Grameenphone Bangladesh Ltd',
+    contactPerson: 'Tanveer Ahmed (Network & Commercial Marketing Director)',
+    phone: '+8801711998877',
+    whatsapp: '8801711998877',
+    email: 'tanveer.ahmed@grameenphone.com',
+    country: 'Bangladesh',
+    pipelineType: 'DOOH_MEDIA_SLOT',
+    stage: 'MEETING_SCHEDULED',
+    estimatedValue: 3600000,
+    currency: 'BDT',
+    probability: 60,
+    expectedCloseDate: '2026-12-05',
+    commissionRate: 10,
+    commissionAmount: 360000,
+    customerPaymentStatus: 'PENDING',
+    entityPayoutStatus: 'AWAITING_CUSTOMER_PAYMENT',
+    payoutAmountReceived: 0,
+    directCustomerFee: 50000,
+    directCustomerPaymentStatus: 'PENDING',
+    projectName: '5G Nationwide Brand Launch',
+    notepadMarkdown: `### Grameenphone Parallel Project: 5G Network Launch
+- **Client Organization:** Grameenphone Bangladesh Ltd (Parallel Project #2)
+- **Dedicated Project Contact:** Tanveer Ahmed (Director, Commercial Marketing)
+- **Direct Contractual Fee:** ৳ 50,000 technical screen calibration fee direct from GP.
+- **Bizman Commission:** 10% on ৳ 3.6M (৳ 360,000).`,
+    specifics: {
+      ownBoards: 12,
+      vendorBoards: 18,
+      slotsPerDay: 600,
+      campaignDays: 45,
+    },
+    createdAt: '2026-10-24',
   },
   {
     id: 'lead-biz-2',
@@ -165,10 +206,15 @@ export const INITIAL_LEADS: LeadItem[] = [
     customerPaymentStatus: 'RECEIVED',
     entityPayoutStatus: 'READY_FOR_SETTLEMENT',
     payoutAmountReceived: 0,
+    directCustomerFee: 3500,
+    directCustomerPaymentStatus: 'RECEIVED',
+    projectName: '25,000 Pcs Organic Jute Tote Bags',
     notepadMarkdown: `### EcoLiving UK Order Details
 - **Product:** 100% Biodegradable Laminated Jute Beach Bags with cotton rope handles.
 - **Quantity:** 25,000 Units.
-- **Target FOB Price:** $3.12 / pc Chittagong Port.
+- **Target FOB Price:** $3.12 / pc Chittagong Port ($78,000 USD).
+- **Direct Buyer Contract:** $3,500 USD direct buyer QA inspection & export compliance retainer paid directly to Syed Akramul Hassan.
+- **ArielMC Commission:** 8% ($6,240 USD) payable once L/C payment is released to ArielMC.
 - **Payment Terms:** 30% advance T/T, 70% against Bill of Lading (BL) copy.
 - **Audit Requirement:** SEDEX Smeta 4-pillar audit report shared and approved.
 - **Samples:** Express DHL courier dispatched on Oct 20. Delivered & approved.`,
@@ -179,6 +225,42 @@ export const INITIAL_LEADS: LeadItem[] = [
       material: '14x15 Yarn Natural Jute',
     },
     createdAt: '2026-10-12',
+  },
+  {
+    id: 'lead-amc-1b',
+    companyCode: 'ARIELMC',
+    title: 'EcoLiving UK - Hand-Braided Jute & Hemp Floor Rugs (Consignment #2)',
+    customerName: 'EcoLiving Retail Goods UK Ltd',
+    contactPerson: 'Emma Watson (Home Decor Procurement Lead)',
+    phone: '+442079460883',
+    whatsapp: '442079460883',
+    email: 'emma.decor@ecoliving-uk.co.uk',
+    country: 'United Kingdom',
+    pipelineType: 'EXPORT_HOME_TEXTILES',
+    stage: 'PROPOSAL_SENT',
+    estimatedValue: 45000,
+    currency: 'USD',
+    probability: 70,
+    expectedCloseDate: '2026-11-25',
+    commissionRate: 10,
+    commissionAmount: 4500,
+    customerPaymentStatus: 'PENDING',
+    entityPayoutStatus: 'AWAITING_CUSTOMER_PAYMENT',
+    payoutAmountReceived: 0,
+    directCustomerFee: 2000,
+    directCustomerPaymentStatus: 'PENDING',
+    projectName: 'Hand-Braided Floor Rugs (Consignment #2)',
+    notepadMarkdown: `### EcoLiving UK Parallel Project #2: Floor Rugs
+- **Client Organization:** EcoLiving Retail Goods UK Ltd (Parallel Project running alongside Jute Bags)
+- **Dedicated Project Contact:** Emma Watson (Home Decor Procurement Lead)
+- **Direct Buyer Fee:** $2,000 USD artisan design curation fee direct from EcoLiving.
+- **ArielMC Commission:** 10% on $45,000 USD ($4,500 USD).`,
+    specifics: {
+      orderQuantityPcs: 1200,
+      unitPriceUSD: 37.50,
+      material: 'Organic Jute + Hemp Yarn',
+    },
+    createdAt: '2026-10-22',
   },
   {
     id: 'lead-amc-2',

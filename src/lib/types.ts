@@ -116,6 +116,11 @@ export interface LeadItem {
   customerPaymentStatus: CustomerPaymentStatus;
   entityPayoutStatus: EntityPayoutStatus;
   payoutAmountReceived?: number;
+
+  // Extra Direct Contractual Payment from Customer to Syed Akramul Hassan
+  directCustomerFee?: number; // e.g. 50000 (direct contract fee/advisory from Customer)
+  directCustomerPaymentStatus?: 'PENDING' | 'RECEIVED';
+  projectName?: string; // Sub-project or specific campaign name under the parent client
 }
 
 export type ExpensePayer = 'MY_PERSONAL_FUNDS' | 'ENTITY_DIRECT';
