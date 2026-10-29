@@ -142,8 +142,8 @@ export default function Sidebar() {
                 )}
 
                 {activeCompany === 'LINDA' && (
-                  <div className="h-10 w-22 rounded-lg overflow-hidden border border-[var(--sidebar-border)] bg-black shrink-0 px-1.5 py-0.5 flex items-center justify-center shadow">
-                    <img src="/logos/linda-logo.png" alt="Linda Resort" className="w-full h-auto object-contain scale-110" />
+                  <div className="h-9 px-2.5 rounded-lg overflow-hidden border border-[var(--sidebar-border)] bg-black shrink-0 flex items-center justify-center shadow">
+                    <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-6 w-auto object-contain" />
                   </div>
                 )}
 
@@ -155,8 +155,8 @@ export default function Sidebar() {
                     <div className="h-7 w-7 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-[#0D3B29] p-0.5 shadow flex items-center justify-center">
                       <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-full w-full object-contain" />
                     </div>
-                    <div className="h-7 w-11 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-black p-0.5 shadow flex items-center justify-center">
-                      <img src="/logos/linda-logo.png" alt="Linda" className="w-full h-auto object-contain scale-110" />
+                    <div className="h-7 px-1.5 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-black shadow flex items-center justify-center shrink-0">
+                      <img src="/logos/linda-logo.png" alt="Linda" className="h-4 w-auto object-contain" />
                     </div>
                   </div>
                 )}
