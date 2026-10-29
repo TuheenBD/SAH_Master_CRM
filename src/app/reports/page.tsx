@@ -635,7 +635,7 @@ ${specificContent}
                   <img src="/logos/bizman-logo.jpg" alt="Bizman Media" className="h-full w-full object-contain" />
                 </div>
                 {/* 3. Linda Resort */}
-                <div className="h-10 px-2.5 rounded-lg overflow-hidden border border-[#DDE3DD] bg-black flex items-center justify-center shadow-xs shrink-0" title="Linda Resort Limited">
+                <div className="h-10 px-2.5 rounded-lg overflow-hidden border border-[#DDE3DD] bg-[#112717] flex items-center justify-center shadow-xs shrink-0" title="Linda Resort Limited">
                   <img src="/logos/linda-logo.png" alt="Linda Resort Limited" className="h-7 w-auto object-contain" />
                 </div>
               </div>

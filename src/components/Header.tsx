@@ -96,7 +96,7 @@ export default function Header() {
             </div>
           )}
           {activeCompany === 'LINDA' && (
-            <div className="h-9 px-2.5 rounded-lg overflow-hidden border border-[var(--header-border)] bg-black shadow flex items-center justify-center shrink-0">
+            <div className="h-9 px-2.5 rounded-lg overflow-hidden border border-[var(--header-border)] bg-[#112717] shadow flex items-center justify-center shrink-0">
               <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-7 w-auto object-contain" />
             </div>
           )}

@@ -401,16 +401,16 @@ main .border-\[\#C8A96A\] {
 }
 
 /* Text Overrides for High Contrast Light Canvas (Excluding Dark Cards/Containers) */
-main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-black"]) > p.text-white,
-main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-black"]) > h1.text-white,
-main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-black"]) > h2.text-white,
-main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-black"]) > h3.text-white,
-main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-black"]) > h4.text-white,
-main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-black"]) > span.text-white:not([class*="bg-"]):not([class*="rounded"]):not([class*="badge"]),
-main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-black"]) > td.text-white,
-main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-black"]) > div.text-white:not([class*="bg-"]):not([class*="btn"]):not([class*="badge"]),
-main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-black"]) > .text-slate-100,
-main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-black"]) > .text-slate-200 {
+main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-[#112717]"]):not([class*="bg-black"]) > p.text-white,
+main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-[#112717]"]):not([class*="bg-black"]) > h1.text-white,
+main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-[#112717]"]):not([class*="bg-black"]) > h2.text-white,
+main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-[#112717]"]):not([class*="bg-black"]) > h3.text-white,
+main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-[#112717]"]):not([class*="bg-black"]) > h4.text-white,
+main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-[#112717]"]):not([class*="bg-black"]) > span.text-white:not([class*="bg-"]):not([class*="rounded"]):not([class*="badge"]),
+main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-[#112717]"]):not([class*="bg-black"]) > td.text-white,
+main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-[#112717]"]):not([class*="bg-black"]) > div.text-white:not([class*="bg-"]):not([class*="btn"]):not([class*="badge"]),
+main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-[#112717]"]):not([class*="bg-black"]) > .text-slate-100,
+main :not([class*="bg-[#1F3A2E]"]):not([class*="bg-[#0D3B29]"]):not([class*="bg-[#0A1628]"]):not([class*="bg-[#112717]"]):not([class*="bg-black"]) > .text-slate-200 {
   color: var(--main-text) !important;
 }
 
@@ -424,6 +424,7 @@ main [class*="bg-[#1F3A2E]"] [class*="text-[#FDFBF7]"],
 main [class*="bg-[#1F3A2E]"] [class*="text-white"],
 main [class*="bg-[#0D3B29]"] .text-white,
 main [class*="bg-[#0A1628]"] .text-white,
+main [class*="bg-[#112717]"] .text-white,
 main [class*="bg-black"] .text-white {
   color: #FFFFF0 !important;
 }

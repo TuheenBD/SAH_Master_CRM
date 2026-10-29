@@ -88,7 +88,7 @@ export default function MasterDashboard() {
               </div>
             )}
             {activeCompany === 'LINDA' && (
-              <div className="h-16 w-40 rounded-xl overflow-hidden border border-[#DDE3DD] bg-black p-2 shadow-sm flex items-center justify-center shrink-0">
+              <div className="h-16 w-44 rounded-xl overflow-hidden border border-[#DDE3DD] bg-[#112717] p-2 shadow-sm flex items-center justify-center shrink-0">
                 <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-full w-auto object-contain" />
               </div>
             )}
@@ -109,8 +109,8 @@ export default function MasterDashboard() {
                   <div className="h-12 w-12 rounded-xl overflow-hidden border border-[#DDE3DD] bg-[#0D3B29] p-1 shadow-sm flex items-center justify-center">
                     <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-full w-full object-contain" />
                   </div>
-                  <div className="h-12 px-2.5 rounded-xl overflow-hidden border border-[#DDE3DD] bg-black shadow-sm flex items-center justify-center shrink-0">
-                    <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-6 w-auto object-contain" />
+                  <div className="h-12 px-2.5 rounded-xl overflow-hidden border border-[#DDE3DD] bg-[#112717] shadow-sm flex items-center justify-center shrink-0">
+                    <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-7 w-auto object-contain" />
                   </div>
                 </div>
               </div>

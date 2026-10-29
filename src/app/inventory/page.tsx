@@ -374,7 +374,7 @@ export default function InventoryPage() {
         <div className="space-y-4 pt-6 border-t border-slate-800">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="h-10 px-2.5 rounded-lg overflow-hidden border border-[#DDE3DD] bg-black shadow flex items-center justify-center shrink-0">
+              <div className="h-10 px-2.5 rounded-lg overflow-hidden border border-[#DDE3DD] bg-[#112717] shadow flex items-center justify-center shrink-0">
                 <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-7 w-auto object-contain" />
               </div>
               <h2 className="text-base font-bold text-white">
