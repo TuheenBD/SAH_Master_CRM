@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { 
   FolderKanban, 
@@ -41,7 +41,8 @@ import {
   UserCheck, 
   AlertTriangle,
   MessageSquare,
-  FileCheck2
+  FileCheck2,
+  RotateCcw
 } from 'lucide-react';
 import { 
   DocumentRecord, 
@@ -76,6 +77,54 @@ export default function DocumentCenterPage() {
   const [deleteConfirmDoc, setDeleteConfirmDoc] = useState<DocumentRecord | null>(null);
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+
+  // Persistent Storage in Browser & Feedback
+  const [isLoadedFromStorage, setIsLoadedFromStorage] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [newlySavedId, setNewlySavedId] = useState<string | null>(null);
+
+  // Auto-dismiss toast
+  useEffect(() => {
+    if (!toastMessage) return;
+    const timer = setTimeout(() => setToastMessage(null), 5000);
+    return () => clearTimeout(timer);
+  }, [toastMessage]);
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('sah_master_crm_documents_v2');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setDocuments(parsed);
+        }
+      }
+    } catch (e) {
+      console.warn('Could not read documents from localStorage', e);
+    } finally {
+      setIsLoadedFromStorage(true);
+    }
+  }, []);
+
+  // Sync to localStorage on change
+  useEffect(() => {
+    if (!isLoadedFromStorage) return;
+    try {
+      localStorage.setItem('sah_master_crm_documents_v2', JSON.stringify(documents));
+    } catch (err) {
+      console.warn('Quota exceeded saving full documents, persisting without large dataUrls', err);
+      try {
+        const stripped = documents.map(d => ({
+          ...d,
+          fileDataUrl: d.fileDataUrl && d.fileDataUrl.length < 200000 ? d.fileDataUrl : undefined
+        }));
+        localStorage.setItem('sah_master_crm_documents_v2', JSON.stringify(stripped));
+      } catch (err2) {
+        console.error('LocalStorage persistence failed', err2);
+      }
+    }
+  }, [documents, isLoadedFromStorage]);
 
   // File Upload Drag & Drop State
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -233,12 +282,19 @@ export default function DocumentCenterPage() {
 
   const handleSubmitUpload = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title.trim()) return;
+
+    // Auto-generate safe title if blank
+    const autoTitle = formData.title.trim() || 
+      (formData.fileName ? formData.fileName.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ') : '') || 
+      'Vault Document';
+
+    const safeTitle = autoTitle.charAt(0).toUpperCase() + autoTitle.slice(1);
+    const safeFileName = formData.fileName.trim() || `${safeTitle.toLowerCase().replace(/\s+/g, '-')}.${formData.fileType.toLowerCase()}`;
 
     const newDoc: DocumentRecord = {
       id: `doc-${Date.now()}`,
-      title: formData.title.trim(),
-      fileName: formData.fileName.trim() || `${formData.title.toLowerCase().replace(/\s+/g, '-')}.${formData.fileType.toLowerCase()}`,
+      title: safeTitle,
+      fileName: safeFileName,
       fileSize: formData.fileSize || '1.2 MB',
       fileType: formData.fileType,
       companyCode: formData.companyCode,
@@ -254,8 +310,19 @@ export default function DocumentCenterPage() {
       fileDataUrl: formData.fileDataUrl || undefined,
     };
 
-    setDocuments([newDoc, ...documents]);
+    setDocuments(prev => [newDoc, ...prev]);
     setIsUploadModalOpen(false);
+    setNewlySavedId(newDoc.id);
+
+    // Switch view to ensure the user immediately sees their uploaded doc
+    if (selectedEntity !== 'CONSOLIDATED' && selectedEntity !== newDoc.companyCode) {
+      setSelectedEntity(newDoc.companyCode);
+    }
+    if (selectedCategory !== 'ALL' && selectedCategory !== newDoc.category) {
+      setSelectedCategory('ALL');
+    }
+
+    setToastMessage(`Document "${safeTitle}" successfully saved and verified in your secure vault.`);
   };
 
   // Edit Handlers
@@ -282,11 +349,13 @@ export default function DocumentCenterPage() {
     e.preventDefault();
     if (!editingDoc) return;
 
+    const safeTitle = formData.title.trim() || editingDoc.title;
+
     setDocuments(prev => prev.map(d => {
       if (d.id === editingDoc.id) {
         return {
           ...d,
-          title: formData.title.trim(),
+          title: safeTitle,
           fileName: formData.fileName.trim() || d.fileName,
           fileSize: formData.fileSize || d.fileSize,
           fileType: formData.fileType,
@@ -304,6 +373,8 @@ export default function DocumentCenterPage() {
     }));
 
     setEditingDoc(null);
+    setNewlySavedId(editingDoc.id);
+    setToastMessage(`Document "${safeTitle}" updated successfully.`);
   };
 
   // Dedicated Real Vault File Downloader
@@ -673,15 +744,30 @@ Transmitted securely via Syed Akramul Hassan - Personal CRM Sovereign Enclave
   // Delete Handlers
   const handleConfirmDelete = () => {
     if (!deleteConfirmDoc) return;
+    const title = deleteConfirmDoc.title;
     setDocuments(prev => prev.filter(d => d.id !== deleteConfirmDoc.id));
     setSelectedIds(prev => prev.filter(id => id !== deleteConfirmDoc.id));
     setDeleteConfirmDoc(null);
+    setToastMessage(`Document "${title}" removed from vault.`);
   };
 
   const handleConfirmBulkDelete = () => {
+    const count = selectedIds.length;
     setDocuments(prev => prev.filter(d => !selectedIds.includes(d.id)));
     setSelectedIds([]);
     setBulkDeleteConfirmOpen(false);
+    setToastMessage(`${count} documents removed from vault.`);
+  };
+
+  // Restore Factory Preset Documents
+  const handleRestoreDefaults = () => {
+    if (window.confirm('Restore standard repository templates? (Your custom uploaded documents will reset to factory preset)')) {
+      setDocuments(INITIAL_DOCUMENTS);
+      try {
+        localStorage.removeItem('sah_master_crm_documents_v2');
+      } catch (e) {}
+      setToastMessage('Default vault documents restored.');
+    }
   };
 
   // WhatsApp & Share Message Generator
@@ -790,6 +876,16 @@ Attested: Syed Akramul Hassan`;
             </button>
           </div>
 
+          {/* Reset Templates Option */}
+          <button
+            onClick={handleRestoreDefaults}
+            title="Restore standard sample templates"
+            className="hidden sm:flex items-center gap-1.5 rounded-lg border border-[#DDE3DD] bg-white hover:bg-[#F4F6F4] text-[#6B7269] hover:text-[#1A1A1A] px-2.5 py-2 text-xs font-semibold shadow-xs"
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+            <span>Reset Defaults</span>
+          </button>
+
           {/* Primary Action: Upload Document */}
           <button
             onClick={handleOpenUpload}
@@ -800,6 +896,24 @@ Attested: Syed Akramul Hassan`;
           </button>
         </div>
       </div>
+
+      {/* Toast Notification Alert */}
+      {toastMessage && (
+        <div className="flex items-center justify-between gap-3 bg-emerald-50 border border-emerald-300 text-emerald-950 px-4 py-3 rounded-xl shadow-xs transition-all animate-in fade-in">
+          <div className="flex items-center gap-2.5 text-xs font-semibold">
+            <div className="h-6 w-6 rounded-full bg-emerald-700 text-white flex items-center justify-center shrink-0">
+              <Check className="h-3.5 w-3.5" />
+            </div>
+            <span>{toastMessage}</span>
+          </div>
+          <button 
+            onClick={() => setToastMessage(null)}
+            className="text-emerald-800 hover:text-emerald-950 text-xs font-bold px-2 py-1"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* =================================================================== */}
       {/* 2. EXECUTIVE REPOSITORY METRICS OVERVIEW */}
@@ -1108,6 +1222,12 @@ Attested: Syed Akramul Hassan`;
                     }`}>
                       {doc.companyCode === 'ARIELMC' ? 'ArielMC' : doc.companyCode === 'LINDA' ? 'Linda Resort' : doc.companyCode}
                     </span>
+
+                    {newlySavedId === doc.id && (
+                      <span className="inline-flex items-center gap-1 rounded bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 text-[9px] font-extrabold animate-pulse">
+                        <Check className="h-3 w-3" /> Just Saved
+                      </span>
+                    )}
                   </div>
 
                   {/* Security Badge */}
@@ -1267,6 +1387,11 @@ Attested: Syed Akramul Hassan`;
                         >
                           <div className="shrink-0">{getFileIcon(doc.fileType)}</div>
                           <span>{doc.title}</span>
+                          {newlySavedId === doc.id && (
+                            <span className="inline-flex items-center gap-1 rounded bg-emerald-100 text-emerald-800 border border-emerald-300 px-1.5 py-0.5 text-[9px] font-extrabold animate-pulse">
+                              <Check className="h-2.5 w-2.5" /> Just Saved
+                            </span>
+                          )}
                         </div>
                         <div className="text-[11px] font-mono text-[#6B7269] pl-7">{doc.fileName}</div>
                       </td>
@@ -1469,10 +1594,11 @@ Attested: Syed Akramul Hassan`;
               </div>
 
               <div>
-                <label className="text-[#556055] font-bold block mb-1">Document Title *</label>
+                <label className="text-[#556055] font-bold block mb-1">
+                  Document Title <span className="text-[#8F9E8F] text-[10px] font-normal font-sans">(Auto-fills from file if blank)</span>
+                </label>
                 <input
                   type="text"
-                  required
                   placeholder="e.g. Irrevocable Commercial Letter of Credit (LC)"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
@@ -1624,10 +1750,9 @@ Attested: Syed Akramul Hassan`;
 
             <form onSubmit={handleSubmitEdit} className="space-y-4 text-xs">
               <div>
-                <label className="text-[#556055] font-bold block mb-1">Document Title *</label>
+                <label className="text-[#556055] font-bold block mb-1">Document Title</label>
                 <input
                   type="text"
-                  required
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   className="w-full rounded-lg border border-[#DDE3DD] p-2 text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
