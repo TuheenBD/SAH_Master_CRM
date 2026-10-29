@@ -103,7 +103,7 @@ export default function Sidebar() {
                   </div>
                   <div>
                     <div className="font-extrabold text-xs text-white tracking-tight flex items-center gap-1.5">
-                      <span>MASTER</span>
+                      <span>PERSONAL</span>
                       <span className="text-[var(--sidebar-active-text)] font-extrabold">CRM</span>
                       <span className="h-1.5 w-1.5 rounded-full bg-[var(--sidebar-active-text)]" />
                     </div>

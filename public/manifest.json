@@ -1,7 +1,7 @@
 {
-  "name": "Master CRM — Syed Akramul Hassan",
-  "short_name": "Master CRM",
-  "description": "Multi-Company Personal Business & Financial Operating System",
+  "name": "Syed Akramul Hassan - Personal CRM",
+  "short_name": "Personal CRM",
+  "description": "Syed Akramul Hassan - Personal CRM",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1F3A2E",
@@ -19,4 +19,3 @@
     }
   ]
 }
-

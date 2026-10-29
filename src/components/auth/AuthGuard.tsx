@@ -257,10 +257,10 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
                 <span>&bull;</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white mt-1">
-                MASTER <span className="text-[#C8A96A]">CRM</span>
+                Personal <span className="text-[#C8A96A]">CRM</span>
               </h1>
               <p className="text-[11px] text-[#9BB1A6] mt-1 font-medium">
-                Executive Operating System &bull; ArielMC &bull; Bizman Media &bull; Linda Resort
+                Syed Akramul Hassan &bull; Personal CRM
               </p>
             </div>
 
@@ -443,10 +443,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         {/* Bottom Footer: Official Executive Signature */}
         <div className="relative z-10 text-center text-xs text-[#6B7269] space-y-1 max-w-lg mx-auto w-full pt-4">
           <div className="text-[10px] text-[#C8A96A] font-serif tracking-widest uppercase font-semibold">
-            OFFICIALLY COMMISSIONED FOR MANAGING DIRECTOR & FOUNDER
-          </div>
-          <div className="text-[10px] font-mono text-[#4A6356]">
-            ArielMC &bull; Bizman Media Limited &bull; Linda Resort Limited
+            SYED AKRAMUL HASSAN &bull; PERSONAL CRM
           </div>
         </div>
       </div>
