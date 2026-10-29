@@ -17,6 +17,7 @@ import {
   Edit2, 
   Share2, 
   Download, 
+  Printer,
   Eye, 
   CheckSquare, 
   Square, 
@@ -345,6 +346,325 @@ Transmitted securely via Syed Akramul Hassan - Personal CRM Sovereign Enclave
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+    }
+
+    setDocuments(prev => prev.map(d => d.id === doc.id ? { ...d, downloadCount: (d.downloadCount || 0) + 1 } : d));
+  };
+
+  // Open Document in External Window with Executive Print & PDF Layout
+  const handleOpenExternalPrintPreview = (doc: DocumentRecord, autoPrint = false) => {
+    const printWindow = window.open('', '_blank', 'width=920,height=1000,scrollbars=yes,resizable=yes');
+    if (!printWindow) {
+      alert('Popup window was blocked by your browser. Please allow popups for Master CRM to inspect and print this document.');
+      return;
+    }
+
+    const entityLabel = doc.companyCode === 'ARIELMC' 
+      ? 'ArielMC (Ariel Marketing & Communications Limited)'
+      : doc.companyCode === 'BIZMAN'
+      ? 'Bizman Media Limited'
+      : doc.companyCode === 'LINDA'
+      ? 'Linda Resort Limited'
+      : doc.companyCode === 'PERSONAL'
+      ? 'Personal / Director Sovereign Vault'
+      : 'Consolidated Group Master';
+
+    const cleanDate = new Date().toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+
+    const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>${doc.title} - Master CRM Print Preview</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 15mm 20mm;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #1A1A1A;
+      background: #F4F6F4;
+      margin: 0;
+      padding: 32px 16px;
+      line-height: 1.5;
+    }
+    .print-control-bar {
+      max-width: 840px;
+      margin: 0 auto 20px auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #1F3A2E;
+      color: #FFFFFF;
+      padding: 12px 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-gold {
+      background: #C8A96A;
+      color: #1F3A2E;
+    }
+    .btn-gold:hover { background: #b8995a; }
+    .btn-outline {
+      background: transparent;
+      color: #FFFFFF;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    .btn-outline:hover { background: rgba(255,255,255,0.15); }
+    .doc-page {
+      max-width: 840px;
+      margin: 0 auto;
+      background: #FFFFFF;
+      border: 1px solid #DDE3DD;
+      border-radius: 16px;
+      padding: 48px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+    .header-table {
+      width: 100%;
+      border-bottom: 2px solid #1F3A2E;
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+    }
+    .main-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #1F3A2E;
+      letter-spacing: -0.5px;
+      margin: 0;
+    }
+    .sub-head {
+      font-size: 11px;
+      color: #556055;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+    .sec-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      font-family: monospace;
+      background: #FEE8E8;
+      color: #C5221F;
+      border: 1px solid #F8B4B4;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin: 24px 0;
+    }
+    .meta-box {
+      background: #F8FAF8;
+      border: 1px solid #E2E8E2;
+      padding: 12px 16px;
+      border-radius: 10px;
+    }
+    .meta-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: #6B7269;
+      font-weight: 700;
+      display: block;
+      margin-bottom: 2px;
+      letter-spacing: 0.5px;
+    }
+    .meta-val {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1F3A2E;
+    }
+    .notes-card {
+      background: #F8FAF8;
+      border-left: 4px solid #1F3A2E;
+      padding: 20px;
+      border-radius: 0 10px 10px 0;
+      margin: 24px 0;
+      font-size: 13.5px;
+      line-height: 1.65;
+      color: #1A1A1A;
+      white-space: pre-wrap;
+    }
+    .tag-pill {
+      display: inline-block;
+      background: #E8F0FA;
+      color: #1F5FA8;
+      border: 1px solid #BBD5F2;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: monospace;
+      margin-right: 6px;
+      margin-bottom: 6px;
+    }
+    .footer-attestation {
+      border-top: 1px solid #DDE3DD;
+      padding-top: 24px;
+      margin-top: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      font-size: 11px;
+      color: #6B7269;
+    }
+    .sig-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: #1F3A2E;
+    }
+    .sig-role {
+      font-size: 11px;
+      color: #556055;
+    }
+    .preview-frame {
+      width: 100%;
+      height: 600px;
+      border: 1px solid #DDE3DD;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+    .preview-img {
+      max-width: 100%;
+      max-height: 600px;
+      object-fit: contain;
+      border-radius: 10px;
+      border: 1px solid #DDE3DD;
+      margin-top: 20px;
+    }
+    @media print {
+      body { padding: 0 !important; background: #FFFFFF !important; }
+      .print-control-bar { display: none !important; }
+      .doc-page { border: none !important; box-shadow: none !important; padding: 0 !important; }
+      .preview-frame { border: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="print-control-bar">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span style="color:#C8A96A; font-weight:800; font-size:14px; letter-spacing:0.5px;">MASTER CRM &bull; EXECUTIVE VAULT</span>
+      <span style="opacity:0.7; font-size:12px;">| Print Preview & PDF Export</span>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-gold" onclick="window.print()">🖨️ Print / Save as PDF</button>
+      <button class="btn btn-outline" onclick="window.close()">✕ Close Window</button>
+    </div>
+  </div>
+
+  <div class="doc-page">
+    <table class="header-table">
+      <tr>
+        <td>
+          <h1 class="main-title">${doc.title}</h1>
+          <div class="sub-head">Syed Akramul Hassan &bull; Sovereign Vault Attested Record</div>
+        </td>
+        <td style="text-align: right; vertical-align: top;">
+          <span class="sec-badge">${doc.securityLevel}</span>
+          <div style="font-size: 11px; font-family: monospace; color: #888; margin-top: 6px;">ID: ${doc.id}</div>
+        </td>
+      </tr>
+    </table>
+
+    <div class="meta-grid">
+      <div class="meta-box">
+        <span class="meta-label">Affiliated Business Entity</span>
+        <span class="meta-val">${entityLabel}</span>
+      </div>
+      <div class="meta-box">
+        <span class="meta-label">Document Category</span>
+        <span class="meta-val">${doc.category.replace(/_/g, ' ')}</span>
+      </div>
+      <div class="meta-box">
+        <span class="meta-label">Original Vault Filename</span>
+        <span class="meta-val" style="font-family:monospace; font-size:12px;">${doc.fileName} (${doc.fileType} &bull; ${doc.fileSize})</span>
+      </div>
+      <div class="meta-box">
+        <span class="meta-label">Vault Upload Date ${doc.expiryDate ? '&bull; Renewal Expiry' : ''}</span>
+        <span class="meta-val">${doc.uploadDate} ${doc.expiryDate ? `<span style="color:#8A5A00;">(Exp: ${doc.expiryDate})</span>` : ''}</span>
+      </div>
+    </div>
+
+    ${doc.notes ? `
+    <div style="font-size: 12px; font-weight: 800; color: #1F3A2E; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 24px;">Executive Scope & Details</div>
+    <div class="notes-card">${doc.notes}</div>
+    ` : ''}
+
+    ${doc.tags && doc.tags.length > 0 ? `
+    <div style="margin-top: 16px;">
+      <span style="font-size: 11px; font-weight: 700; color: #6B7269; display:block; margin-bottom: 6px;">Indexed Search Tags:</span>
+      ${doc.tags.map(t => `<span class="tag-pill">#${t}</span>`).join('')}
+    </div>
+    ` : ''}
+
+    ${doc.fileDataUrl && doc.fileType === 'IMAGE' ? `
+    <div style="text-align: center;">
+      <img src="${doc.fileDataUrl}" class="preview-img" alt="${doc.title}" />
+    </div>
+    ` : ''}
+
+    ${doc.fileDataUrl && doc.fileType === 'PDF' ? `
+    <div>
+      <iframe src="${doc.fileDataUrl}" class="preview-frame" title="${doc.title}"></iframe>
+    </div>
+    ` : ''}
+
+    <div class="footer-attestation">
+      <div>
+        <strong>Sovereign Vault Attestation:</strong><br>
+        Digitally registered & archived in Syed Akramul Hassan - Personal CRM.<br>
+        Verification Date: ${cleanDate} &bull; Sovereign Status: Verified
+      </div>
+      <div style="text-align: right;">
+        <div class="sig-name">Syed Akramul Hassan</div>
+        <div class="sig-role">Managing Director & Executive Founder</div>
+      </div>
+    </div>
+  </div>
+
+  ${autoPrint ? `<script>window.onload = function() { setTimeout(function() { window.print(); }, 400); };<\/script>` : ''}
+</body>
+</html>`;
+
+    printWindow.document.open();
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+  };
+
+  // Dedicated PDF Downloader
+  const handleDownloadPDF = (doc: DocumentRecord) => {
+    if (doc.fileDataUrl && doc.fileType === 'PDF') {
+      const a = document.createElement('a');
+      a.href = doc.fileDataUrl;
+      a.download = doc.fileName.endsWith('.pdf') ? doc.fileName : `${doc.fileName}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } else {
+      // Trigger the external print-to-PDF engine
+      handleOpenExternalPrintPreview(doc, true);
     }
 
     setDocuments(prev => prev.map(d => d.id === doc.id ? { ...d, downloadCount: (d.downloadCount || 0) + 1 } : d));
@@ -1469,6 +1789,15 @@ Attested: Syed Akramul Hassan`;
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-end gap-2 pt-2 border-t border-[#DDE3DD]">
               <button
+                onClick={() => handleOpenExternalPrintPreview(sharingDoc, true)}
+                className="w-full sm:w-auto flex items-center justify-center gap-1.5 rounded-lg border border-[#1F3A2E] bg-[#1F3A2E] hover:bg-[#2C5240] text-white px-3.5 py-2 text-xs font-bold transition-all shadow-xs"
+                title="Print or save this document memo as PDF"
+              >
+                <Printer className="h-3.5 w-3.5 text-[#C8A96A]" />
+                <span>Print / Save as PDF</span>
+              </button>
+
+              <button
                 onClick={() => handleCopyLink(sharingDoc)}
                 className="w-full sm:w-auto flex items-center justify-center gap-1.5 rounded-lg border border-[#DDE3DD] bg-white px-4 py-2 text-xs font-bold text-[#1F3A2E] hover:bg-[#F4F6F4] transition-colors"
               >
@@ -1592,30 +1921,69 @@ Attested: Syed Akramul Hassan`;
               </div>
             ) : null}
 
-            {/* Actions: Download & Share */}
-            <div className="flex items-center justify-between pt-4 border-t border-[#DDE3DD]">
-              <div className="text-[11px] text-[#6B7269] font-mono">
-                Uploaded by {previewDoc.uploadedBy} on {previewDoc.uploadDate}
+            {/* Executive Action Command Bar: Print Preview, Download PDF, View in Window, Share */}
+            <div className="space-y-3 pt-4 border-t border-[#DDE3DD]">
+              {/* Row 1: Primary 4 Action Buttons Requested */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {/* 1. View Document (External Window) */}
+                <button
+                  onClick={() => handleOpenExternalPrintPreview(previewDoc, false)}
+                  className="flex items-center justify-center gap-1.5 rounded-lg border border-[#DDE3DD] bg-white hover:bg-[#F4F6F4] text-[#1F3A2E] px-3 py-2 text-xs font-bold transition-all shadow-xs"
+                  title="Open full document dossier in an external dedicated window"
+                >
+                  <ExternalLink className="h-3.5 w-3.5 text-[#C8A96A]" />
+                  <span>View in Window</span>
+                </button>
+
+                {/* 2. Print Preview */}
+                <button
+                  onClick={() => handleOpenExternalPrintPreview(previewDoc, true)}
+                  className="flex items-center justify-center gap-1.5 rounded-lg border border-[#1F3A2E] bg-[#1F3A2E] hover:bg-[#2C5240] text-white px-3 py-2 text-xs font-bold transition-all shadow-xs"
+                  title="Open print preview and print dialog"
+                >
+                  <Printer className="h-3.5 w-3.5 text-[#C8A96A]" />
+                  <span>Print Preview</span>
+                </button>
+
+                {/* 3. Download PDF */}
+                <button
+                  onClick={() => handleDownloadPDF(previewDoc)}
+                  className="flex items-center justify-center gap-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-2 text-xs font-extrabold transition-all shadow-xs"
+                  title="Download document as PDF or raw vault asset"
+                >
+                  <Download className="h-3.5 w-3.5 text-[#C8A96A]" />
+                  <span>Download PDF</span>
+                </button>
+
+                {/* 4. Share (as Printable PDF) */}
+                <button
+                  onClick={() => {
+                    const docToShare = previewDoc;
+                    setPreviewDoc(null);
+                    setSharingDoc(docToShare);
+                  }}
+                  className="flex items-center justify-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 px-3 py-2 text-xs font-bold transition-all shadow-xs"
+                  title="Share document memo as printable PDF or WhatsApp message"
+                >
+                  <Share2 className="h-3.5 w-3.5 text-emerald-700" />
+                  <span>Share as PDF</span>
+                </button>
               </div>
 
-              <div className="flex items-center gap-2">
+              {/* Row 2: Status & Quick WhatsApp Action */}
+              <div className="flex items-center justify-between text-[11px] text-[#6B7269] font-mono pt-1">
+                <div>
+                  Uploaded by <strong className="text-[#1F3A2E]">{previewDoc.uploadedBy}</strong> on {previewDoc.uploadDate}
+                </div>
                 <button
                   onClick={() => {
                     const text = generateWhatsAppText(previewDoc);
                     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
                   }}
-                  className="flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 text-xs font-bold transition-all shadow-xs"
+                  className="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-900 font-bold hover:underline"
                 >
-                  <MessageSquare className="h-3.5 w-3.5" />
-                  <span>WhatsApp</span>
-                </button>
-
-                <button
-                  onClick={() => handleDownload(previewDoc)}
-                  className="flex items-center gap-1.5 rounded-lg bg-[#1F3A2E] hover:bg-[#2C5240] text-white px-3.5 py-1.5 text-xs font-extrabold transition-all shadow-xs"
-                >
-                  <Download className="h-3.5 w-3.5 text-[#C8A96A]" />
-                  <span>Download Document</span>
+                  <MessageSquare className="h-3 w-3" />
+                  <span>Send via WhatsApp</span>
                 </button>
               </div>
             </div>
