@@ -90,6 +90,75 @@ export type PipelineStage =
 export type CustomerPaymentStatus = 'PENDING' | 'PARTIAL' | 'RECEIVED';
 export type EntityPayoutStatus = 'AWAITING_CUSTOMER_PAYMENT' | 'READY_FOR_SETTLEMENT' | 'SETTLED';
 
+export type ContactRoleType = 
+  | 'PRIMARY_DECISION_MAKER' 
+  | 'PROCUREMENT' 
+  | 'MEDIA_BUYER' 
+  | 'FINANCE_ACCOUNTS' 
+  | 'OPERATIONS'
+  | 'GENERAL';
+
+export interface LeadContact {
+  id: string;
+  name: string;
+  designation: string;
+  department?: string;
+  roleType?: ContactRoleType;
+  phone: string;
+  pabxPhone?: string;
+  email: string;
+  whatsapp?: string;
+  isPrimary?: boolean;
+  notes?: string;
+}
+
+export interface ParallelProject {
+  id: string;
+  projectCode: string;
+  title: string;
+  pipelineType: string;
+  stage: PipelineStage;
+  estimatedValue: number;
+  currency: 'USD' | 'BDT';
+  probability: number;
+  expectedCloseDate: string;
+  contactPersonId?: string;
+  contactPersonName: string;
+  contactPersonPhone?: string;
+  
+  // Syed Akramul Hassan's Personal Yield Engine
+  commissionRate: number; // e.g. 10%
+  commissionAmount: number; // estimatedValue * (commissionRate / 100)
+  directCustomerFee?: number; // Extra fee contracted directly with customer
+  directCustomerPaymentStatus?: 'PENDING' | 'RECEIVED';
+  customerPaymentStatus: CustomerPaymentStatus;
+  entityPayoutStatus: EntityPayoutStatus;
+  payoutAmountReceived?: number;
+  notepadMarkdown?: string;
+  specifics?: Record<string, any>;
+  createdAt: string;
+}
+
+export interface CompanyLead {
+  id: string;
+  companyCode: 'BIZMAN' | 'LINDA' | 'ARIELMC';
+  companyName: string; // The Lead Company Account (e.g. Grameenphone Ltd., Unilever Bangladesh, EcoLiving UK)
+  industry: string;
+  clientType: 'Direct Brand' | 'Media Agency' | 'Government / Institutional' | 'International Buyer' | 'Corporate Client';
+  priorityTemp: 'HOT' | 'WARM' | 'COLD';
+  country: string;
+  city?: string;
+  website?: string;
+  address?: string;
+  createdAt: string;
+
+  // 1-to-Many: Contact Persons under this Lead Company
+  contacts: LeadContact[];
+
+  // 1-to-Many: Parallel Commercial Projects under this Lead Company
+  projects: ParallelProject[];
+}
+
 export interface LeadItem {
   id: string;
   companyCode: 'BIZMAN' | 'LINDA' | 'ARIELMC';
@@ -121,6 +190,10 @@ export interface LeadItem {
   directCustomerFee?: number; // e.g. 50000 (direct contract fee/advisory from Customer)
   directCustomerPaymentStatus?: 'PENDING' | 'RECEIVED';
   projectName?: string; // Sub-project or specific campaign name under the parent client
+
+  // Bizman CRM Model: Multiple Contacts & Parallel Projects under this Lead
+  contacts?: LeadContact[];
+  projects?: ParallelProject[];
 }
 
 export type ExpensePayer = 'MY_PERSONAL_FUNDS' | 'ENTITY_DIRECT';

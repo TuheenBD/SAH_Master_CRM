@@ -53,3 +53,4 @@ try {
   console.error('\n❌ Backup encountered an error:', err.message);
   process.exit(1);
 }
+
