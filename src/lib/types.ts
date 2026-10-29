@@ -370,4 +370,5 @@ export interface DocumentRecord {
   uploadedBy: string;
   version: string;
   downloadCount?: number;
+  fileDataUrl?: string;
 }

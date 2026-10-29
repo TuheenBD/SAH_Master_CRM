@@ -1,11 +1,13 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { 
   FolderKanban, 
   FolderPlus,
   Upload, 
+  UploadCloud,
+  Paperclip,
   Search, 
   Filter, 
   LayoutGrid, 
@@ -74,6 +76,12 @@ export default function DocumentCenterPage() {
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
 
+  // File Upload Drag & Drop State
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const editFileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
   // Upload/Edit Form State
   const [formData, setFormData] = useState<{
     title: string;
@@ -87,10 +95,11 @@ export default function DocumentCenterPage() {
     tags: string;
     notes: string;
     version: string;
+    fileDataUrl: string;
   }>({
     title: '',
     fileName: '',
-    fileSize: '1.5 MB',
+    fileSize: '',
     fileType: 'PDF',
     companyCode: 'ARIELMC',
     category: 'CONTRACT_AGREEMENT',
@@ -99,6 +108,7 @@ export default function DocumentCenterPage() {
     tags: '',
     notes: '',
     version: 'v1.0',
+    fileDataUrl: '',
   });
 
   // Filtered Documents
@@ -162,11 +172,51 @@ export default function DocumentCenterPage() {
   };
 
   // Upload Handlers
+  const handleFileSelected = (file: File) => {
+    setSelectedFile(file);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = (e.target?.result as string) || '';
+
+      // Compute file type
+      let detectedType: DocumentFileType = 'PDF';
+      const ext = file.name.split('.').pop()?.toLowerCase();
+      if (ext === 'docx' || ext === 'doc') detectedType = 'DOCX';
+      else if (ext === 'xlsx' || ext === 'xls' || ext === 'csv') detectedType = 'XLSX';
+      else if (['png', 'jpg', 'jpeg', 'webp', 'svg', 'gif'].includes(ext || '')) detectedType = 'IMAGE';
+      else if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext || '')) detectedType = 'ZIP';
+
+      // Compute formatted size
+      let sizeStr = '';
+      if (file.size >= 1024 * 1024) {
+        sizeStr = `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
+      } else {
+        sizeStr = `${Math.round(file.size / 1024)} KB`;
+      }
+
+      // Compute friendly title from filename if title is empty
+      const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+      const friendlyTitle = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
+
+      setFormData(prev => ({
+        ...prev,
+        fileName: file.name,
+        fileSize: sizeStr,
+        fileType: detectedType,
+        title: prev.title.trim() ? prev.title : friendlyTitle,
+        fileDataUrl: dataUrl,
+      }));
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleOpenUpload = () => {
+    setSelectedFile(null);
+    setIsDragging(false);
     setFormData({
       title: '',
       fileName: '',
-      fileSize: '2.1 MB',
+      fileSize: '',
       fileType: 'PDF',
       companyCode: selectedEntity === 'CONSOLIDATED' ? 'ARIELMC' : (selectedEntity as any),
       category: 'CONTRACT_AGREEMENT',
@@ -175,6 +225,7 @@ export default function DocumentCenterPage() {
       tags: '',
       notes: '',
       version: 'v1.0',
+      fileDataUrl: '',
     });
     setIsUploadModalOpen(true);
   };
@@ -187,7 +238,7 @@ export default function DocumentCenterPage() {
       id: `doc-${Date.now()}`,
       title: formData.title.trim(),
       fileName: formData.fileName.trim() || `${formData.title.toLowerCase().replace(/\s+/g, '-')}.${formData.fileType.toLowerCase()}`,
-      fileSize: formData.fileSize || '1.8 MB',
+      fileSize: formData.fileSize || '1.2 MB',
       fileType: formData.fileType,
       companyCode: formData.companyCode,
       category: formData.category,
@@ -199,6 +250,7 @@ export default function DocumentCenterPage() {
       uploadedBy: 'Syed Akramul Hassan',
       version: formData.version || 'v1.0',
       downloadCount: 0,
+      fileDataUrl: formData.fileDataUrl || undefined,
     };
 
     setDocuments([newDoc, ...documents]);
@@ -207,6 +259,7 @@ export default function DocumentCenterPage() {
 
   // Edit Handlers
   const handleOpenEdit = (doc: DocumentRecord) => {
+    setSelectedFile(null);
     setEditingDoc(doc);
     setFormData({
       title: doc.title,
@@ -220,6 +273,7 @@ export default function DocumentCenterPage() {
       tags: doc.tags.join(', '),
       notes: doc.notes || '',
       version: doc.version,
+      fileDataUrl: doc.fileDataUrl || '',
     });
   };
 
@@ -233,6 +287,7 @@ export default function DocumentCenterPage() {
           ...d,
           title: formData.title.trim(),
           fileName: formData.fileName.trim() || d.fileName,
+          fileSize: formData.fileSize || d.fileSize,
           fileType: formData.fileType,
           companyCode: formData.companyCode,
           category: formData.category,
@@ -241,12 +296,58 @@ export default function DocumentCenterPage() {
           tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
           notes: formData.notes.trim() || undefined,
           version: formData.version || d.version,
+          fileDataUrl: formData.fileDataUrl || d.fileDataUrl,
         };
       }
       return d;
     }));
 
     setEditingDoc(null);
+  };
+
+  // Dedicated Real Vault File Downloader
+  const handleDownload = (doc: DocumentRecord) => {
+    if (doc.fileDataUrl) {
+      const a = document.createElement('a');
+      a.href = doc.fileDataUrl;
+      a.download = doc.fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } else {
+      const content = `================================================================================
+MASTER CRM - CERTIFIED EXECUTIVE VAULT RECORD
+================================================================================
+Vault ID: ${doc.id}
+Document Title: ${doc.title}
+Affiliated Entity: ${doc.companyCode}
+Category: ${doc.category}
+Security Classification: ${doc.securityLevel}
+Original Filename: ${doc.fileName} (${doc.fileSize})
+Upload Date: ${doc.uploadDate}
+${doc.expiryDate ? `Expiry Date: ${doc.expiryDate}\n` : ''}Version: ${doc.version}
+Attested & Uploaded By: ${doc.uploadedBy}
+
+Tags: ${doc.tags.join(', ')}
+
+EXECUTIVE SCOPE & CONFIDENTIAL NOTES:
+--------------------------------------------------------------------------------
+${doc.notes || 'No extra notes recorded.'}
+================================================================================
+Transmitted securely via Syed Akramul Hassan - Personal CRM Sovereign Enclave
+`;
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${doc.fileName.replace(/\.[^/.]+$/, '')}_vault_record.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    setDocuments(prev => prev.map(d => d.id === doc.id ? { ...d, downloadCount: (d.downloadCount || 0) + 1 } : d));
   };
 
   // Delete Handlers
@@ -740,7 +841,7 @@ Attested: Syed Akramul Hassan`;
                     )}
                   </div>
 
-                  {/* Actions: View, Share, Edit, Delete */}
+                  {/* Actions: View, Download, Share, Edit, Delete */}
                   <div className="flex items-center gap-1">
                     {/* Preview */}
                     <button
@@ -749,6 +850,15 @@ Attested: Syed Akramul Hassan`;
                       className="p-1.5 rounded-md hover:bg-[#F4F6F4] text-[#556055] hover:text-[#1F3A2E] transition-colors"
                     >
                       <Eye className="h-3.5 w-3.5" />
+                    </button>
+
+                    {/* Direct Download */}
+                    <button
+                      onClick={() => handleDownload(doc)}
+                      title="Download File"
+                      className="p-1.5 rounded-md hover:bg-emerald-50 text-[#556055] hover:text-emerald-700 transition-colors"
+                    >
+                      <Download className="h-3.5 w-3.5" />
                     </button>
 
                     {/* Share */}
@@ -889,6 +999,13 @@ Attested: Syed Akramul Hassan`;
                             <Eye className="h-3.5 w-3.5" />
                           </button>
                           <button
+                            onClick={() => handleDownload(doc)}
+                            title="Download File"
+                            className="p-1 rounded text-[#556055] hover:text-emerald-700 hover:bg-emerald-50"
+                          >
+                            <Download className="h-3.5 w-3.5" />
+                          </button>
+                          <button
                             onClick={() => setSharingDoc(doc)}
                             title="Share"
                             className="p-1 rounded text-[#556055] hover:text-emerald-700 hover:bg-emerald-50"
@@ -945,6 +1062,92 @@ Attested: Syed Akramul Hassan`;
             </div>
 
             <form onSubmit={handleSubmitUpload} className="space-y-4 text-xs">
+              {/* 1. ACTUAL FILE ATTACHMENT & DRAG-AND-DROP UPLOAD ZONE */}
+              <div>
+                <label className="text-[#556055] font-bold block mb-1.5 flex items-center justify-between">
+                  <span>Select or Drop Document File *</span>
+                  {selectedFile && (
+                    <span className="text-[11px] font-bold text-emerald-700 flex items-center gap-1 font-mono">
+                      <Check className="h-3.5 w-3.5" /> File Attached
+                    </span>
+                  )}
+                </label>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleFileSelected(file);
+                  }}
+                  accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.png,.jpg,.jpeg,.webp,.zip,.txt"
+                  className="hidden"
+                />
+                
+                {selectedFile ? (
+                  <div className="flex items-center justify-between p-3.5 rounded-xl border border-emerald-300 bg-emerald-50/70 transition-all shadow-xs">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="h-10 w-10 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 border border-emerald-200">
+                        {getFileIcon(formData.fileType)}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-extrabold text-[#1F3A2E] text-xs truncate max-w-[240px] sm:max-w-xs">{formData.fileName}</div>
+                        <div className="text-[11px] text-[#556055] font-mono">{formData.fileType} &bull; {formData.fileSize}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-white border border-emerald-300 text-emerald-800 hover:bg-emerald-50 transition-colors shadow-xs"
+                      >
+                        Change
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedFile(null);
+                          setFormData(prev => ({ ...prev, fileDataUrl: '', fileName: '', fileSize: '' }));
+                        }}
+                        className="p-1 rounded-md text-emerald-800 hover:bg-emerald-100 transition-colors"
+                        title="Remove attached file"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      setIsDragging(true);
+                    }}
+                    onDragLeave={() => setIsDragging(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setIsDragging(false);
+                      const file = e.dataTransfer.files?.[0];
+                      if (file) handleFileSelected(file);
+                    }}
+                    className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
+                      isDragging 
+                        ? 'border-emerald-600 bg-emerald-50 scale-[1.01]' 
+                        : 'border-[#1F3A2E]/30 hover:border-[#1F3A2E] bg-[#F9FAF9] hover:bg-white shadow-xs'
+                    }`}
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-white shadow-xs border border-[#DDE3DD] flex items-center justify-center mx-auto mb-2 text-[#1F3A2E]">
+                      <UploadCloud className="h-6 w-6 text-[#1F3A2E]" />
+                    </div>
+                    <div className="font-extrabold text-xs text-[#1F3A2E]">
+                      Click to Browse File, or Drag & Drop Here
+                    </div>
+                    <p className="text-[11px] text-[#6B7269] mt-1">
+                      Upload PDF, Excel (.xlsx/.csv), Word (.docx), Images, or ZIP (up to 50 MB)
+                    </p>
+                  </div>
+                )}
+              </div>
+
               <div>
                 <label className="text-[#556055] font-bold block mb-1">Document Title *</label>
                 <input
@@ -991,33 +1194,7 @@ Attested: Syed Akramul Hassan`;
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <label className="text-[#556055] font-bold block mb-1">File Type</label>
-                  <select
-                    value={formData.fileType}
-                    onChange={(e) => setFormData({ ...formData, fileType: e.target.value as any })}
-                    className="w-full rounded-lg border border-[#DDE3DD] p-2 text-[#1A1A1A] focus:outline-none"
-                  >
-                    <option value="PDF">PDF Document</option>
-                    <option value="DOCX">Word (.docx)</option>
-                    <option value="XLSX">Excel (.xlsx)</option>
-                    <option value="IMAGE">Image Scan</option>
-                    <option value="ZIP">Archive (.zip)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="text-[#556055] font-bold block mb-1">File Size</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. 2.4 MB"
-                    value={formData.fileSize}
-                    onChange={(e) => setFormData({ ...formData, fileSize: e.target.value })}
-                    className="w-full rounded-lg border border-[#DDE3DD] p-2 text-[#1A1A1A] focus:outline-none"
-                  />
-                </div>
-
+              <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-[#556055] font-bold block mb-1">Security Level</label>
                   <select
@@ -1031,20 +1208,7 @@ Attested: Syed Akramul Hassan`;
                     <option value="PUBLIC">PUBLIC</option>
                   </select>
                 </div>
-              </div>
 
-              <div>
-                <label className="text-[#556055] font-bold block mb-1">File Name</label>
-                <input
-                  type="text"
-                  placeholder="e.g. LC-Munich-Living-GmbH.pdf"
-                  value={formData.fileName}
-                  onChange={(e) => setFormData({ ...formData, fileName: e.target.value })}
-                  className="w-full rounded-lg border border-[#DDE3DD] p-2 text-[#1A1A1A] focus:outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-[#556055] font-bold block mb-1">Expiration / Renewal Date</label>
                   <input
@@ -1054,17 +1218,33 @@ Attested: Syed Akramul Hassan`;
                     className="w-full rounded-lg border border-[#DDE3DD] p-2 text-[#1A1A1A] focus:outline-none"
                   />
                 </div>
+              </div>
 
+              {/* File Specs Preview Row */}
+              <div className="grid grid-cols-3 gap-2 bg-[#F4F6F4] p-2.5 rounded-lg border border-[#DDE3DD] text-[11px]">
                 <div>
-                  <label className="text-[#556055] font-bold block mb-1">Tags (comma separated)</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Export, Germany, LC, High-Value"
-                    value={formData.tags}
-                    onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                    className="w-full rounded-lg border border-[#DDE3DD] p-2 text-[#1A1A1A] focus:outline-none"
-                  />
+                  <span className="text-[#6B7269] block text-[10px]">Detected Type:</span>
+                  <span className="font-bold text-[#1F3A2E]">{formData.fileType}</span>
                 </div>
+                <div>
+                  <span className="text-[#6B7269] block text-[10px]">File Size:</span>
+                  <span className="font-bold text-[#1F3A2E]">{formData.fileSize || 'Auto (on pick)'}</span>
+                </div>
+                <div className="truncate">
+                  <span className="text-[#6B7269] block text-[10px]">File Name:</span>
+                  <span className="font-mono text-[#1F3A2E] truncate block">{formData.fileName || 'Auto (on pick)'}</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[#556055] font-bold block mb-1">Tags (comma separated)</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Export, Germany, LC, High-Value"
+                  value={formData.tags}
+                  onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                  className="w-full rounded-lg border border-[#DDE3DD] p-2 text-[#1A1A1A] focus:outline-none"
+                />
               </div>
 
               <div>
@@ -1382,6 +1562,36 @@ Attested: Syed Akramul Hassan`;
               </div>
             </div>
 
+            {/* Attached File Viewer / Status */}
+            {previewDoc.fileDataUrl ? (
+              <div className="space-y-1.5 text-xs">
+                <span className="text-[#556055] font-bold">Document Content Preview:</span>
+                {previewDoc.fileType === 'IMAGE' ? (
+                  <div className="rounded-xl border border-[#DDE3DD] overflow-hidden max-h-72 flex items-center justify-center bg-[#F9FAF9] p-2">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={previewDoc.fileDataUrl} alt={previewDoc.title} className="max-h-68 object-contain rounded-lg" />
+                  </div>
+                ) : previewDoc.fileType === 'PDF' ? (
+                  <div className="rounded-xl border border-[#DDE3DD] overflow-hidden h-72 bg-[#F9FAF9]">
+                    <iframe src={previewDoc.fileDataUrl} className="w-full h-full" title={previewDoc.title} />
+                  </div>
+                ) : (
+                  <div className="p-3.5 bg-emerald-50 rounded-xl border border-emerald-200 text-xs text-emerald-900 flex items-center justify-between">
+                    <div className="flex items-center gap-2 font-semibold">
+                      <FileCheck2 className="h-5 w-5 text-emerald-700 shrink-0" />
+                      <span>Attached {previewDoc.fileType} file ready ({previewDoc.fileSize})</span>
+                    </div>
+                    <button
+                      onClick={() => handleDownload(previewDoc)}
+                      className="text-xs font-bold text-emerald-800 underline hover:text-emerald-950"
+                    >
+                      Download {previewDoc.fileName}
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : null}
+
             {/* Actions: Download & Share */}
             <div className="flex items-center justify-between pt-4 border-t border-[#DDE3DD]">
               <div className="text-[11px] text-[#6B7269] font-mono">
@@ -1401,9 +1611,7 @@ Attested: Syed Akramul Hassan`;
                 </button>
 
                 <button
-                  onClick={() => {
-                    alert(`Simulated Download: ${previewDoc.fileName} has been securely fetched from Master CRM vault.`);
-                  }}
+                  onClick={() => handleDownload(previewDoc)}
                   className="flex items-center gap-1.5 rounded-lg bg-[#1F3A2E] hover:bg-[#2C5240] text-white px-3.5 py-1.5 text-xs font-extrabold transition-all shadow-xs"
                 >
                   <Download className="h-3.5 w-3.5 text-[#C8A96A]" />
