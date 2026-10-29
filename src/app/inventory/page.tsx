@@ -245,10 +245,14 @@ export default function InventoryPage() {
       {showResort && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <Palmtree className="h-5 w-5 text-[#C8A96A]" />
-              <span>Linda Resort Limited: Luxury Villas, Cottages & Banquets</span>
-            </h2>
+            <div className="flex items-center gap-3">
+              <div className="h-7 w-20 rounded overflow-hidden border border-[#C8A96A]/40 bg-black px-1 shadow flex items-center justify-center shrink-0">
+                <img src="/logos/linda-logo.png" alt="Linda Resort" className="max-h-5 w-auto object-contain" />
+              </div>
+              <h2 className="text-base font-bold text-white">
+                Linda Resort Limited: Luxury Villas, Cottages & Banquets
+              </h2>
+            </div>
             <span className="text-xs text-slate-400">
               Executive Director Portfolio &bull; www.lindaresort.com
             </span>
@@ -313,10 +317,14 @@ export default function InventoryPage() {
       {showBillboards && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <Tv2 className="h-5 w-5 text-blue-400" />
-              <span>Bizman Media DOOH LED Screens & Static Billboards</span>
-            </h2>
+            <div className="flex items-center gap-2.5">
+              <div className="h-7 w-7 rounded overflow-hidden border border-slate-700 bg-[#0D3B29] p-0.5 shadow flex items-center justify-center shrink-0">
+                <img src="/logos/bizman-logo.jpg" alt="Bizman Media" className="h-full w-full object-contain" />
+              </div>
+              <h2 className="text-base font-bold text-white">
+                Bizman Media DOOH LED Screens & Static Billboards
+              </h2>
+            </div>
             <span className="text-xs text-slate-400">
               Own Screens & Partner Vendor Network (20 Own Displays / 50+ Nationwide)
             </span>
@@ -379,10 +387,14 @@ export default function InventoryPage() {
       {showProducts && (
         <div className="space-y-4 pt-6 border-t border-slate-800">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <Globe2 className="h-5 w-5 text-emerald-400" />
-              <span>Ariel Marketing & Communications - Export Product Catalog</span>
-            </h2>
+            <div className="flex items-center gap-2.5">
+              <div className="h-7 w-10 rounded overflow-hidden border border-slate-700 bg-white p-0.5 shadow flex items-center justify-center shrink-0">
+                <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-5 w-auto object-contain" />
+              </div>
+              <h2 className="text-base font-bold text-white">
+                Ariel Marketing & Communications - Export Product Catalog
+              </h2>
+            </div>
             <span className="text-xs text-slate-400">
               International B2B/B2C Portfolios: UK, EU, Australia & US
             </span>

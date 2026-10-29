@@ -120,6 +120,17 @@ export default function ReportsPage() {
         <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-6 space-y-6 shadow-xl print:border-none print:bg-white print:text-black">
           <div className="border-b border-slate-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
+              <div className="flex items-center gap-2 mb-2.5">
+                <div className="h-7 w-7 rounded overflow-hidden border border-slate-700 bg-[#0D3B29] p-0.5 shrink-0 shadow-sm" title="Bizman Media Limited">
+                  <img src="/logos/bizman-logo.jpg" alt="Bizman Media" className="h-full w-full object-contain" />
+                </div>
+                <div className="h-7 w-16 rounded overflow-hidden border border-slate-700 bg-black px-1 shrink-0 shadow-sm flex items-center justify-center" title="Linda Resort Limited">
+                  <img src="/logos/linda-logo.png" alt="Linda Resort Limited" className="max-h-5 w-auto object-contain" />
+                </div>
+                <div className="h-7 w-10 rounded overflow-hidden border border-slate-700 bg-white p-0.5 shrink-0 shadow-sm flex items-center justify-center" title="Ariel Marketing & Communications">
+                  <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-6 w-auto object-contain" />
+                </div>
+              </div>
               <div className="text-xs uppercase tracking-widest text-indigo-400 font-bold">Standard Management Framework &bull; Report 01</div>
               <h2 className="text-xl font-extrabold text-white mt-1 print:text-black">Consolidated Group Financial & Operating Brief</h2>
               <p className="text-xs text-slate-400">Bizman Media Limited &bull; Linda Resort Limited &bull; Ariel Marketing & Communications</p>

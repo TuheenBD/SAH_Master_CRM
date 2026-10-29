@@ -64,8 +64,29 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-[#2C5240] bg-[#1F3A2E] text-white shadow-md">
       <div className="flex flex-col md:flex-row md:h-16 md:items-center justify-between px-4 sm:px-6 lg:px-8 py-2 md:py-0 gap-3">
-        {/* Left: Breadcrumb / Page Title */}
+        {/* Left: Breadcrumb / Page Title with Active Entity Logo */}
         <div className="flex items-center gap-3 shrink-0">
+          {activeCompany === 'BIZMAN' && (
+            <div className="h-8 w-8 rounded-lg overflow-hidden border border-[#2C5240] bg-[#0D3B29] p-0.5 shadow flex items-center justify-center shrink-0">
+              <img src="/logos/bizman-logo.jpg" alt="Bizman Media" className="h-full w-full object-contain" />
+            </div>
+          )}
+          {activeCompany === 'LINDA' && (
+            <div className="h-8 w-16 rounded-lg overflow-hidden border border-[#2C5240] bg-black px-1 shadow flex items-center justify-center shrink-0">
+              <img src="/logos/linda-logo.png" alt="Linda Resort" className="max-h-6 w-auto object-contain" />
+            </div>
+          )}
+          {activeCompany === 'ARIELMC' && (
+            <div className="h-8 w-11 rounded-lg overflow-hidden border border-[#2C5240] bg-white p-0.5 shadow flex items-center justify-center shrink-0">
+              <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-7 w-auto object-contain" />
+            </div>
+          )}
+          {activeCompany === 'CONSOLIDATED' && (
+            <div className="h-8 w-8 rounded-lg bg-[var(--header-accent)] text-[var(--header-bg)] flex items-center justify-center font-black shadow shrink-0">
+              <Layers className="h-4 w-4" />
+            </div>
+          )}
+
           <div>
             <div className="flex items-center gap-1.5 text-[10px] text-[#CFE0D5] font-mono uppercase tracking-wider">
               <span>{meta.code === 'CONSOLIDATED' ? 'GROUP' : meta.code}</span>
@@ -78,7 +99,7 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Center: ACTIVE ENTITY VIEW */}
+        {/* Center: ACTIVE ENTITY VIEW with Brand Logos */}
         <div className="flex flex-wrap items-center gap-1.5 bg-[#162B22] p-1 rounded-xl border border-[#2C5240]">
           {(Object.keys(COMPANIES) as CompanyCode[]).map((code) => {
             const isSelected = activeCompany === code;
@@ -94,10 +115,16 @@ export default function Header() {
                 onClick={() => switchCompany(code)}
                 className={`rounded-lg px-2.5 sm:px-3 py-1.5 text-xs transition-all whitespace-nowrap flex items-center gap-1.5 ${activeStyle}`}
               >
-                {code === 'CONSOLIDATED' && <Layers className="h-3.5 w-3.5" />}
-                {code === 'BIZMAN' && <Tv2 className="h-3.5 w-3.5" />}
-                {code === 'LINDA' && <Palmtree className="h-3.5 w-3.5" />}
-                {code === 'ARIELMC' && <Globe2 className="h-3.5 w-3.5" />}
+                {code === 'CONSOLIDATED' && <Layers className="h-3.5 w-3.5 shrink-0" />}
+                {code === 'BIZMAN' && (
+                  <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-3.5 w-3.5 rounded object-contain shrink-0" />
+                )}
+                {code === 'LINDA' && (
+                  <img src="/logos/linda-logo.png" alt="Linda" className="h-3 w-auto object-contain shrink-0 max-w-[28px] bg-black px-0.5 rounded" />
+                )}
+                {code === 'ARIELMC' && (
+                  <img src="/logos/arielmc-logo.png" alt="ArielMC" className="h-3.5 w-auto object-contain shrink-0 bg-white px-0.5 rounded" />
+                )}
                 <span>{code === 'CONSOLIDATED' ? 'ALL ENTITIES' : code === 'LINDA' ? 'LINDA RESORT' : code}</span>
               </button>
             );

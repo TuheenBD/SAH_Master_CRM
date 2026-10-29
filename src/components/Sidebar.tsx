@@ -118,16 +118,54 @@ export default function Sidebar() {
               </span>
             </div>
 
-            {/* Selected Active Entity Box */}
-            <div className="mt-4 rounded-xl bg-[#162B22] border border-[#2C5240] p-2.5 space-y-1">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-[#CFE0D5] flex items-center justify-between">
+            {/* Selected Active Entity Box with Official Brand Logo */}
+            <div className="mt-4 rounded-xl bg-[#162B22] border border-[#2C5240] p-2.5 space-y-2">
+              <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-[#CFE0D5]">
                 <span>Active Context</span>
-                <span className="h-2 w-2 rounded-full bg-[#C8A96A]" />
+                <span className="h-2 w-2 rounded-full bg-[var(--sidebar-active-text)]" />
               </div>
-              <div className="font-bold text-xs text-white truncate">{currentMeta.name}</div>
-              <div className="text-[10px] text-[#CFE0D5] truncate flex items-center justify-between">
-                <span>{currentMeta.role}</span>
-                <span className="font-mono font-bold text-[#C8A96A]">{currentMeta.currency}</span>
+
+              {/* Brand Logo Display */}
+              <div className="flex items-center gap-2.5 pt-0.5">
+                {activeCompany === 'BIZMAN' && (
+                  <div className="h-9 w-9 rounded-lg overflow-hidden border border-[#2C5240] bg-[#0D3B29] shrink-0 p-0.5 flex items-center justify-center shadow">
+                    <img src="/logos/bizman-logo.jpg" alt="Bizman Media" className="h-full w-full object-contain" />
+                  </div>
+                )}
+
+                {activeCompany === 'LINDA' && (
+                  <div className="h-9 w-20 rounded-lg overflow-hidden border border-[#2C5240] bg-black shrink-0 px-1 flex items-center justify-center shadow">
+                    <img src="/logos/linda-logo.png" alt="Linda Resort" className="max-h-7 w-auto object-contain" />
+                  </div>
+                )}
+
+                {activeCompany === 'ARIELMC' && (
+                  <div className="h-9 w-12 rounded-lg overflow-hidden border border-[#2C5240] bg-white shrink-0 p-0.5 flex items-center justify-center shadow">
+                    <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-8 w-auto object-contain" />
+                  </div>
+                )}
+
+                {activeCompany === 'CONSOLIDATED' && (
+                  <div className="flex items-center -space-x-1.5 shrink-0">
+                    <div className="h-7 w-7 rounded-md overflow-hidden border border-[#2C5240] bg-[#0D3B29] p-0.5 shadow">
+                      <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-full w-full object-contain" />
+                    </div>
+                    <div className="h-7 w-7 rounded-md overflow-hidden border border-[#2C5240] bg-black p-0.5 shadow">
+                      <img src="/logos/linda-logo.png" alt="Linda" className="h-full w-full object-contain" />
+                    </div>
+                    <div className="h-7 w-7 rounded-md overflow-hidden border border-[#2C5240] bg-white p-0.5 shadow">
+                      <img src="/logos/arielmc-logo.png" alt="ArielMC" className="h-full w-full object-contain" />
+                    </div>
+                  </div>
+                )}
+
+                <div className="min-w-0 flex-1">
+                  <div className="font-bold text-xs text-white truncate">{currentMeta.name}</div>
+                  <div className="text-[10px] text-[#CFE0D5] truncate flex items-center justify-between">
+                    <span>{currentMeta.role}</span>
+                    <span className="font-mono font-bold text-[var(--sidebar-active-text)]">{currentMeta.currency}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

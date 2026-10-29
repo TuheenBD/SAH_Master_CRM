@@ -81,17 +81,48 @@ export default function MasterDashboard() {
       {/* Executive Welcome Card */}
       <div className="rounded-xl border border-[#DDE3DD] bg-white p-6 shadow-sm relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#C8A96A]">
-              <Sparkles className="h-4 w-4 text-[#C8A96A]" />
-              <span>Personal Executive Operating System</span>
+          <div className="flex items-start gap-4">
+            {activeCompany === 'BIZMAN' && (
+              <div className="h-14 w-14 rounded-xl overflow-hidden border border-[#DDE3DD] bg-[#0D3B29] p-1 shadow-sm flex items-center justify-center shrink-0">
+                <img src="/logos/bizman-logo.jpg" alt="Bizman Media" className="h-full w-full object-contain" />
+              </div>
+            )}
+            {activeCompany === 'LINDA' && (
+              <div className="h-14 w-32 rounded-xl overflow-hidden border border-[#DDE3DD] bg-black p-2 shadow-sm flex items-center justify-center shrink-0">
+                <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-full w-auto object-contain" />
+              </div>
+            )}
+            {activeCompany === 'ARIELMC' && (
+              <div className="h-14 w-20 rounded-xl overflow-hidden border border-[#DDE3DD] bg-white p-1 shadow-sm flex items-center justify-center shrink-0">
+                <img src="/logos/arielmc-logo.png" alt="ArielMC" className="h-full w-auto object-contain" />
+              </div>
+            )}
+            {activeCompany === 'CONSOLIDATED' && (
+              <div className="flex items-center -space-x-2 shrink-0 pt-1">
+                <div className="h-12 w-12 rounded-xl overflow-hidden border border-[#DDE3DD] bg-[#0D3B29] p-1 shadow-sm">
+                  <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-full w-full object-contain" />
+                </div>
+                <div className="h-12 w-12 rounded-xl overflow-hidden border border-[#DDE3DD] bg-black p-1 shadow-sm">
+                  <img src="/logos/linda-logo.png" alt="Linda" className="h-full w-full object-contain" />
+                </div>
+                <div className="h-12 w-12 rounded-xl overflow-hidden border border-[#DDE3DD] bg-white p-1 shadow-sm">
+                  <img src="/logos/arielmc-logo.png" alt="ArielMC" className="h-full w-full object-contain" />
+                </div>
+              </div>
+            )}
+
+            <div>
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#C8A96A]">
+                <Sparkles className="h-4 w-4 text-[#C8A96A]" />
+                <span>Personal Executive Operating System</span>
+              </div>
+              <h1 className="mt-1 text-2xl md:text-3xl font-extrabold text-[#1F3A2E] tracking-tight">
+                {meta.name}
+              </h1>
+              <p className="mt-1 text-xs text-[#6B7269]">
+                Active Role: <strong className="text-[#1A1A1A]">{meta.role}</strong> &bull; {meta.industry}
+              </p>
             </div>
-            <h1 className="mt-1 text-2xl md:text-3xl font-extrabold text-[#1F3A2E] tracking-tight">
-              {meta.name}
-            </h1>
-            <p className="mt-1 text-xs text-[#6B7269]">
-              Active Role: <strong className="text-[#1A1A1A]">{meta.role}</strong> &bull; {meta.industry}
-            </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">

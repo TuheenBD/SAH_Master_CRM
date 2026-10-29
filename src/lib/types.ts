@@ -8,6 +8,7 @@ export interface CompanyMeta {
   website: string;
   currency: string;
   paletteDescription: string;
+  logoUrl?: string;
   stats: {
     label: string;
     value: string;
@@ -23,6 +24,7 @@ export const COMPANIES: Record<CompanyCode, CompanyMeta> = {
     website: 'Executive OS',
     currency: 'USD/BDT',
     paletteDescription: 'Royal Green, Bottle Green, Imperial Gold & Ivory White',
+    logoUrl: '/logos/arielmc-logo.png',
     stats: [
       { label: 'Operating Entities', value: '3 Companies' },
       { label: 'Consolidated Active Deals', value: '42 Deals' },
@@ -37,6 +39,7 @@ export const COMPANIES: Record<CompanyCode, CompanyMeta> = {
     website: 'www.bizmanbd.com',
     currency: 'BDT',
     paletteDescription: 'Bottle Green (#1F3A2E), Imperial Gold (#C8A96A) & Ivory White',
+    logoUrl: '/logos/bizman-logo.jpg',
     stats: [
       { label: 'Own LED Displays', value: '20 Premium Boards' },
       { label: 'Partner Vendor Boards', value: '50+ Nationwide' },
@@ -51,6 +54,7 @@ export const COMPANIES: Record<CompanyCode, CompanyMeta> = {
     website: 'www.lindaresort.com',
     currency: 'BDT',
     paletteDescription: 'Bottle Green (#1F3A2E), Imperial Gold (#C8A96A) & Ivory White',
+    logoUrl: '/logos/linda-logo.png',
     stats: [
       { label: 'Private Pool Villas', value: 'Couple & Family Villas' },
       { label: 'Corporate Retreats', value: 'Banquet & Day-Out Hub' },
@@ -65,6 +69,7 @@ export const COMPANIES: Record<CompanyCode, CompanyMeta> = {
     website: 'www.arielmc.com',
     currency: 'USD',
     paletteDescription: 'Royal Green (#1F3A2E), Imperial Gold (#C8A96A) & Ivory White',
+    logoUrl: '/logos/arielmc-logo.png',
     stats: [
       { label: 'Export Markets', value: 'UK, EU, US, Australia' },
       { label: 'Active Shipments', value: '7 In Transit' },
