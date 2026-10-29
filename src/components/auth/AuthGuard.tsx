@@ -5,17 +5,16 @@ import {
   ShieldCheck, 
   Lock, 
   Unlock, 
-  Fingerprint, 
   Smartphone, 
   KeyRound, 
   Check, 
   AlertCircle, 
-  Sparkles, 
   Eye, 
   EyeOff, 
   Shield, 
-  RefreshCw,
   Clock,
+  ArrowRight,
+  ArrowLeft,
   CheckCircle2
 } from 'lucide-react';
 import { playClickSound } from '@/lib/sound';
@@ -34,20 +33,16 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuth = () => useContext(AuthContext);
 
-// Pre-configured default Executive Credentials for Syed Akramul Hassan
-const DEFAULT_PASSCODE = '202600'; // 6-digit Executive Passcode
-const DEFAULT_PASSWORD = 'tuheen@mastercrm2026'; // Master Passphrase
+// Sovereign Executive Password for Syed Akramul Hassan
+const MASTER_PASSWORD = 'tuheen@mastercrm2026';
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [authMode, setAuthMode] = useState<'PASSCODE' | 'AUTHENTICATOR' | 'BIOMETRIC' | 'PASSWORD'>('PASSCODE');
-  const [pinDigits, setPinDigits] = useState<string[]>([]);
-  const [totpCode, setTotpCode] = useState<string>('');
+  const [authStep, setAuthStep] = useState<'PASSWORD' | '2FA'>('PASSWORD');
   const [passwordInput, setPasswordInput] = useState<string>('');
+  const [totpCode, setTotpCode] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [rememberDevice, setRememberDevice] = useState<boolean>(true);
-  const [isBiometricScanning, setIsBiometricScanning] = useState<boolean>(false);
-  const [biometricSuccess, setBiometricSuccess] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isLoadingStorage, setIsLoadingStorage] = useState<boolean>(true);
   const [lockoutRemaining, setLockoutRemaining] = useState<number>(0);
@@ -79,7 +74,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       clearTimeout(timer);
       timer = setTimeout(() => {
         lockVault();
-      }, 10 * 60 * 1000); // 10 minutes inactivity
+      }, 10 * 60 * 1000); // 10 minutes
     };
 
     const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
@@ -100,7 +95,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         setIsAuthenticated(true);
       }
     } catch (e) {
-      // LocalStorage access fallback
+      // LocalStorage fallback
     } finally {
       setIsLoadingStorage(false);
     }
@@ -127,9 +122,9 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       } catch (e) {}
     }
     setIsAuthenticated(true);
-    setPinDigits([]);
-    setTotpCode('');
+    setAuthStep('PASSWORD');
     setPasswordInput('');
+    setTotpCode('');
     setErrorMessage('');
   };
 
@@ -146,7 +141,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         localStorage.setItem('sah_lockout_until', String(lockoutTime));
       } catch (e) {}
       setLockoutRemaining(15 * 60);
-      setErrorMessage('SECURITY LOCKOUT: 5 failed attempts. System locked for 15 minutes.');
+      setErrorMessage('SECURITY LOCKDOWN: Maximum 5 failed attempts reached. System locked for 15 minutes.');
     } else {
       setErrorMessage(`Access Denied. ${5 - currentFails} attempt(s) remaining before system lockout.`);
     }
@@ -157,94 +152,38 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       localStorage.removeItem('sah_master_crm_auth_session');
     } catch (e) {}
     setIsAuthenticated(false);
-    setPinDigits([]);
-    setTotpCode('');
+    setAuthStep('PASSWORD');
     setPasswordInput('');
+    setTotpCode('');
     setErrorMessage('');
     playClickSound();
   };
 
-  // Handle Passcode (PIN keypad) Input
-  const handlePinPress = (num: string) => {
-    if (lockoutRemaining > 0) return;
-    playClickSound();
-    setErrorMessage('');
-    if (pinDigits.length < 6) {
-      const nextDigits = [...pinDigits, num];
-      setPinDigits(nextDigits);
-
-      if (nextDigits.length === 6) {
-        const enteredPin = nextDigits.join('');
-        if (enteredPin === DEFAULT_PASSCODE) {
-          unlockVault();
-        } else {
-          registerFailedAttempt();
-          setTimeout(() => setPinDigits([]), 500);
-        }
-      }
-    }
-  };
-
-  const handlePinDelete = () => {
-    if (lockoutRemaining > 0) return;
-    playClickSound();
-    setErrorMessage('');
-    setPinDigits(prev => prev.slice(0, -1));
-  };
-
-  const handlePinClear = () => {
-    if (lockoutRemaining > 0) return;
-    playClickSound();
-    setErrorMessage('');
-    setPinDigits([]);
-  };
-
-  // Handle Authenticator TOTP Code
-  const handleTotpSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (lockoutRemaining > 0) return;
-    if (totpCode.length === 6) {
-      unlockVault();
-    } else {
-      setErrorMessage('Please enter the 6-digit Authenticator TOTP token.');
-    }
-  };
-
-  // Handle Biometric (Face ID / Touch ID)
-  const handleBiometricScan = async () => {
-    playClickSound();
-    setIsBiometricScanning(true);
-    setErrorMessage('');
-
-    // Check for native Apple Face ID / Touch ID (WebAuthn)
-    try {
-      if (typeof window !== 'undefined' && window.PublicKeyCredential) {
-        // Native biometric prompt trigger
-        const challenge = new Uint8Array(32);
-        window.crypto.getRandomValues(challenge);
-      }
-    } catch (e) {
-      // Fallback to simulated scan
-    }
-
-    setTimeout(() => {
-      setIsBiometricScanning(false);
-      setBiometricSuccess(true);
-      setTimeout(() => {
-        setBiometricSuccess(false);
-        unlockVault();
-      }, 350);
-    }, 900);
-  };
-
-  // Handle Password Submit
+  // STEP 1: Verify Password
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (lockoutRemaining > 0) return;
-    if (passwordInput === DEFAULT_PASSWORD) {
-      unlockVault();
+    playClickSound();
+
+    if (passwordInput === MASTER_PASSWORD) {
+      setErrorMessage('');
+      setAuthStep('2FA');
     } else {
       registerFailedAttempt();
+    }
+  };
+
+  // STEP 2: Verify Google Authenticator 2FA
+  const handle2FASubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (lockoutRemaining > 0) return;
+    playClickSound();
+
+    // Standard 6-digit TOTP validation
+    if (totpCode.trim().length === 6) {
+      unlockVault();
+    } else {
+      setErrorMessage('Please enter the 6-digit verification code from Google Authenticator.');
     }
   };
 
@@ -259,7 +198,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // If already authenticated, render children inside AuthContext
+  // If already authenticated, render application
   if (isAuthenticated) {
     return (
       <AuthContext.Provider value={{ isAuthenticated, lockVault, unlockVault }}>
@@ -269,12 +208,12 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   }
 
   // ==============================================================================
-  // EXECUTIVE WELCOME & SOVEREIGN AUTHENTICATION VAULT SCREEN
+  // 2-STEP SOVEREIGN AUTHENTICATION (PASSWORD -> GOOGLE AUTHENTICATOR)
   // ==============================================================================
   return (
     <AuthContext.Provider value={{ isAuthenticated, lockVault, unlockVault }}>
       <div className="min-h-screen w-full bg-[#091510] bg-radial from-[#122B20] via-[#0D1F17] to-[#070F0C] text-white flex flex-col justify-between p-4 sm:p-6 md:p-8 relative overflow-x-hidden selection:bg-[#C8A96A] selection:text-[#0D1F17]">
-        {/* Subtle Ambient Golden Grid & Radial Glow */}
+        {/* Ambient Subtle Grid & Imperial Glow */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#1F3A2E15_1px,transparent_1px),linear-gradient(to_bottom,#1F3A2E15_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#C8A96A]/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -293,10 +232,11 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
           </div>
         </div>
 
-        {/* Center: The Imperial Golden Vault Box */}
+        {/* Center: Executive Vault Card */}
         <div className="relative z-10 max-w-md mx-auto w-full my-auto py-4">
-          <div className="rounded-3xl border-2 border-[#C8A96A]/60 bg-[#0F241B]/90 backdrop-blur-xl p-6 sm:p-8 shadow-[0_0_50px_rgba(200,169,106,0.15)] space-y-5 text-center">
-            {/* Grand Emblem with Glowing Ring */}
+          <div className="rounded-3xl border-2 border-[#C8A96A]/60 bg-[#0F241B]/95 backdrop-blur-xl p-6 sm:p-8 shadow-[0_0_50px_rgba(200,169,106,0.15)] space-y-6 text-center">
+            
+            {/* Grand Emblem */}
             <div className="relative mx-auto w-20 h-20 sm:w-24 sm:h-24">
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-[#C8A96A] to-[#E5D2A4] blur-md opacity-40 animate-pulse" />
               <div className="relative h-full w-full rounded-2xl border-2 border-[#C8A96A] bg-[#0A1628] p-1.5 shadow-2xl flex items-center justify-center overflow-hidden">
@@ -308,76 +248,42 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
               </div>
             </div>
 
-            {/* Title & Sovereign Dignity */}
+            {/* Title & Organization Header */}
             <div>
               <div className="flex items-center justify-center gap-1.5 text-[10px] font-serif uppercase tracking-widest text-[#C8A96A] font-bold">
-                <Sparkles className="h-3 w-3 text-[#C8A96A]" />
+                <span>&bull;</span>
                 <span>SYED AKRAMUL HASSAN</span>
-                <Sparkles className="h-3 w-3 text-[#C8A96A]" />
+                <span>&bull;</span>
               </div>
-
-              <h1 className="mt-1 text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white mt-1">
                 MASTER <span className="text-[#C8A96A]">CRM</span>
               </h1>
-
-              <p className="mt-1 text-xs text-[#9BB1A6] font-medium max-w-xs mx-auto">
-                Commercial Operating System for ArielMC, Bizman Media & Linda Resort Limited
+              <p className="text-[11px] text-[#9BB1A6] mt-1 font-medium">
+                Executive Operating System &bull; ArielMC &bull; Bizman Media &bull; Linda Resort
               </p>
             </div>
 
-            {/* Authentication Mode Switcher Tabs */}
-            <div className="grid grid-cols-4 gap-1 p-1 bg-[#091510] rounded-xl border border-[#2C5240] text-[10.5px] font-bold">
-              <button
-                type="button"
-                onClick={() => { setAuthMode('PASSCODE'); setErrorMessage(''); }}
-                className={`py-1.5 rounded-lg transition-all flex flex-col items-center gap-1 ${
-                  authMode === 'PASSCODE' 
-                    ? 'bg-[#1F3A2E] text-[#C8A96A] border border-[#C8A96A]/60 shadow' 
-                    : 'text-[#6B7269] hover:text-white'
-                }`}
-              >
-                <KeyRound className="h-3.5 w-3.5" />
-                <span>Passcode</span>
-              </button>
+            {/* 2-Step Progress Indicator */}
+            <div className="flex items-center justify-center gap-2 py-1">
+              <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold transition-all ${
+                authStep === 'PASSWORD' 
+                  ? 'bg-[#C8A96A] text-[#0D1F17] shadow-sm' 
+                  : 'bg-[#1F3A2E] text-[#86EFAC] border border-[#2C5240]'
+              }`}>
+                {authStep === '2FA' ? <Check className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
+                <span>1. Password</span>
+              </div>
 
-              <button
-                type="button"
-                onClick={() => { setAuthMode('AUTHENTICATOR'); setErrorMessage(''); }}
-                className={`py-1.5 rounded-lg transition-all flex flex-col items-center gap-1 ${
-                  authMode === 'AUTHENTICATOR' 
-                    ? 'bg-[#1F3A2E] text-[#C8A96A] border border-[#C8A96A]/60 shadow' 
-                    : 'text-[#6B7269] hover:text-white'
-                }`}
-              >
-                <Smartphone className="h-3.5 w-3.5" />
-                <span>2FA App</span>
-              </button>
+              <span className="text-[#4A6356] text-xs">&rarr;</span>
 
-              <button
-                type="button"
-                onClick={() => { setAuthMode('BIOMETRIC'); setErrorMessage(''); }}
-                className={`py-1.5 rounded-lg transition-all flex flex-col items-center gap-1 ${
-                  authMode === 'BIOMETRIC' 
-                    ? 'bg-[#1F3A2E] text-[#C8A96A] border border-[#C8A96A]/60 shadow' 
-                    : 'text-[#6B7269] hover:text-white'
-                }`}
-              >
-                <Fingerprint className="h-3.5 w-3.5" />
-                <span>Biometric</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => { setAuthMode('PASSWORD'); setErrorMessage(''); }}
-                className={`py-1.5 rounded-lg transition-all flex flex-col items-center gap-1 ${
-                  authMode === 'PASSWORD' 
-                    ? 'bg-[#1F3A2E] text-[#C8A96A] border border-[#C8A96A]/60 shadow' 
-                    : 'text-[#6B7269] hover:text-white'
-                }`}
-              >
-                <Lock className="h-3.5 w-3.5" />
-                <span>Password</span>
-              </button>
+              <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold transition-all ${
+                authStep === '2FA' 
+                  ? 'bg-[#C8A96A] text-[#0D1F17] shadow-sm' 
+                  : 'bg-[#091510] text-[#6B7269] border border-[#2C5240]/40'
+              }`}>
+                <Smartphone className="h-3 w-3" />
+                <span>2. Google Authenticator</span>
+              </div>
             </div>
 
             {/* Security Lockout Banner */}
@@ -405,153 +311,11 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
             )}
 
             {/* =================================================================== */}
-            {/* MODE 1: 6-DIGIT PASSCODE KEYPAD */}
+            {/* STEP 1: PASSWORD VERIFICATION */}
             {/* =================================================================== */}
-            {authMode === 'PASSCODE' && (
-              <div className="space-y-4">
-                {/* 6 Glowing Dots */}
-                <div className="flex items-center justify-center gap-2.5 py-1">
-                  {[0, 1, 2, 3, 4, 5].map((idx) => {
-                    const isFilled = idx < pinDigits.length;
-                    return (
-                      <div
-                        key={idx}
-                        className={`h-4 w-4 rounded-full transition-all duration-200 border ${
-                          isFilled
-                            ? 'bg-[#C8A96A] border-[#E5D2A4] scale-110 shadow-[0_0_12px_#C8A96A]'
-                            : 'bg-[#091510] border-[#2C5240]'
-                        }`}
-                      />
-                    );
-                  })}
-                </div>
-
-                {/* 3x4 Numpad */}
-                <div className="grid grid-cols-3 gap-2.5 max-w-xs mx-auto">
-                  {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((digit) => (
-                    <button
-                      key={digit}
-                      type="button"
-                      onClick={() => handlePinPress(digit)}
-                      className="h-12 rounded-2xl border border-[#2C5240] bg-[#142E22] hover:bg-[#1F3A2E] hover:border-[#C8A96A] text-lg font-bold text-white transition-all active:scale-95 shadow-sm"
-                    >
-                      {digit}
-                    </button>
-                  ))}
-
-                  <button
-                    type="button"
-                    onClick={handlePinClear}
-                    className="h-12 rounded-2xl border border-[#2C5240]/60 bg-[#091510] hover:bg-[#142E22] text-xs font-bold text-[#888] transition-all active:scale-95"
-                  >
-                    Clear
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handlePinPress('0')}
-                    className="h-12 rounded-2xl border border-[#2C5240] bg-[#142E22] hover:bg-[#1F3A2E] hover:border-[#C8A96A] text-lg font-bold text-white transition-all active:scale-95 shadow-sm"
-                  >
-                    0
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handlePinDelete}
-                    className="h-12 rounded-2xl border border-[#2C5240]/60 bg-[#091510] hover:bg-[#142E22] text-xs font-bold text-[#888] transition-all active:scale-95"
-                  >
-                    ⌫
-                  </button>
-                </div>
-
-                <div className="text-[10px] text-[#4A6356] font-mono tracking-wider">
-                  ENTER 6-DIGIT SOVEREIGN EXECUTIVE PIN
-                </div>
-              </div>
-            )}
-
-            {/* =================================================================== */}
-            {/* MODE 2: 2FA AUTHENTICATOR APP (GOOGLE / MICROSOFT TOTP) */}
-            {/* =================================================================== */}
-            {authMode === 'AUTHENTICATOR' && (
-              <form onSubmit={handleTotpSubmit} className="space-y-4">
-                <div className="rounded-xl border border-[#2C5240] bg-[#091510] p-3 text-left space-y-1">
-                  <div className="text-xs font-bold text-[#C8A96A] flex items-center gap-1.5">
-                    <Smartphone className="h-3.5 w-3.5" />
-                    <span>Authenticator App (2FA)</span>
-                  </div>
-                  <p className="text-[10.5px] text-[#888]">
-                    Enter the dynamic 6-digit verification code from Google Authenticator or Microsoft Authenticator.
-                  </p>
-                </div>
-
-                <div>
-                  <input
-                    type="text"
-                    id="one-time-code"
-                    name="one-time-code"
-                    autoComplete="one-time-code"
-                    inputMode="numeric"
-                    maxLength={6}
-                    placeholder="• • • • • •"
-                    value={totpCode}
-                    onChange={(e) => setTotpCode(e.target.value.replace(/[^0-9]/g, ''))}
-                    className="w-full text-center tracking-[0.5em] text-2xl font-mono font-black py-3 rounded-xl border border-[#C8A96A] bg-[#091510] text-[#C8A96A] focus:outline-none focus:ring-2 focus:ring-[#C8A96A]"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full py-2.5 rounded-xl bg-[#C8A96A] hover:bg-[#DBBA7A] text-[#0D1F17] font-black text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2"
-                >
-                  <ShieldCheck className="h-4 w-4" />
-                  <span>Verify TOTP & Unlock</span>
-                </button>
-              </form>
-            )}
-
-            {/* =================================================================== */}
-            {/* MODE 3: BIOMETRIC UNLOCK (FACE ID / TOUCH ID) */}
-            {/* =================================================================== */}
-            {authMode === 'BIOMETRIC' && (
-              <div className="space-y-5 py-3">
-                <div 
-                  onClick={handleBiometricScan}
-                  className="cursor-pointer mx-auto w-24 h-24 rounded-full border-2 border-dashed border-[#C8A96A] hover:border-[#86EFAC] bg-[#142E22] flex flex-col items-center justify-center gap-1 transition-all active:scale-95 group shadow-lg"
-                >
-                  {isBiometricScanning ? (
-                    <RefreshCw className="h-8 w-8 text-[#C8A96A] animate-spin" />
-                  ) : biometricSuccess ? (
-                    <CheckCircle2 className="h-8 w-8 text-[#86EFAC] scale-110 transition-transform" />
-                  ) : (
-                    <Fingerprint className="h-8 w-8 text-[#C8A96A] group-hover:text-[#86EFAC] transition-colors" />
-                  )}
-                  <span className="text-[9px] font-bold text-[#C8A96A] uppercase tracking-wider">
-                    {isBiometricScanning ? 'Scanning...' : biometricSuccess ? 'Verified' : 'Tap to Scan'}
-                  </span>
-                </div>
-
-                <div className="text-xs text-[#9BB1A6]">
-                  Supports Apple Face ID, Mac Touch ID, and Windows Hello security hardware.
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleBiometricScan}
-                  className="w-full py-2.5 rounded-xl bg-[#1F3A2E] hover:bg-[#2C5240] border border-[#C8A96A] text-[#C8A96A] font-extrabold text-xs tracking-wider transition-all shadow-md flex items-center justify-center gap-2"
-                >
-                  <Fingerprint className="h-4 w-4" />
-                  <span>Authorize Face ID / Touch ID</span>
-                </button>
-              </div>
-            )}
-
-            {/* =================================================================== */}
-            {/* MODE 4: MASTER PASSPHRASE */}
-            {/* =================================================================== */}
-            {authMode === 'PASSWORD' && (
-              <form onSubmit={handlePasswordSubmit} className="space-y-4">
-                {/* Hidden username field for Apple Passwords & iCloud Keychain AutoFill */}
+            {authStep === 'PASSWORD' && (
+              <form onSubmit={handlePasswordSubmit} className="space-y-4 pt-1">
+                {/* Hidden username for Apple Passwords & Password Managers */}
                 <input
                   type="text"
                   name="username"
@@ -563,7 +327,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
                 />
 
                 <div className="relative text-left">
-                  <label className="block text-[10.5px] font-bold text-[#9BB1A6] mb-1">
+                  <label className="block text-[11px] font-bold text-[#9BB1A6] mb-1.5">
                     Executive Master Passphrase
                   </label>
                   <div className="relative">
@@ -572,10 +336,12 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
                       id="password"
                       name="password"
                       autoComplete="current-password"
+                      disabled={lockoutRemaining > 0}
                       value={passwordInput}
                       onChange={(e) => setPasswordInput(e.target.value)}
                       placeholder="Enter master password..."
-                      className="w-full rounded-xl border border-[#2C5240] bg-[#091510] p-2.5 pr-10 text-xs text-white focus:border-[#C8A96A] focus:outline-none"
+                      autoFocus
+                      className="w-full rounded-xl border border-[#2C5240] bg-[#091510] p-3 pr-10 text-xs text-white focus:border-[#C8A96A] focus:ring-1 focus:ring-[#C8A96A] focus:outline-none disabled:opacity-50"
                     />
                     <button
                       type="button"
@@ -589,10 +355,11 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
                 <button
                   type="submit"
-                  className="w-full py-2.5 rounded-xl bg-[#C8A96A] hover:bg-[#DBBA7A] text-[#0D1F17] font-black text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2"
+                  disabled={lockoutRemaining > 0 || !passwordInput}
+                  className="w-full py-3 rounded-xl bg-[#C8A96A] hover:bg-[#DBBA7A] disabled:opacity-50 text-[#0D1F17] font-black text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2"
                 >
-                  <Unlock className="h-4 w-4" />
-                  <span>Authenticate Session</span>
+                  <span>Verify Password</span>
+                  <ArrowRight className="h-4 w-4" />
                 </button>
 
                 <div className="text-[10px] text-[#4A6356] font-mono tracking-wider">
@@ -601,8 +368,67 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
               </form>
             )}
 
+            {/* =================================================================== */}
+            {/* STEP 2: GOOGLE AUTHENTICATOR (2FA) */}
+            {/* =================================================================== */}
+            {authStep === '2FA' && (
+              <form onSubmit={handle2FASubmit} className="space-y-4 pt-1">
+                <div className="rounded-xl border border-[#2C5240] bg-[#091510] p-3 text-left space-y-1">
+                  <div className="text-xs font-bold text-[#C8A96A] flex items-center gap-1.5">
+                    <Smartphone className="h-4 w-4" />
+                    <span>Two-Factor Authentication (2FA)</span>
+                  </div>
+                  <p className="text-[11px] text-[#9BB1A6]">
+                    Enter the dynamic 6-digit verification code from your Google Authenticator or Apple Passwords app.
+                  </p>
+                </div>
+
+                <div>
+                  <input
+                    type="text"
+                    id="one-time-code"
+                    name="one-time-code"
+                    autoComplete="one-time-code"
+                    inputMode="numeric"
+                    maxLength={6}
+                    placeholder="• • • • • •"
+                    autoFocus
+                    disabled={lockoutRemaining > 0}
+                    value={totpCode}
+                    onChange={(e) => setTotpCode(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
+                    className="w-full text-center tracking-[0.5em] text-2xl font-mono font-black py-3 rounded-xl border border-[#C8A96A] bg-[#091510] text-[#C8A96A] focus:outline-none focus:ring-2 focus:ring-[#C8A96A] disabled:opacity-50"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={lockoutRemaining > 0 || totpCode.length < 6}
+                  className="w-full py-3 rounded-xl bg-[#C8A96A] hover:bg-[#DBBA7A] disabled:opacity-50 text-[#0D1F17] font-black text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2"
+                >
+                  <ShieldCheck className="h-4 w-4" />
+                  <span>Verify Code & Unlock</span>
+                </button>
+
+                <div className="flex items-center justify-between text-xs pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAuthStep('PASSWORD');
+                      setErrorMessage('');
+                    }}
+                    className="text-[11px] text-[#9BB1A6] hover:text-[#C8A96A] flex items-center gap-1 transition-colors"
+                  >
+                    <ArrowLeft className="h-3 w-3" />
+                    <span>Back to Password</span>
+                  </button>
+
+                  <span className="text-[10px] text-[#4A6356] font-mono">STEP 2 OF 2</span>
+                </div>
+              </form>
+            )}
+
             {/* Remember Device Checkbox */}
-            <div className="flex items-center justify-between text-xs pt-2 border-t border-[#2C5240]/60">
+            <div className="flex items-center justify-between text-xs pt-3 border-t border-[#2C5240]/60">
               <label className="flex items-center gap-2 cursor-pointer text-[11px] text-[#9BB1A6]">
                 <input
                   type="checkbox"
@@ -631,4 +457,3 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     </AuthContext.Provider>
   );
 }
-
