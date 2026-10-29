@@ -2,8 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Default Executive Obsidian */
-:root {
+/* Default ArielMC ERP Signature Palette */
+:root,
+[data-theme="arielmc-erp"] {
+  --theme-bg: #0c1611;
+  --theme-sidebar: #08100c;
+  --theme-card: #14241b;
+  --theme-card-sub: #0f1c15;
+  --theme-border: #1F3A2E;
+  --theme-text: #F4F6F4;
+  --theme-muted: #8fa899;
+  --theme-accent: #C8A96A;
+  --theme-accent-hover: #dbae64;
+  --theme-highlight: #C8A96A;
+}
+
+/* Executive Dark Slate */
+[data-theme="executive-dark"] {
   --theme-bg: #0b0f19;
   --theme-sidebar: #070a12;
   --theme-card: #111827;
@@ -137,6 +152,7 @@ body {
 
 [data-theme] .bg-indigo-600 {
   background-color: var(--theme-accent) !important;
+  color: #0c1611 !important;
 }
 
 [data-theme] .hover\:bg-indigo-500:hover {

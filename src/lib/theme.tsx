@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 export type ThemeId = 
+  | 'arielmc-erp'
   | 'executive-dark'
   | 'ink-wash'
   | 'fresh-peach'
@@ -15,14 +16,16 @@ export interface ThemeOption {
   name: string;
   palette: string[];
   description: string;
+  isPreferred?: boolean;
 }
 
 export const THEMES: ThemeOption[] = [
   {
-    id: 'executive-dark',
-    name: 'Executive Obsidian (Default)',
-    palette: ['#0f172a', '#1e293b', '#6366f1', '#10b981'],
-    description: 'Ultra-dark slate with indigo and emerald accents',
+    id: 'arielmc-erp',
+    name: 'ArielMC ERP (Signature)',
+    palette: ['#1F3A2E', '#C8A96A', '#2C5240', '#0A1A2F'],
+    description: 'Official ArielMC ERP: Forest Pine Green (#1F3A2E) & Imperial Gold (#C8A96A)',
+    isPreferred: true,
   },
   {
     id: 'ink-wash',
@@ -54,6 +57,12 @@ export const THEMES: ThemeOption[] = [
     palette: ['#3D4127', '#636B2F', '#BAC095', '#D4DE95'],
     description: 'Deep forest foliage, organic olive & pale chartreuse sage',
   },
+  {
+    id: 'executive-dark',
+    name: 'Executive Obsidian',
+    palette: ['#0f172a', '#1e293b', '#6366f1', '#10b981'],
+    description: 'Ultra-dark slate with indigo and emerald accents',
+  },
 ];
 
 interface ThemeContextType {
@@ -62,12 +71,12 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-  currentTheme: 'executive-dark',
+  currentTheme: 'arielmc-erp',
   setTheme: () => {},
 });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [currentTheme, setCurrentTheme] = useState<ThemeId>('executive-dark');
+  const [currentTheme, setCurrentTheme] = useState<ThemeId>('arielmc-erp');
 
   useEffect(() => {
     const saved = localStorage.getItem('master_crm_theme') as ThemeId;
@@ -75,7 +84,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       setCurrentTheme(saved);
       document.documentElement.setAttribute('data-theme', saved);
     } else {
-      document.documentElement.setAttribute('data-theme', 'executive-dark');
+      // Default to ArielMC ERP signature theme
+      setCurrentTheme('arielmc-erp');
+      document.documentElement.setAttribute('data-theme', 'arielmc-erp');
     }
   }, []);
 
