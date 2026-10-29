@@ -368,8 +368,36 @@ main .border-slate-800\/40,
 main .border-slate-800\/50,
 main .border-slate-800\/60,
 main .border-slate-800\/80,
-main .border-slate-700 {
+main .border-slate-700,
+main .border-\[\#DDE3DD\],
+main .border-\[\#DDE3DD\]\/40,
+main .border-\[\#DDE3DD\]\/60,
+main .border-\[\#DDE3DD\]\/70 {
   border-color: var(--main-border) !important;
+}
+
+/* Sub-panels and card backgrounds */
+main .bg-\[\#F4F6F4\],
+main .bg-\[\#F4F6F4\]\/30,
+main .bg-\[\#F4F6F4\]\/50 {
+  background-color: var(--main-card-sub) !important;
+}
+
+/* Theme Brand & Accent text propagation */
+main .text-\[\#1F3A2E\] {
+  color: var(--main-brand-green) !important;
+}
+
+main .text-\[\#C8A96A\] {
+  color: var(--main-brand-gold) !important;
+}
+
+main .border-\[\#1F3A2E\] {
+  border-color: var(--main-brand-green) !important;
+}
+
+main .border-\[\#C8A96A\] {
+  border-color: var(--main-brand-gold) !important;
 }
 
 /* Text Overrides for High Contrast Light Canvas */

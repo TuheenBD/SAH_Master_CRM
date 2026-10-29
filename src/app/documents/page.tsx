@@ -627,10 +627,10 @@ Attested: Syed Akramul Hassan`;
             return (
               <div
                 key={doc.id}
-                className={`rounded-xl border p-4.5 space-y-3.5 transition-all bg-white relative shadow-xs ${
+                className={`rounded-xl border p-6 space-y-4 transition-all bg-white relative shadow-xs ${
                   isSelected 
                     ? 'border-[#1F3A2E] ring-2 ring-[#1F3A2E]/10 bg-[#F4F6F4]/30' 
-                    : 'border-[#DDE3DD] hover:border-[#1F3A2E]/50'
+                    : 'border-[#DDE3DD] hover:border-[#1F3A2E]/50 hover:shadow-sm'
                 }`}
               >
                 {/* Top Row: Checkbox, File Icon, Entity Badge & Quick Actions */}
@@ -648,7 +648,7 @@ Attested: Syed Akramul Hassan`;
                       )}
                     </button>
 
-                    <div className="h-8 w-8 rounded-lg bg-[#F4F6F4] border border-[#DDE3DD] flex items-center justify-center shrink-0">
+                    <div className="h-9 w-9 rounded-lg bg-[#F4F6F4] border border-[#DDE3DD] flex items-center justify-center shrink-0">
                       {getFileIcon(doc.fileType)}
                     </div>
 
@@ -665,7 +665,7 @@ Attested: Syed Akramul Hassan`;
                   </div>
 
                   {/* Security Badge */}
-                  <span className={`px-2 py-0.5 text-[9px] font-extrabold uppercase rounded font-mono ${
+                  <span className={`px-2.5 py-1 text-[9px] font-extrabold uppercase rounded-md font-mono ${
                     doc.securityLevel === 'CONFIDENTIAL' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
                     doc.securityLevel === 'RESTRICTED' ? 'bg-amber-50 text-amber-800 border border-amber-200' :
                     doc.securityLevel === 'INTERNAL' ? 'bg-blue-50 text-blue-700 border border-blue-200' :
@@ -675,43 +675,43 @@ Attested: Syed Akramul Hassan`;
                   </span>
                 </div>
 
-                {/* Title & File Name */}
-                <div>
+                {/* Title & File Name - Generous spacing, no clamp */}
+                <div className="pt-1">
                   <h3 
                     onClick={() => setPreviewDoc(doc)}
-                    className="text-sm font-extrabold text-[#1F3A2E] hover:text-[#C8A96A] cursor-pointer line-clamp-1 transition-colors"
+                    className="text-base font-extrabold text-[#1F3A2E] hover:text-[#C8A96A] cursor-pointer leading-snug transition-colors"
                   >
                     {doc.title}
                   </h3>
-                  <div className="text-xs font-mono text-[#6B7269] flex items-center gap-1.5 mt-0.5">
+                  <div className="text-xs font-mono text-[#6B7269] flex items-center gap-2 mt-1.5">
                     <span className="truncate">{doc.fileName}</span>
                     <span>&bull;</span>
-                    <span className="shrink-0">{doc.fileSize}</span>
+                    <span className="shrink-0 font-semibold">{doc.fileSize}</span>
                   </div>
                 </div>
 
                 {/* Notes or Category */}
                 {doc.notes && (
-                  <p className="text-[11px] text-[#556055] line-clamp-2 bg-[#F4F6F4] p-2 rounded-lg border border-[#DDE3DD]/70">
+                  <p className="text-xs leading-relaxed text-[#444] bg-[#F8F9F8] p-3 rounded-lg border border-[#DDE3DD]">
                     {doc.notes}
                   </p>
                 )}
 
                 {/* Tags */}
-                <div className="flex flex-wrap gap-1 text-[10px]">
+                <div className="flex flex-wrap gap-1.5 text-xs pt-0.5">
                   {doc.tags.map((tag, tIdx) => (
-                    <span key={tIdx} className="rounded bg-slate-100 text-[#556055] px-1.5 py-0.5 font-medium">
+                    <span key={tIdx} className="rounded-md bg-[#F4F6F4] text-[#1F3A2E] border border-[#DDE3DD] px-2.5 py-1 text-[11px] font-semibold">
                       #{tag}
                     </span>
                   ))}
                 </div>
 
                 {/* Footer Metadata & Action Buttons */}
-                <div className="flex items-center justify-between border-t border-[#DDE3DD] pt-2.5 text-xs text-[#6B7269]">
-                  <div className="text-[10px] font-mono">
+                <div className="flex items-center justify-between border-t border-[#DDE3DD] pt-3 text-xs text-[#6B7269]">
+                  <div className="text-[11px] font-mono">
                     <span>Uploaded: {doc.uploadDate}</span>
                     {doc.expiryDate && (
-                      <span className="text-[#8A5A00] block">Exp: {doc.expiryDate}</span>
+                      <span className="text-[#8A5A00] font-semibold block">Exp: {doc.expiryDate}</span>
                     )}
                   </div>
 
@@ -1486,3 +1486,4 @@ Attested: Syed Akramul Hassan`;
     </div>
   );
 }
+

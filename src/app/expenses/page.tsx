@@ -132,10 +132,10 @@ export default function ExpensesPage() {
       </div>
 
       {/* Expense Records Table */}
-      <div className="rounded-xl border border-slate-800 bg-slate-900/60 overflow-hidden shadow-sm">
+      <div className="rounded-xl border border-[#DDE3DD] bg-white overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
+            <thead className="bg-[#F8F9F8] border-b border-[#DDE3DD] text-[#556055] font-extrabold uppercase tracking-wider text-[11px]">
               <tr>
                 <th className="py-3 px-4">Ref #</th>
                 <th className="py-3 px-4">Entity</th>
@@ -146,42 +146,42 @@ export default function ExpensesPage() {
                 <th className="py-3 px-4 text-right">Amount</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-[#DDE3DD]">
               {filteredExpenses.map((exp) => (
-                <tr key={exp.id} className="hover:bg-slate-800/40 transition-colors">
-                  <td className="py-3.5 px-4 font-mono text-slate-300 whitespace-nowrap">
+                <tr key={exp.id} className="hover:bg-[#F4F6F4] transition-colors">
+                  <td className="py-3.5 px-4 font-mono font-bold text-[#1F3A2E] text-xs whitespace-nowrap">
                     {exp.expenseNumber}
                   </td>
                   <td className="py-3.5 px-4 whitespace-nowrap">
-                    <span className={`px-2 py-0.5 text-[10px] font-bold rounded ${
-                      exp.companyCode === 'BIZMAN' ? 'bg-blue-950 text-blue-400 border border-blue-800' :
-                      exp.companyCode === 'LINDA' ? 'bg-[#FFF3D6] text-[#8A5A00] border border-[#FBE0A8]' :
-                      'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                    <span className={`px-2 py-0.5 text-[10px] font-bold rounded shadow-xs ${
+                      exp.companyCode === 'BIZMAN' ? 'bg-[#ECFDF5] text-[#065F46] border border-[#A7F3D0]' :
+                      exp.companyCode === 'LINDA' ? 'bg-black text-white px-1.5 py-0.5 text-[9px] font-extrabold tracking-wider' :
+                      'bg-[#F0FDF4] text-[#166534] border border-[#BBF7D0]'
                     }`}>
-                      {exp.companyCode === 'ARIELMC' ? 'ArielMC' : exp.companyCode}
+                      {exp.companyCode === 'ARIELMC' ? 'ArielMC' : exp.companyCode === 'LINDA' ? 'Linda Resort' : exp.companyCode}
                     </span>
                   </td>
-                  <td className="py-3.5 px-4 font-mono text-slate-400 whitespace-nowrap">
+                  <td className="py-3.5 px-4 font-mono font-bold text-[#1A1A1A] text-xs whitespace-nowrap">
                     {exp.date}
                   </td>
-                  <td className="py-3.5 px-4 font-medium text-slate-200">
-                    <div>{exp.description}</div>
-                    <div className="text-[10px] text-slate-500 font-normal">Paid to: {exp.vendorRecipient}</div>
+                  <td className="py-3.5 px-4 font-semibold text-[#1F3A2E]">
+                    <div className="font-bold">{exp.description}</div>
+                    <div className="text-[10px] text-[#6B7269] font-normal">Paid to: <strong className="text-[#1A1A1A]">{exp.vendorRecipient}</strong></div>
                   </td>
                   <td className="py-3.5 px-4">
                     {exp.leadTitle ? (
-                      <span className="inline-block max-w-xs truncate rounded bg-indigo-950/60 border border-indigo-900/60 px-2 py-0.5 text-[11px] text-indigo-300">
+                      <span className="inline-block max-w-xs truncate rounded-md bg-[#EEF2FF] border border-[#C7D2FE] px-2.5 py-1 text-xs font-bold text-[#4338CA] shadow-xs">
                         {exp.leadTitle}
                       </span>
                     ) : (
-                      <span className="text-slate-600 italic">General Overhead</span>
+                      <span className="text-[#888] italic text-xs">General Overhead</span>
                     )}
                   </td>
-                  <td className="py-3.5 px-4 text-[11px] text-slate-400 font-mono">
-                    <div>Dr: {exp.expenseAccount}</div>
-                    <div className="text-slate-500">Cr: {exp.paidFromAccount}</div>
+                  <td className="py-3.5 px-4 text-xs text-[#1A1A1A] font-semibold font-mono">
+                    <div className="text-[#1F3A2E]">Dr: {exp.expenseAccount}</div>
+                    <div className="text-[#6B7269] text-[11px]">Cr: {exp.paidFromAccount}</div>
                   </td>
-                  <td className="py-3.5 px-4 text-right font-mono font-bold text-rose-400 whitespace-nowrap">
+                  <td className="py-3.5 px-4 text-right font-mono font-bold text-rose-600 whitespace-nowrap text-sm">
                     -{exp.currency === 'USD' ? '$' : '৳'}{exp.amount.toLocaleString()}
                   </td>
                 </tr>

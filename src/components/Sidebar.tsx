@@ -142,21 +142,21 @@ export default function Sidebar() {
                 )}
 
                 {activeCompany === 'LINDA' && (
-                  <div className="h-9 w-20 rounded-lg overflow-hidden border border-[var(--sidebar-border)] bg-black shrink-0 px-1 flex items-center justify-center shadow">
-                    <img src="/logos/linda-logo.png" alt="Linda Resort" className="max-h-7 w-auto object-contain" />
+                  <div className="h-10 w-28 rounded-lg overflow-hidden border border-[var(--sidebar-border)] bg-black shrink-0 px-2 py-0.5 flex items-center justify-center shadow">
+                    <img src="/logos/linda-logo.png" alt="Linda Resort" className="max-h-8 w-auto object-contain" />
                   </div>
                 )}
 
                 {activeCompany === 'CONSOLIDATED' && (
-                  <div className="flex items-center -space-x-1.5 shrink-0">
-                    <div className="h-7 w-7 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-white p-0.5 shadow">
-                      <img src="/logos/arielmc-logo.png" alt="ArielMC" className="h-full w-full object-contain" />
+                  <div className="flex items-center -space-x-1 shrink-0">
+                    <div className="h-7 w-8 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-white p-0.5 shadow flex items-center justify-center">
+                      <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-6 w-auto object-contain" />
                     </div>
-                    <div className="h-7 w-7 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-[#0D3B29] p-0.5 shadow">
+                    <div className="h-7 w-7 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-[#0D3B29] p-0.5 shadow flex items-center justify-center">
                       <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-full w-full object-contain" />
                     </div>
-                    <div className="h-7 w-7 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-black p-0.5 shadow">
-                      <img src="/logos/linda-logo.png" alt="Linda" className="h-full w-full object-contain" />
+                    <div className="h-7 w-14 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-black p-0.5 shadow flex items-center justify-center">
+                      <img src="/logos/linda-logo.png" alt="Linda" className="max-h-5 w-auto object-contain" />
                     </div>
                   </div>
                 )}

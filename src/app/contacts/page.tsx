@@ -287,10 +287,10 @@ export default function ContactsPage() {
             <button
               key={tab.key}
               onClick={() => setSelectedCategory(tab.key)}
-              className={`rounded-lg px-3 py-1.5 font-medium whitespace-nowrap transition-all ${
+              className={`rounded-lg px-3 py-1.5 font-bold whitespace-nowrap transition-all ${
                 selectedCategory === tab.key
-                  ? 'bg-indigo-600 text-white font-semibold shadow'
-                  : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                  ? 'bg-[#1F3A2E] text-[#C8A96A] font-extrabold shadow-sm border border-[#1F3A2E]'
+                  : 'bg-white border border-[#DDE3DD] text-[#556055] hover:text-[#1F3A2E] hover:bg-[#F4F6F4]'
               }`}
             >
               {tab.label}
@@ -300,13 +300,13 @@ export default function ContactsPage() {
 
         {/* Search Input */}
         <div className="relative w-full md:w-72">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#6B7269]" />
           <input
             type="text"
             placeholder="Search by name, organization, phone..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-lg border border-slate-800 bg-slate-900/90 pl-9 pr-3 py-2 text-xs text-slate-200 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            className="w-full rounded-lg border border-[#DDE3DD] bg-white pl-9 pr-3 py-2 text-xs text-[#1A1A1A] placeholder:text-[#6B7269] focus:border-[#1F3A2E] focus:outline-none focus:ring-1 focus:ring-[#1F3A2E]"
           />
         </div>
       </div>
@@ -357,31 +357,59 @@ export default function ContactsPage() {
                 key={contact.id}
                 className={`rounded-xl border p-4 space-y-3 transition-all relative ${
                   isChecked
-                    ? 'border-indigo-500 bg-slate-900 shadow-md shadow-indigo-500/10'
-                    : 'border-slate-800 bg-slate-900/60 hover:border-slate-700 hover:bg-slate-900/90'
+                    ? 'border-[#1F3A2E] bg-white shadow-md'
+                    : 'border-[#DDE3DD] bg-white hover:border-[#1F3A2E] hover:shadow-sm'
                 }`}
               >
-                {/* Card Top Row: Checkbox, Category Badge & Edit/Delete Actions */}
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2">
+                {/* Card Top Row: Checkbox, Affiliation Badge, Category Badge & Actions */}
+                <div className="flex items-center justify-between text-xs gap-2">
+                  <div className="flex items-center gap-1.5 flex-wrap">
                     <button
                       onClick={() => handleToggleSelect(contact.id)}
-                      className="text-slate-400 hover:text-white transition-colors"
+                      className="text-[#6B7269] hover:text-[#1F3A2E] transition-colors"
                       title="Select Contact"
                     >
                       {isChecked ? (
-                        <CheckSquare className="h-4 w-4 text-indigo-400" />
+                        <CheckSquare className="h-4 w-4 text-[#1F3A2E]" />
                       ) : (
-                        <Square className="h-4 w-4 text-slate-600 hover:text-slate-400" />
+                        <Square className="h-4 w-4 text-[#6B7269]" />
                       )}
                     </button>
 
-                    <span className={`px-2 py-0.5 text-[10px] font-bold rounded ${
-                      contact.category === 'BUYER_CLIENT' ? 'bg-indigo-950 text-indigo-400 border border-indigo-800' :
-                      contact.category === 'SUPPLIER_RAW_MATERIAL' ? 'bg-amber-950 text-amber-400 border border-amber-800' :
-                      contact.category === 'VENDOR_BILLBOARD' ? 'bg-orange-950 text-orange-400 border border-orange-800' :
-                      contact.category === 'CO_WORKER' ? 'bg-blue-950 text-blue-400 border border-blue-800' :
-                      'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                    {/* Affiliation Badge */}
+                    {contact.companyAffiliation === 'ARIELMC' && (
+                      <span className="bg-[#F0FDF4] border border-[#BBF7D0] text-[#166534] px-1.5 py-0.5 rounded text-[10px] font-bold shadow-xs">
+                        ArielMC
+                      </span>
+                    )}
+                    {contact.companyAffiliation === 'BIZMAN' && (
+                      <span className="bg-[#ECFDF5] border border-[#A7F3D0] text-[#065F46] px-1.5 py-0.5 rounded text-[10px] font-bold shadow-xs">
+                        Bizman
+                      </span>
+                    )}
+                    {contact.companyAffiliation === 'LINDA' && (
+                      <span className="bg-black text-white px-1.5 py-0.5 rounded text-[9px] font-extrabold tracking-wider shadow-xs">
+                        Linda Resort
+                      </span>
+                    )}
+                    {contact.companyAffiliation === 'GROUP' && (
+                      <span className="bg-[#EEF2FF] border border-[#C7D2FE] text-[#4338CA] px-1.5 py-0.5 rounded text-[10px] font-bold shadow-xs">
+                        Group
+                      </span>
+                    )}
+                    {contact.companyAffiliation === 'PERSONAL' && (
+                      <span className="bg-[#FDF2F8] border border-[#FBCFE8] text-[#9D174D] px-1.5 py-0.5 rounded text-[10px] font-bold shadow-xs">
+                        Personal
+                      </span>
+                    )}
+
+                    {/* Category Badge */}
+                    <span className={`px-2 py-0.5 text-[10px] font-bold rounded shadow-xs ${
+                      contact.category === 'BUYER_CLIENT' ? 'bg-[#E8F0FA] text-[#1F5FA8] border border-[#BBD5F2]' :
+                      contact.category === 'SUPPLIER_RAW_MATERIAL' ? 'bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]' :
+                      contact.category === 'VENDOR_BILLBOARD' ? 'bg-[#E0F2FE] text-[#0369A1] border border-[#BAE6FD] font-extrabold' :
+                      contact.category === 'CO_WORKER' ? 'bg-[#F3E8FF] text-[#6B21A8] border border-[#E9D5FF]' :
+                      'bg-[#E4F3E9] text-[#1E6B3A] border border-[#B6E2C5]'
                     }`}>
                       {contact.category.replace(/_/g, ' ')}
                     </span>
@@ -392,14 +420,14 @@ export default function ContactsPage() {
                     <button
                       onClick={() => handleOpenEdit(contact)}
                       title="Edit Contact"
-                      className="p-1 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                      className="p-1 rounded text-[#6B7269] hover:text-[#1F3A2E] hover:bg-[#F4F6F4] transition-colors"
                     >
-                      <Edit2 className="h-3.5 w-3.5 text-slate-400 hover:text-indigo-400" />
+                      <Edit2 className="h-3.5 w-3.5" />
                     </button>
                     <button
                       onClick={() => handleDeleteSingle(contact.id, contact.fullName)}
                       title="Delete Contact"
-                      className="p-1 rounded text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition-colors"
+                      className="p-1 rounded text-[#6B7269] hover:text-rose-600 hover:bg-[#FEE8E8] transition-colors"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -407,45 +435,53 @@ export default function ContactsPage() {
                 </div>
 
                 {/* Name, Designation & Organization */}
-                <div>
-                  <h3 className="text-sm font-bold text-white flex items-center justify-between">
+                <div className="space-y-1">
+                  <h3 className="text-sm font-extrabold text-[#1F3A2E] flex items-center justify-between">
                     <span>{contact.fullName}</span>
                     {contact.convertedLeadId && (
-                      <span className="text-[10px] rounded bg-emerald-950 border border-emerald-800 text-emerald-400 px-1.5 py-0.5 font-semibold">
+                      <span className="text-[10px] rounded bg-[#E4F3E9] border border-[#B6E2C5] text-[#1E6B3A] px-1.5 py-0.5 font-bold">
                         ✓ Active Lead
                       </span>
                     )}
                   </h3>
-                  <div className="text-xs text-slate-300 font-medium">{contact.designation}</div>
-                  <div className="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
-                    <Building2 className="h-3 w-3 text-slate-500 shrink-0" />
-                    <span className="truncate">{contact.organization} &bull; {contact.city}, {contact.country}</span>
+                  <div className="text-xs text-[#556055] font-semibold">{contact.designation}</div>
+                  
+                  {/* COMPANY - High Visibility */}
+                  <div className="text-xs flex items-center gap-1.5 pt-0.5">
+                    <Building2 className="h-3.5 w-3.5 text-[#1F3A2E] shrink-0" />
+                    <span className="font-extrabold text-[#1F3A2E] text-xs tracking-tight">{contact.organization}</span>
+                  </div>
+
+                  {/* LOCATION - High Visibility */}
+                  <div className="text-xs flex items-center gap-1.5 text-[#1A1A1A] font-semibold">
+                    <MapPin className="h-3.5 w-3.5 text-[#C8A96A] shrink-0" />
+                    <span>{contact.city}, {contact.country}</span>
                   </div>
                 </div>
 
                 {/* Relationship Notes */}
-                <p className="text-[11px] text-slate-400 line-clamp-2 bg-slate-950/60 p-2 rounded border border-slate-800/60">
+                <p className="text-[11px] text-[#444] line-clamp-2 bg-[#F8F9F8] p-2.5 rounded-lg border border-[#DDE3DD]">
                   {contact.relationshipNotes}
                 </p>
 
                 {/* Tags */}
                 <div className="flex flex-wrap gap-1 text-[10px]">
                   {contact.tags.map((tag, idx) => (
-                    <span key={idx} className="rounded bg-slate-800/70 text-slate-400 px-1.5 py-0.5">
+                    <span key={idx} className="rounded bg-[#F4F6F4] text-[#1F3A2E] border border-[#DDE3DD] px-1.5 py-0.5 font-semibold">
                       #{tag}
                     </span>
                   ))}
                 </div>
 
                 {/* Bottom Action Bar: Calling, WhatsApp & Lead Conversion */}
-                <div className="flex items-center justify-between border-t border-slate-800/80 pt-2.5 text-xs">
+                <div className="flex items-center justify-between border-t border-[#DDE3DD] pt-2.5 text-xs">
                   <div className="flex items-center gap-1.5">
                     <a
                       href={`tel:${contact.primaryPhone}`}
                       title={`Call ${contact.fullName}`}
-                      className="rounded p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-colors"
+                      className="rounded p-1.5 bg-[#F4F6F4] hover:bg-[#E4F3E9] text-[#1F3A2E] border border-[#DDE3DD] transition-colors"
                     >
-                      <PhoneCall className="h-3.5 w-3.5 text-emerald-400" />
+                      <PhoneCall className="h-3.5 w-3.5 text-[#1E6B3A]" />
                     </a>
 
                     <a
@@ -453,7 +489,7 @@ export default function ContactsPage() {
                       target="_blank"
                       rel="noopener noreferrer"
                       title="WhatsApp Chat"
-                      className="rounded p-1.5 bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-800 transition-colors"
+                      className="rounded p-1.5 bg-[#25D366] hover:bg-[#20BA5A] text-white border border-[#1EBE5D] transition-colors shadow-xs"
                     >
                       <MessageSquare className="h-3.5 w-3.5" />
                     </a>
@@ -462,9 +498,9 @@ export default function ContactsPage() {
                       <a
                         href={`mailto:${contact.email}`}
                         title={`Email ${contact.fullName}`}
-                        className="rounded p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-colors"
+                        className="rounded p-1.5 bg-[#F4F6F4] hover:bg-[#E8F0FA] text-[#1F5FA8] border border-[#DDE3DD] transition-colors"
                       >
-                        <Mail className="h-3.5 w-3.5 text-indigo-400" />
+                        <Mail className="h-3.5 w-3.5" />
                       </a>
                     )}
                   </div>
@@ -472,9 +508,9 @@ export default function ContactsPage() {
                   {contact.isConvertibleToLead && !contact.convertedLeadId && (
                     <button
                       onClick={() => handleOpenConvert(contact)}
-                      className="flex items-center gap-1 rounded bg-indigo-600/90 hover:bg-indigo-600 text-white px-2.5 py-1 text-[11px] font-semibold transition-colors shadow-sm"
+                      className="flex items-center gap-1 rounded-lg bg-[#1F3A2E] hover:bg-[#2C5240] text-[#C8A96A] px-2.5 py-1 text-[11px] font-bold transition-colors shadow-xs border border-[#1F3A2E]"
                     >
-                      <Sparkles className="h-3 w-3 text-amber-300" />
+                      <Sparkles className="h-3 w-3 text-[#C8A96A]" />
                       <span>Turn to Lead</span>
                     </button>
                   )}
@@ -489,17 +525,17 @@ export default function ContactsPage() {
       {/* 2. TABLE VIEW MODE (DATA TABLE WITH ACTIONS) */}
       {/* =================================================================== */}
       {viewMode === 'TABLE' && (
-        <div className="rounded-xl border border-slate-800 bg-slate-900/60 overflow-hidden shadow-sm">
+        <div className="rounded-xl border border-[#DDE3DD] bg-white overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
+              <thead className="bg-[#F8F9F8] border-b border-[#DDE3DD] text-[#556055] font-extrabold uppercase tracking-wider text-[11px]">
                 <tr>
                   <th className="py-3 px-3 w-10 text-center">
                     <button onClick={handleSelectAll} title="Select All">
                       {selectedIds.length === filteredContacts.length && filteredContacts.length > 0 ? (
-                        <CheckSquare className="h-4 w-4 text-indigo-400" />
+                        <CheckSquare className="h-4 w-4 text-[#1F3A2E]" />
                       ) : (
-                        <Square className="h-4 w-4 text-slate-600" />
+                        <Square className="h-4 w-4 text-[#6B7269]" />
                       )}
                     </button>
                   </th>
@@ -511,54 +547,81 @@ export default function ContactsPage() {
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody className="divide-y divide-[#DDE3DD]">
                 {filteredContacts.map((contact) => {
                   const isChecked = selectedIds.includes(contact.id);
                   return (
                     <tr
                       key={contact.id}
-                      className={`hover:bg-slate-800/40 transition-colors ${isChecked ? 'bg-indigo-950/20' : ''}`}
+                      className={`hover:bg-[#F4F6F4] transition-colors ${isChecked ? 'bg-[#E4F3E9]/30' : ''}`}
                     >
                       {/* Select Checkbox */}
                       <td className="py-3 px-3 text-center">
                         <button onClick={() => handleToggleSelect(contact.id)}>
                           {isChecked ? (
-                            <CheckSquare className="h-4 w-4 text-indigo-400" />
+                            <CheckSquare className="h-4 w-4 text-[#1F3A2E]" />
                           ) : (
-                            <Square className="h-4 w-4 text-slate-600 hover:text-slate-400" />
+                            <Square className="h-4 w-4 text-[#6B7269] hover:text-[#1F3A2E]" />
                           )}
                         </button>
                       </td>
 
                       {/* Contact & Organization */}
                       <td className="py-3 px-4">
-                        <div className="font-bold text-white flex items-center gap-1.5">
+                        <div className="font-extrabold text-[#1F3A2E] text-xs flex items-center gap-1.5">
                           <span>{contact.fullName}</span>
                           {contact.convertedLeadId && (
-                            <span className="text-[9px] rounded bg-emerald-950 border border-emerald-800 text-emerald-400 px-1 py-0.2 font-semibold">
+                            <span className="text-[9px] rounded-md bg-[#E4F3E9] border border-[#B6E2C5] text-[#1E6B3A] px-1.5 py-0.5 font-bold">
                               ✓ Lead
                             </span>
                           )}
                         </div>
-                        <div className="text-[11px] text-slate-400">{contact.designation} &bull; <strong className="text-slate-300">{contact.organization}</strong></div>
+                        <div className="text-xs text-[#1A1A1A] font-semibold mt-0.5">
+                          <span className="text-[#556055]">{contact.designation} &bull; </span>
+                          <strong className="text-[#1F3A2E] font-black">{contact.organization}</strong>
+                        </div>
                       </td>
 
                       {/* Category Badge */}
                       <td className="py-3 px-4 whitespace-nowrap">
-                        <span className={`px-2 py-0.5 text-[10px] font-bold rounded ${
-                          contact.category === 'BUYER_CLIENT' ? 'bg-indigo-950 text-indigo-400 border border-indigo-800' :
-                          contact.category === 'SUPPLIER_RAW_MATERIAL' ? 'bg-amber-950 text-amber-400 border border-amber-800' :
-                          contact.category === 'VENDOR_BILLBOARD' ? 'bg-orange-950 text-orange-400 border border-orange-800' :
-                          contact.category === 'CO_WORKER' ? 'bg-blue-950 text-blue-400 border border-blue-800' :
-                          'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                        <span className={`px-2 py-0.5 text-[10px] font-bold rounded-md shadow-xs ${
+                          contact.category === 'BUYER_CLIENT' ? 'bg-[#E8F0FA] text-[#1F5FA8] border border-[#BBD5F2]' :
+                          contact.category === 'SUPPLIER_RAW_MATERIAL' ? 'bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]' :
+                          contact.category === 'VENDOR_BILLBOARD' ? 'bg-[#E0F2FE] text-[#0369A1] border border-[#BAE6FD] font-extrabold' :
+                          contact.category === 'CO_WORKER' ? 'bg-[#F3E8FF] text-[#6B21A8] border border-[#E9D5FF]' :
+                          'bg-[#E4F3E9] text-[#1E6B3A] border border-[#B6E2C5]'
                         }`}>
                           {contact.category.replace(/_/g, ' ')}
                         </span>
                       </td>
 
                       {/* Affiliation */}
-                      <td className="py-3 px-4 whitespace-nowrap font-mono text-[11px] text-slate-300">
-                        {contact.companyAffiliation === 'ARIELMC' ? 'ArielMC' : contact.companyAffiliation === 'LINDA' ? 'Linda Resort' : contact.companyAffiliation === 'BIZMAN' ? 'Bizman' : contact.companyAffiliation}
+                      <td className="py-3 px-4 whitespace-nowrap font-mono text-xs">
+                        {contact.companyAffiliation === 'ARIELMC' && (
+                          <span className="rounded-md bg-[#F0FDF4] border border-[#BBF7D0] text-[#166534] px-2 py-0.5 font-bold shadow-xs">
+                            ArielMC
+                          </span>
+                        )}
+                        {contact.companyAffiliation === 'BIZMAN' && (
+                          <span className="rounded-md bg-[#ECFDF5] border border-[#A7F3D0] text-[#065F46] font-bold px-2 py-0.5 shadow-xs">
+                            Bizman
+                          </span>
+                        )}
+                        {contact.companyAffiliation === 'LINDA' && (
+                          <span className="rounded-md bg-black text-white px-2 py-0.5 font-extrabold tracking-wider text-[10px] shadow-xs">
+                            Linda Resort
+                          </span>
+                        )}
+                        {contact.companyAffiliation === 'GROUP' && (
+                          <span className="rounded-md bg-[#EEF2FF] border border-[#C7D2FE] text-[#4338CA] font-bold px-2 py-0.5 shadow-xs">
+                            Group / All
+                          </span>
+                        )}
+                        {contact.companyAffiliation === 'PERSONAL' && (
+                          <span className="rounded-md bg-[#FDF2F8] border border-[#FBCFE8] text-[#9D174D] font-bold px-2 py-0.5 shadow-xs">
+                            Personal
+                          </span>
+                        )}
                       </td>
 
                       {/* Phone & WhatsApp Quick Communication */}
@@ -566,9 +629,9 @@ export default function ContactsPage() {
                         <div className="flex items-center gap-2">
                           <a
                             href={`tel:${contact.primaryPhone}`}
-                            className="flex items-center gap-1 text-slate-200 hover:text-indigo-400 font-mono text-[11px]"
+                            className="flex items-center gap-1.5 text-[#1A1A1A] hover:text-[#1F3A2E] font-mono text-xs font-semibold"
                           >
-                            <PhoneCall className="h-3 w-3 text-emerald-400" />
+                            <PhoneCall className="h-3.5 w-3.5 text-[#1E6B3A]" />
                             <span>{contact.primaryPhone}</span>
                           </a>
 
@@ -576,17 +639,20 @@ export default function ContactsPage() {
                             href={`https://wa.me/${contact.whatsappNumber}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="rounded p-1 bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-800"
+                            className="rounded p-1 bg-[#25D366] hover:bg-[#20BA5A] text-white border border-[#1EBE5D] shadow-xs"
                             title="Chat on WhatsApp"
                           >
-                            <MessageSquare className="h-3 w-3" />
+                            <MessageSquare className="h-3.5 w-3.5" />
                           </a>
                         </div>
                       </td>
 
                       {/* Location */}
-                      <td className="py-3 px-4 text-slate-400 whitespace-nowrap">
-                        {contact.city}, {contact.country}
+                      <td className="py-3 px-4 text-[#1A1A1A] font-semibold whitespace-nowrap text-xs">
+                        <div className="flex items-center gap-1.5">
+                          <MapPin className="h-3.5 w-3.5 text-[#C8A96A] shrink-0" />
+                          <span>{contact.city}, {contact.country}</span>
+                        </div>
                       </td>
 
                       {/* Table Row Actions: Convert, Edit, Delete */}
@@ -595,7 +661,7 @@ export default function ContactsPage() {
                           {contact.isConvertibleToLead && !contact.convertedLeadId && (
                             <button
                               onClick={() => handleOpenConvert(contact)}
-                              className="rounded bg-indigo-600/90 hover:bg-indigo-600 text-white px-2 py-1 text-[10px] font-semibold"
+                              className="rounded-md bg-[#1F3A2E] hover:bg-[#2C5240] text-[#C8A96A] border border-[#1F3A2E] px-2 py-1 text-[10px] font-bold shadow-xs"
                               title="Turn into Active Lead"
                             >
                               + Lead
@@ -604,7 +670,7 @@ export default function ContactsPage() {
 
                           <button
                             onClick={() => handleOpenEdit(contact)}
-                            className="p-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                            className="p-1.5 rounded-md text-[#6B7269] hover:text-[#1F3A2E] hover:bg-[#F4F6F4] transition-colors"
                             title="Edit Contact"
                           >
                             <Edit2 className="h-3.5 w-3.5" />
@@ -612,7 +678,7 @@ export default function ContactsPage() {
 
                           <button
                             onClick={() => handleDeleteSingle(contact.id, contact.fullName)}
-                            className="p-1.5 rounded text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition-colors"
+                            className="p-1.5 rounded-md text-[#6B7269] hover:text-rose-600 hover:bg-[#FEE8E8] transition-colors"
                             title="Delete Contact"
                           >
                             <Trash2 className="h-3.5 w-3.5" />

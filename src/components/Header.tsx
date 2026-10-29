@@ -80,8 +80,8 @@ export default function Header() {
             </div>
           )}
           {activeCompany === 'LINDA' && (
-            <div className="h-8 w-16 rounded-lg overflow-hidden border border-[var(--header-border)] bg-black px-1 shadow flex items-center justify-center shrink-0">
-              <img src="/logos/linda-logo.png" alt="Linda Resort" className="max-h-6 w-auto object-contain" />
+            <div className="h-10 w-32 rounded-lg overflow-hidden border border-[var(--header-border)] bg-black px-2.5 py-1 shadow flex items-center justify-center shrink-0">
+              <img src="/logos/linda-logo.png" alt="Linda Resort" className="max-h-8 w-auto object-contain" />
             </div>
           )}
           {activeCompany === 'CONSOLIDATED' && (
@@ -122,15 +122,15 @@ export default function Header() {
                 >
                   {code === 'CONSOLIDATED' && <Layers className="h-3.5 w-3.5 shrink-0" />}
                   {code === 'ARIELMC' && (
-                    <img src="/logos/arielmc-logo.png" alt="ArielMC" className="h-3.5 w-auto object-contain shrink-0 bg-white px-0.5 rounded" />
+                    <img src="/logos/arielmc-logo.png" alt="ArielMC" className="h-4 w-auto object-contain shrink-0 bg-white px-0.5 rounded shadow-xs" />
                   )}
                   {code === 'BIZMAN' && (
-                    <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-3.5 w-3.5 rounded object-contain shrink-0" />
+                    <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-4 w-4 rounded object-contain shrink-0 shadow-xs" />
                   )}
                   {code === 'LINDA' && (
-                    <img src="/logos/linda-logo.png" alt="Linda" className="h-3 w-auto object-contain shrink-0 max-w-[28px] bg-black px-0.5 rounded" />
+                    <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-4.5 w-auto object-contain shrink-0 max-w-[58px] bg-black px-1.5 py-0.5 rounded border border-white/20 shadow-xs" />
                   )}
-                  <span>{code === 'CONSOLIDATED' ? 'ALL ENTITIES' : code === 'ARIELMC' ? 'ArielMC' : code === 'LINDA' ? 'LINDA RESORT' : code}</span>
+                  <span>{code === 'CONSOLIDATED' ? 'ALL ENTITIES' : code === 'ARIELMC' ? 'ArielMC' : code === 'BIZMAN' ? 'Bizman' : 'Linda Resort'}</span>
                 </button>
               );
             })}

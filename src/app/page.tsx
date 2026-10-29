@@ -88,25 +88,25 @@ export default function MasterDashboard() {
               </div>
             )}
             {activeCompany === 'LINDA' && (
-              <div className="h-14 w-32 rounded-xl overflow-hidden border border-[#DDE3DD] bg-black p-2 shadow-sm flex items-center justify-center shrink-0">
+              <div className="h-16 w-44 rounded-xl overflow-hidden border border-[#DDE3DD] bg-black p-2.5 shadow-sm flex items-center justify-center shrink-0">
                 <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-full w-auto object-contain" />
               </div>
             )}
             {activeCompany === 'ARIELMC' && (
-              <div className="h-14 w-20 rounded-xl overflow-hidden border border-[#DDE3DD] bg-white p-1 shadow-sm flex items-center justify-center shrink-0">
+              <div className="h-16 w-24 rounded-xl overflow-hidden border border-[#DDE3DD] bg-white p-1.5 shadow-sm flex items-center justify-center shrink-0">
                 <img src="/logos/arielmc-logo.png" alt="ArielMC" className="h-full w-auto object-contain" />
               </div>
             )}
             {activeCompany === 'CONSOLIDATED' && (
-              <div className="flex items-center -space-x-2 shrink-0 pt-1">
-                <div className="h-12 w-12 rounded-xl overflow-hidden border border-[#DDE3DD] bg-white p-1 shadow-sm">
-                  <img src="/logos/arielmc-logo.png" alt="ArielMC" className="h-full w-full object-contain" />
+              <div className="flex items-center -space-x-1.5 shrink-0 pt-1">
+                <div className="h-12 w-14 rounded-xl overflow-hidden border border-[#DDE3DD] bg-white p-1 shadow-sm flex items-center justify-center">
+                  <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-10 w-auto object-contain" />
                 </div>
-                <div className="h-12 w-12 rounded-xl overflow-hidden border border-[#DDE3DD] bg-[#0D3B29] p-1 shadow-sm">
+                <div className="h-12 w-12 rounded-xl overflow-hidden border border-[#DDE3DD] bg-[#0D3B29] p-1 shadow-sm flex items-center justify-center">
                   <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-full w-full object-contain" />
                 </div>
-                <div className="h-12 w-12 rounded-xl overflow-hidden border border-[#DDE3DD] bg-black p-1 shadow-sm">
-                  <img src="/logos/linda-logo.png" alt="Linda" className="h-full w-full object-contain" />
+                <div className="h-12 w-24 rounded-xl overflow-hidden border border-[#DDE3DD] bg-black p-1.5 shadow-sm flex items-center justify-center">
+                  <img src="/logos/linda-logo.png" alt="Linda" className="max-h-9 w-auto object-contain" />
                 </div>
               </div>
             )}
@@ -285,9 +285,9 @@ export default function MasterDashboard() {
                         target="_blank"
                         rel="noopener noreferrer"
                         title="Chat via WhatsApp"
-                        className="flex items-center gap-1 rounded bg-[#E4F3E9] hover:bg-[#1E6B3A] text-[#1E6B3A] hover:text-white px-2 py-1 text-xs border border-[#B6E2C5] transition-colors font-semibold"
+                        className="flex items-center gap-1.5 rounded-lg bg-[#25D366] hover:bg-[#20BA5A] text-white px-2.5 py-1 text-xs border border-[#1EBE5D] transition-colors font-bold shadow-xs"
                       >
-                        <MessageSquare className="h-3 w-3" />
+                        <MessageSquare className="h-3.5 w-3.5" />
                         <span className="text-[11px]">WhatsApp</span>
                       </a>
                     </div>

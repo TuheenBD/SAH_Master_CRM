@@ -374,8 +374,8 @@ export default function InventoryPage() {
         <div className="space-y-4 pt-6 border-t border-slate-800">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="h-7 w-20 rounded overflow-hidden border border-[#C8A96A]/40 bg-black px-1 shadow flex items-center justify-center shrink-0">
-                <img src="/logos/linda-logo.png" alt="Linda Resort" className="max-h-5 w-auto object-contain" />
+              <div className="h-10 w-28 rounded-lg overflow-hidden border border-[#DDE3DD] bg-black px-2 shadow flex items-center justify-center shrink-0">
+                <img src="/logos/linda-logo.png" alt="Linda Resort" className="max-h-8 w-auto object-contain" />
               </div>
               <h2 className="text-base font-bold text-white">
                 Linda Resort Limited: Luxury Villas, Cottages & Banquets
