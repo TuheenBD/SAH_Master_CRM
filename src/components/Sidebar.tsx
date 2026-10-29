@@ -18,6 +18,7 @@ import {
   Contact,
   Wallet,
   FileSpreadsheet,
+  FolderKanban,
   Menu,
   X,
   Sparkles
@@ -40,6 +41,7 @@ export default function Sidebar() {
         { label: 'Executive Dashboard', href: '/', icon: BarChart3 },
         { label: 'Master Contacts', href: '/contacts', icon: Contact },
         { label: 'Leads & Pipeline', href: '/leads', icon: Users },
+        { label: 'Document Center', href: '/documents', icon: FolderKanban },
         { label: 'Inventory & Catalog', href: '/inventory', icon: Tv2 },
       ],
     },

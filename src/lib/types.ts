@@ -233,3 +233,34 @@ export interface PersonalTransaction {
   accountName: string;
   notes?: string;
 }
+
+export type DocumentCategory = 
+  | 'CONTRACT_AGREEMENT'
+  | 'EXPORT_SHIPPING_LC'
+  | 'GOVT_REGULATORY_TAX'
+  | 'CORPORATE_GOVERNANCE'
+  | 'BANKING_FINANCIAL'
+  | 'MARKETING_CATALOG'
+  | 'PERSONAL_VAULT';
+
+export type DocumentSecurityLevel = 'CONFIDENTIAL' | 'RESTRICTED' | 'INTERNAL' | 'PUBLIC';
+
+export type DocumentFileType = 'PDF' | 'DOCX' | 'XLSX' | 'IMAGE' | 'ZIP';
+
+export interface DocumentRecord {
+  id: string;
+  title: string;
+  fileName: string;
+  fileSize: string;
+  fileType: DocumentFileType;
+  companyCode: 'ARIELMC' | 'BIZMAN' | 'LINDA' | 'PERSONAL' | 'CONSOLIDATED';
+  category: DocumentCategory;
+  securityLevel: DocumentSecurityLevel;
+  uploadDate: string;
+  expiryDate?: string;
+  tags: string[];
+  notes?: string;
+  uploadedBy: string;
+  version: string;
+  downloadCount?: number;
+}

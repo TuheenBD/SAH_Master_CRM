@@ -19,7 +19,9 @@ import {
   Sparkles,
   Palette,
   Check,
-  Palmtree
+  Palmtree,
+  FolderPlus,
+  FolderKanban
 } from 'lucide-react';
 import { CompanyCode, COMPANIES } from '@/lib/types';
 import { useTheme, THEMES } from '@/lib/theme';
@@ -47,6 +49,7 @@ export default function Header() {
       case '/': return 'Executive Master';
       case '/contacts': return 'Master Contacts';
       case '/leads': return 'Leads & Pipelines';
+      case '/documents': return 'Document Center';
       case '/inventory': return 'Inventory & Catalog';
       case '/expenses': return 'Deal Expenses';
       case '/finance': return 'Accounting & P&L';
@@ -269,6 +272,15 @@ export default function Header() {
                   >
                     <FileText className="h-4 w-4 text-[#88BDF2]" />
                     <span>Add New Contact</span>
+                  </Link>
+
+                  <Link
+                    href={`/documents?company=${activeCompany}&action=upload`}
+                    onClick={() => setQuickActionOpen(false)}
+                    className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-white transition-colors"
+                  >
+                    <FolderPlus className="h-4 w-4 text-[#C8A96A]" />
+                    <span>Upload Document</span>
                   </Link>
 
                   <Link
