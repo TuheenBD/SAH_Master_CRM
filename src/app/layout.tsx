@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
+import SoundAndGlassProvider from '@/components/SoundAndGlassProvider';
 import { ThemeProvider } from '@/lib/theme';
 import './globals.css';
 
@@ -24,6 +25,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="min-h-screen antialiased selection:bg-emerald-600 selection:text-white bg-[var(--main-bg)] text-[var(--main-text)]">
         <ThemeProvider>
+          <SoundAndGlassProvider />
           <div className="flex min-h-screen">
             {/* Left Side Panel (Dark Theme Tone) - Hidden in Print */}
             <div className="print:hidden">

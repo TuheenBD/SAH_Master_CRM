@@ -596,6 +596,91 @@ main select:focus {
 }
 
 /* ==============================================================================
+   PREMIUM GLASSMORPHISM onMouseOver (HOVER) EFFECTS FOR WHOLE CRM
+   ============================================================================== */
+
+/* 1. Glass onMouseOver on All Buttons & Interactive Controls */
+button,
+a[role="button"],
+input[type="button"],
+input[type="submit"],
+.btn-glass {
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.22s ease !important;
+}
+
+button:hover:not(:disabled),
+a[role="button"]:hover,
+input[type="button"]:hover:not(:disabled),
+input[type="submit"]:hover:not(:disabled),
+.btn-glass:hover {
+  backdrop-filter: blur(8px) saturate(160%);
+  -webkit-backdrop-filter: blur(8px) saturate(160%);
+  transform: translateY(-1.5px);
+  box-shadow: 
+    0 8px 18px -4px rgba(31, 58, 46, 0.16),
+    0 0 0 1px rgba(255, 255, 255, 0.35) inset,
+    0 1px 3px 0 rgba(200, 169, 106, 0.25) !important;
+}
+
+button:active:not(:disabled),
+a[role="button"]:active {
+  transform: translateY(0px) scale(0.99) !important;
+}
+
+/* 2. Glass onMouseOver on All Cards across the CRM */
+main .rounded-xl:not(button):not(input):not(table):not(tr):not(th):not(td):not(select):not([class*="h-4"]):not([class*="h-5"]):not([class*="h-6"]):not([class*="h-8"]):not([class*="h-9"]):not([class*="h-12"]):not([class*="h-14"]):not([class*="h-16"]),
+main .rounded-2xl:not(button):not(input):not(select),
+.glass-card,
+.card-hover {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              backdrop-filter 0.28s ease !important;
+}
+
+/* Light / White Cards Glass onMouseOver */
+main div.bg-white.rounded-xl:hover:not(button):not(a),
+main div[class*="bg-white"][class*="rounded-xl"]:hover:not(button):not(a),
+main div[class*="bg-white"][class*="rounded-2xl"]:hover:not(button):not(a),
+main .border-\[\#DDE3DD\].rounded-xl:hover:not(button):not(a),
+main .shadow-sm.rounded-xl:hover:not(button):not(a),
+.glass-card:hover {
+  backdrop-filter: blur(12px) saturate(170%);
+  -webkit-backdrop-filter: blur(12px) saturate(170%);
+  transform: translateY(-2.5px);
+  border-color: rgba(200, 169, 106, 0.6) !important;
+  box-shadow: 
+    0 16px 32px -8px rgba(31, 58, 46, 0.12),
+    0 4px 12px 0 rgba(0, 0, 0, 0.04),
+    0 0 0 1px rgba(255, 255, 255, 0.9) inset,
+    0 0 16px 0 rgba(200, 169, 106, 0.15) !important;
+}
+
+/* Dark Green & Royal Executive Cards Glass onMouseOver */
+main div[class*="bg-[#1F3A2E]"]:hover:not(button):not(a),
+main div[class*="bg-[#0D3B29]"]:hover:not(button):not(a),
+main div[class*="bg-[#0A1628]"]:hover:not(button):not(a) {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transform: translateY(-2.5px);
+  border-color: rgba(200, 169, 106, 0.75) !important;
+  box-shadow: 
+    0 20px 40px -10px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(200, 169, 106, 0.5) inset,
+    0 0 24px rgba(200, 169, 106, 0.22) !important;
+}
+
+/* Sidebar & Header Interactive Element Glass Glow */
+aside a:hover,
+header button:hover {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* ==============================================================================
    PRINT & VECTOR PDF EXPORT STYLES (A4 LETTERHEAD)
    ============================================================================== */
 @media print {

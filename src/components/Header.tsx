@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -21,10 +21,13 @@ import {
   Check,
   Palmtree,
   FolderPlus,
-  FolderKanban
+  FolderKanban,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import { CompanyCode, COMPANIES } from '@/lib/types';
 import { useTheme, THEMES } from '@/lib/theme';
+import { isAudioEnabled, toggleAudioEnabled } from '@/lib/sound';
 
 export default function Header() {
   const pathname = usePathname();
@@ -37,6 +40,19 @@ export default function Header() {
 
   const [quickActionOpen, setQuickActionOpen] = useState(false);
   const [themeDropdownOpen, setThemeDropdownOpen] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+
+  useEffect(() => {
+    setSoundEnabled(isAudioEnabled());
+    const onSoundChange = (e: Event) => {
+      const custom = e as CustomEvent<{ enabled: boolean }>;
+      if (custom.detail !== undefined) {
+        setSoundEnabled(custom.detail.enabled);
+      }
+    };
+    window.addEventListener('sound-toggle-change', onSoundChange);
+    return () => window.removeEventListener('sound-toggle-change', onSoundChange);
+  }, []);
 
   const switchCompany = (code: CompanyCode) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -297,6 +313,26 @@ export default function Header() {
               </>
             )}
           </div>
+
+          {/* Executive Audio Feedback Toggle */}
+          <button
+            onClick={() => {
+              const next = toggleAudioEnabled();
+              setSoundEnabled(next);
+            }}
+            title={soundEnabled ? 'Glass Sound Effects: Enabled (Click to Mute)' : 'Glass Sound Effects: Muted (Click to Enable)'}
+            className={`relative rounded-lg border p-2 transition-all ${
+              soundEnabled
+                ? 'border-[#2C5240] bg-[#162B22] text-[#C8A96A] hover:text-white hover:bg-[#2C5240]'
+                : 'border-[var(--header-border)] bg-black/20 text-[var(--header-sub)] hover:text-white'
+            }`}
+          >
+            {soundEnabled ? (
+              <Volume2 className="h-4 w-4" />
+            ) : (
+              <VolumeX className="h-4 w-4 opacity-60" />
+            )}
+          </button>
 
           {/* Agenda Reminder Bell */}
           <Link
