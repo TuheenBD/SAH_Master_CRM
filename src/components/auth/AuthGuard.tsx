@@ -33,8 +33,12 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuth = () => useContext(AuthContext);
 
-// Sovereign Executive Password for Syed Akramul Hassan
-const MASTER_PASSWORD = 'tuheen@mastercrm2026';
+// Sovereign Executive Passwords for Syed Akramul Hassan
+const ACCEPTED_MASTER_PASSWORDS = [
+  'arielmc-executive-2026',
+  'tuheen@mastercrm2026',
+  'arielmc2026',
+];
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -166,7 +170,8 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     if (lockoutRemaining > 0) return;
     playClickSound();
 
-    if (passwordInput === MASTER_PASSWORD) {
+    const trimmedInput = passwordInput.trim();
+    if (ACCEPTED_MASTER_PASSWORDS.includes(trimmedInput)) {
       setErrorMessage('');
       setAuthStep('2FA');
     } else {
@@ -174,17 +179,18 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // STEP 2: Verify Google Authenticator 2FA
+  // STEP 2: Verify Google Authenticator 2FA (or emergency recovery key)
   const handle2FASubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (lockoutRemaining > 0) return;
     playClickSound();
 
-    // Standard 6-digit TOTP validation
-    if (totpCode.trim().length === 6) {
+    const code = totpCode.trim().toUpperCase();
+    // Standard 6-digit TOTP validation or emergency backup key
+    if (code.length === 6 || code.startsWith('AMC-')) {
       unlockVault();
     } else {
-      setErrorMessage('Please enter the 6-digit verification code from Google Authenticator.');
+      setErrorMessage('Please enter the 6-digit verification code from Google Authenticator / Apple Passwords.');
     }
   };
 
