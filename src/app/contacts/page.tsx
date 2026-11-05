@@ -71,14 +71,14 @@ export default function ContactsPage() {
     email: '',
     city: 'Dhaka',
     country: 'Bangladesh',
-    companyAffiliation: 'BIZMAN' as 'BIZMAN' | 'LINDA' | 'ARIELMC' | 'PERSONAL' | 'GROUP',
+    companyAffiliation: 'BIZMAN' as 'BIZMAN' | 'LINDA' | 'ARIELMC' | 'ARIEL_ENERGY' | 'PERSONAL' | 'GROUP',
     relationshipNotes: '',
     tags: 'Media, Corporate',
     isConvertibleToLead: true,
   });
 
   // Lead Conversion State
-  const [targetCompany, setTargetCompany] = useState<'BIZMAN' | 'LINDA' | 'ARIELMC'>('BIZMAN');
+  const [targetCompany, setTargetCompany] = useState<'BIZMAN' | 'LINDA' | 'ARIELMC' | 'ARIEL_ENERGY'>('BIZMAN');
   const [dealTitle, setDealTitle] = useState<string>('');
   const [dealValue, setDealValue] = useState<string>('');
   const [pipelineType, setPipelineType] = useState<string>('DOOH_MEDIA_SLOT');

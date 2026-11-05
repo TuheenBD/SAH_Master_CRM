@@ -22,7 +22,9 @@ import {
   Menu, 
   X, 
   Sparkles,
-  Lock 
+  Lock,
+  Sun,
+  ArrowUpRight 
 } from 'lucide-react';
 import { CompanyCode, COMPANIES } from '@/lib/types';
 
@@ -72,6 +74,12 @@ export default function Sidebar() {
         { label: 'Email Drips', href: '/automations', icon: Send },
         { label: 'Calendar & Tasks', href: '/calendar', icon: CalendarDays },
         { label: 'Executive Scratchpad', href: '/scratchpad', icon: FileEdit },
+      ],
+    },
+    {
+      title: 'RENEWABLE ENERGY (EPC)',
+      items: [
+        { label: 'Solar Technical Hub', href: 'https://energy.arielmc.com/crm', icon: Sun, isExternal: true },
       ],
     },
   ];
@@ -152,16 +160,26 @@ export default function Sidebar() {
                     </div>
                   )}
 
+                  {activeCompany === 'ARIEL_ENERGY' && (
+                    <div className="h-8 px-2.5 rounded-lg overflow-hidden border border-[#10B981]/50 bg-[#064E3B] flex items-center gap-1.5 shadow">
+                      <Sun className="h-4 w-4 text-[#F59E0B]" />
+                      <span className="text-[10px] font-extrabold tracking-wide text-emerald-100 font-serif">Ariel Renewable Energy</span>
+                    </div>
+                  )}
+
                   {activeCompany === 'CONSOLIDATED' && (
-                    <div className="flex items-center gap-2">
-                      <div className="h-7 w-11 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-white p-0.5 shadow flex items-center justify-center">
-                        <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-5.5 w-auto object-contain" />
+                    <div className="flex items-center gap-1.5">
+                      <div className="h-7 w-9 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-white p-0.5 shadow flex items-center justify-center">
+                        <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-5 w-auto object-contain" />
                       </div>
                       <div className="h-7 w-7 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-[#0D3B29] p-0.5 shadow flex items-center justify-center">
                         <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-full w-full object-contain" />
                       </div>
-                      <div className="h-7 px-2 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-[#112717] shadow flex items-center justify-center">
-                        <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-5 w-auto object-contain" />
+                      <div className="h-7 px-1.5 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-[#112717] shadow flex items-center justify-center">
+                        <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-4.5 w-auto object-contain" />
+                      </div>
+                      <div className="h-7 w-7 rounded-md overflow-hidden border border-[#10B981]/40 bg-[#064E3B] shadow flex items-center justify-center" title="Ariel Renewable Energy">
+                        <Sun className="h-3.5 w-3.5 text-[#F59E0B]" />
                       </div>
                     </div>
                   )}
@@ -190,7 +208,26 @@ export default function Sidebar() {
                   </div>
 
                   <div className="space-y-0.5">
-                    {section.items.map((item) => {
+                    {section.items.map((item: any) => {
+                      if (item.isExternal) {
+                        return (
+                          <a
+                            key={item.href}
+                            href={item.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => setMobileOpen(false)}
+                            className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-semibold text-emerald-400 hover:bg-emerald-950/40 hover:text-emerald-300 transition-all border border-emerald-500/20"
+                          >
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <item.icon className="h-3.5 w-3.5 shrink-0 text-amber-400" />
+                              <span className="truncate">{item.label}</span>
+                            </div>
+                            <ArrowUpRight className="h-3 w-3 shrink-0 opacity-70" />
+                          </a>
+                        );
+                      }
+
                       const isActive = pathname === item.href;
                       const fullHref = `${item.href}?company=${activeCompany}`;
                       return (

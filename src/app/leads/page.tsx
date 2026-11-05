@@ -151,7 +151,7 @@ export default function LeadsPage() {
   const [showOptionalContactInCompanyModal, setShowOptionalContactInCompanyModal] = useState(false);
   const [newCompanyData, setNewCompanyData] = useState({
     companyName: '',
-    companyCode: (activeCompany === 'CONSOLIDATED' ? 'BIZMAN' : activeCompany) as 'ARIELMC' | 'BIZMAN' | 'LINDA',
+    companyCode: (activeCompany === 'CONSOLIDATED' ? 'BIZMAN' : activeCompany) as 'ARIELMC' | 'BIZMAN' | 'LINDA' | 'ARIEL_ENERGY',
     clientType: 'Direct Brand' as string,
     industry: 'Telecommunications',
     priorityTemp: 'WARM' as 'HOT' | 'WARM' | 'COLD',
@@ -303,7 +303,7 @@ export default function LeadsPage() {
   const [isCustomContact, setIsCustomContact] = useState(false);
   const [targetCompanyIdForContact, setTargetCompanyIdForContact] = useState<string>('');
   const [formData, setFormData] = useState({
-    companyCode: (activeCompany === 'CONSOLIDATED' ? 'BIZMAN' : activeCompany) as 'ARIELMC' | 'BIZMAN' | 'LINDA',
+    companyCode: (activeCompany === 'CONSOLIDATED' ? 'BIZMAN' : activeCompany) as 'ARIELMC' | 'BIZMAN' | 'LINDA' | 'ARIEL_ENERGY',
     title: '',
     projectName: '',
     customerName: '',
@@ -1124,7 +1124,7 @@ export default function LeadsPage() {
     setIsCreateCompanyModalOpen(false);
     setNewCompanyData({
       companyName: '',
-      companyCode: (activeCompany === 'CONSOLIDATED' ? 'BIZMAN' : activeCompany) as 'ARIELMC' | 'BIZMAN' | 'LINDA',
+      companyCode: (activeCompany === 'CONSOLIDATED' ? 'BIZMAN' : activeCompany) as 'ARIELMC' | 'BIZMAN' | 'LINDA' | 'ARIEL_ENERGY',
       clientType: 'Direct Brand',
       industry: 'Telecommunications',
       priorityTemp: 'WARM',
@@ -1215,7 +1215,7 @@ export default function LeadsPage() {
 
     // Reset form
     setFormData({
-      companyCode: (activeCompany === 'CONSOLIDATED' ? 'BIZMAN' : activeCompany) as 'ARIELMC' | 'BIZMAN' | 'LINDA',
+      companyCode: (activeCompany === 'CONSOLIDATED' ? 'BIZMAN' : activeCompany) as 'ARIELMC' | 'BIZMAN' | 'LINDA' | 'ARIEL_ENERGY',
       title: '',
       projectName: '',
       customerName: '',

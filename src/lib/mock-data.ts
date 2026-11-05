@@ -8539,6 +8539,236 @@ export const INITIAL_LEADS: LeadItem[] = [
 // 2. CORPORATE CLIENT ACCOUNTS (BANGLADESH TOP 100 + ARIELMC INTERNATIONAL 254)
 export const INITIAL_COMPANY_LEADS: CompanyLead[] = [
   {
+    "id": "arel-crm-001",
+    "companyCode": "ARIEL_ENERGY",
+    "companyName": "Apex Spinning & Knitting Mills Ltd",
+    "industry": "RMG / Apparel Decarbonization",
+    "clientType": "Industrial Rooftop C&I",
+    "priorityTemp": "HOT",
+    "country": "Bangladesh",
+    "city": "Gazipur",
+    "address": "Konabari, Gazipur, Dhaka",
+    "createdAt": "2026-10-15",
+    "contacts": [
+      {
+        "id": "cnt-arel-001",
+        "name": "Mr. Zahirul Islam",
+        "designation": "Executive Director (Operations & Energy)",
+        "department": "Energy & Infrastructure",
+        "roleType": "PRIMARY_DECISION_MAKER",
+        "phone": "+880 1711 592841",
+        "email": "zahirul.islam@apexknitting.com",
+        "isPrimary": true,
+        "notes": "Target: 725 kWp SREDA Net-Metering grid-sync with BREB by Dec 2026."
+      }
+    ],
+    "projects": [
+      {
+        "id": "proj-arel-001",
+        "projectCode": "AREL-2026-001",
+        "title": "725 kWp Turnkey C&I Rooftop Solar EPC & SREDA Net-Metering",
+        "pipelineType": "Rooftop Solar EPC",
+        "stage": "PROPOSAL_SENT",
+        "estimatedValue": 37410000,
+        "currency": "BDT",
+        "probability": 85,
+        "expectedCloseDate": "2026-12-15",
+        "contactPersonId": "cnt-arel-001",
+        "contactPersonName": "Mr. Zahirul Islam",
+        "contactPersonPhone": "+880 1711 592841",
+        "commissionRate": 5,
+        "commissionAmount": 1870500,
+        "customerPaymentStatus": "PENDING",
+        "entityPayoutStatus": "AWAITING_CUSTOMER_PAYMENT",
+        "createdAt": "2026-10-15"
+      }
+    ]
+  },
+  {
+    "id": "arel-crm-002",
+    "companyCode": "ARIEL_ENERGY",
+    "companyName": "DBL Color City Dyeing Complex",
+    "industry": "Textiles & Dyeing Infrastructure",
+    "clientType": "Industrial Rooftop C&I",
+    "priorityTemp": "HOT",
+    "country": "Bangladesh",
+    "city": "Gazipur",
+    "address": "Kashimpur, Gazipur",
+    "createdAt": "2026-10-18",
+    "contacts": [
+      {
+        "id": "cnt-arel-002",
+        "name": "Engr. Mahbubur Rahman",
+        "designation": "General Manager (Engineering & Utilities)",
+        "department": "Engineering & Utilities",
+        "roleType": "PRIMARY_DECISION_MAKER",
+        "phone": "+880 1819 284719",
+        "email": "m.rahman@dbl-group.com",
+        "isPrimary": true,
+        "notes": "1.38 MWp cluster; IDCOL 4.5% concessionary green debt application."
+      }
+    ],
+    "projects": [
+      {
+        "id": "proj-arel-002",
+        "projectCode": "AREL-2026-002",
+        "title": "1.38 MWp C&I Rooftop Solar Cluster & SREDA Application",
+        "pipelineType": "Rooftop Solar EPC",
+        "stage": "NEGOTIATION",
+        "estimatedValue": 71208000,
+        "currency": "BDT",
+        "probability": 90,
+        "expectedCloseDate": "2027-01-20",
+        "contactPersonId": "cnt-arel-002",
+        "contactPersonName": "Engr. Mahbubur Rahman",
+        "contactPersonPhone": "+880 1819 284719",
+        "commissionRate": 5,
+        "commissionAmount": 3560400,
+        "customerPaymentStatus": "PENDING",
+        "entityPayoutStatus": "AWAITING_CUSTOMER_PAYMENT",
+        "createdAt": "2026-10-18"
+      }
+    ]
+  },
+  {
+    "id": "arel-crm-003",
+    "companyCode": "ARIEL_ENERGY",
+    "companyName": "Monno Ceramic Industries Ltd",
+    "industry": "Ceramics & Tableware",
+    "clientType": "Industrial Rooftop C&I",
+    "priorityTemp": "HOT",
+    "country": "Bangladesh",
+    "city": "Dhaka",
+    "address": "Islampur, Dhamrai, Dhaka",
+    "createdAt": "2026-10-25",
+    "contacts": [
+      {
+        "id": "cnt-arel-003",
+        "name": "Mr. Tanvir Ahmed",
+        "designation": "Head of Supply Chain & Sustainability",
+        "department": "Supply Chain",
+        "roleType": "PRIMARY_DECISION_MAKER",
+        "phone": "+880 1912 345678",
+        "email": "tanvir@monno-ceramic.com",
+        "isPrimary": true,
+        "notes": "525 kWp concrete slab system with 92% direct factory self-consumption."
+      }
+    ],
+    "projects": [
+      {
+        "id": "proj-arel-003",
+        "projectCode": "AREL-2026-003",
+        "title": "525 kWp RCC Concrete Rooftop Solar Installation",
+        "pipelineType": "Rooftop Solar EPC",
+        "stage": "MEETING_SCHEDULED",
+        "estimatedValue": 27090000,
+        "currency": "BDT",
+        "probability": 70,
+        "expectedCloseDate": "2027-01-30",
+        "contactPersonId": "cnt-arel-003",
+        "contactPersonName": "Mr. Tanvir Ahmed",
+        "contactPersonPhone": "+880 1912 345678",
+        "commissionRate": 5,
+        "commissionAmount": 1354500,
+        "customerPaymentStatus": "PENDING",
+        "entityPayoutStatus": "AWAITING_CUSTOMER_PAYMENT",
+        "createdAt": "2026-10-25"
+      }
+    ]
+  },
+  {
+    "id": "arel-crm-004",
+    "companyCode": "ARIEL_ENERGY",
+    "companyName": "Sonargaon Jute & Composites Mills",
+    "industry": "Golden Jute Manufacturing",
+    "clientType": "Industrial Rooftop C&I",
+    "priorityTemp": "WARM",
+    "country": "Bangladesh",
+    "city": "Narayanganj",
+    "address": "Sonargaon, Narayanganj",
+    "createdAt": "2026-10-29",
+    "contacts": [
+      {
+        "id": "cnt-arel-004",
+        "name": "Engr. Shafiul Alam",
+        "designation": "Plant Director",
+        "department": "Plant Management",
+        "roleType": "PRIMARY_DECISION_MAKER",
+        "phone": "+880 1713 908172",
+        "email": "s.alam@sonargaonjute.com",
+        "isPrimary": true,
+        "notes": "810 kWp array for carbon-negative jute export branding."
+      }
+    ],
+    "projects": [
+      {
+        "id": "proj-arel-004",
+        "projectCode": "AREL-2026-004",
+        "title": "810 kWp Pre-Engineered Steel Shed Solar Array",
+        "pipelineType": "Rooftop Solar EPC",
+        "stage": "CONTACTED",
+        "estimatedValue": 41796000,
+        "currency": "BDT",
+        "probability": 60,
+        "expectedCloseDate": "2027-02-15",
+        "contactPersonId": "cnt-arel-004",
+        "contactPersonName": "Engr. Shafiul Alam",
+        "contactPersonPhone": "+880 1713 908172",
+        "commissionRate": 5,
+        "commissionAmount": 2089800,
+        "customerPaymentStatus": "PENDING",
+        "entityPayoutStatus": "AWAITING_CUSTOMER_PAYMENT",
+        "createdAt": "2026-10-29"
+      }
+    ]
+  },
+  {
+    "id": "arel-crm-005",
+    "companyCode": "ARIEL_ENERGY",
+    "companyName": "Mirsharai Footwear & Tannery Unit",
+    "industry": "Master Leather & Footwear",
+    "clientType": "Industrial Rooftop C&I",
+    "priorityTemp": "HOT",
+    "country": "Bangladesh",
+    "city": "Chattogram",
+    "address": "BSMSN, Mirsharai, Chattogram",
+    "createdAt": "2026-09-30",
+    "contacts": [
+      {
+        "id": "cnt-arel-005",
+        "name": "Mr. Kawsar Chowdhury",
+        "designation": "General Manager (Civil & Infrastructure)",
+        "department": "Civil Infrastructure",
+        "roleType": "PRIMARY_DECISION_MAKER",
+        "phone": "+880 1817 654321",
+        "email": "kawsar.c@apexfootwearltd.com",
+        "isPrimary": true,
+        "notes": "1.10 MWp Turnkey EPC executed. SREDA Grade-B Subcontractor deployed."
+      }
+    ],
+    "projects": [
+      {
+        "id": "proj-arel-005",
+        "projectCode": "AREL-2026-005",
+        "title": "1.10 MWp Turnkey EPC Standing Seam Rooftop Solar Plant",
+        "pipelineType": "Rooftop Solar EPC",
+        "stage": "WON",
+        "estimatedValue": 56760000,
+        "currency": "BDT",
+        "probability": 100,
+        "expectedCloseDate": "2026-12-01",
+        "contactPersonId": "cnt-arel-005",
+        "contactPersonName": "Mr. Kawsar Chowdhury",
+        "contactPersonPhone": "+880 1817 654321",
+        "commissionRate": 5,
+        "commissionAmount": 2838000,
+        "customerPaymentStatus": "RECEIVED",
+        "entityPayoutStatus": "READY_FOR_SETTLEMENT",
+        "createdAt": "2026-09-30"
+      }
+    ]
+  },
+  {
     "id": "corp-bd-001",
     "companyCode": "BIZMAN",
     "companyName": "Grameenphone Ltd.",
@@ -19123,7 +19353,7 @@ export const INITIAL_EXPENSES: ExpenseItem[] = [];
 export const INITIAL_JOURNAL_ENTRIES: JournalEntryItem[] = [];
 
 // 5. OFFICIAL CHART OF ACCOUNTS (BALANCES INITIALIZED)
-export const FINANCIAL_BALANCES: Record<'BIZMAN' | 'LINDA' | 'ARIELMC', AccountBalance[]> = {
+export const FINANCIAL_BALANCES: Record<'BIZMAN' | 'LINDA' | 'ARIELMC' | 'ARIEL_ENERGY', AccountBalance[]> = {
   BIZMAN: [
     { code: '1010', name: 'Petty Cash in Office Safe', type: 'ASSET', classification: 'CASH_AND_BANK', currency: 'BDT', balance: 0 },
     { code: '1020', name: 'Dutch-Bangla Bank Corporate A/C', type: 'ASSET', classification: 'CASH_AND_BANK', currency: 'BDT', balance: 0 },
@@ -19174,6 +19404,23 @@ export const FINANCIAL_BALANCES: Record<'BIZMAN' | 'LINDA' | 'ARIELMC', AccountB
     { code: '6010', name: 'International Trade Exhibitions & Samples', type: 'EXPENSE', classification: 'MARKETING_ENTERTAINMENT', currency: 'USD', balance: 0 },
     { code: '6030', name: 'QA Inspectors & Sourcing Team', type: 'EXPENSE', classification: 'SALARIES_AND_WAGES', currency: 'USD', balance: 0 },
     { code: '6040', name: 'Certifications (SEDEX, REACH, EU Food Contact)', type: 'EXPENSE', classification: 'OFFICE_RENT_UTILITIES', currency: 'USD', balance: 0 },
+  ],
+  ARIEL_ENERGY: [
+    { code: '1010', name: 'Petty Cash Site Operations', type: 'ASSET', classification: 'CASH_AND_BANK', currency: 'BDT', balance: 0 },
+    { code: '1020', name: 'BRAC Bank Green Escrow A/C', type: 'ASSET', classification: 'CASH_AND_BANK', currency: 'BDT', balance: 0 },
+    { code: '1200', name: 'Accounts Receivable (Factory EPC Contracts)', type: 'ASSET', classification: 'ACCOUNTS_RECEIVABLE', currency: 'BDT', balance: 0 },
+    { code: '1500', name: 'PV Module & Inverter Inventory (Tier-1)', type: 'ASSET', classification: 'INVENTORY_ASSET', currency: 'BDT', balance: 0 },
+    { code: '2010', name: 'Accounts Payable (SREDA Subcontractors & EPC Crews)', type: 'LIABILITY', classification: 'ACCOUNTS_PAYABLE', currency: 'BDT', balance: 0 },
+    { code: '2500', name: 'Bangladesh Bank 4.5% Green Refinancing Facility', type: 'LIABILITY', classification: 'LONG_TERM_DEBT', currency: 'BDT', balance: 0 },
+    { code: '3010', name: "Owner's Equity Capital", type: 'EQUITY', classification: 'OWNER_CAPITAL', currency: 'BDT', balance: 0 },
+    { code: '3020', name: 'Retained EPC Project Earnings', type: 'EQUITY', classification: 'RETAINED_EARNINGS', currency: 'BDT', balance: 0 },
+    { code: '4010', name: 'Turnkey C&I Rooftop Solar EPC Revenue', type: 'REVENUE', classification: 'SOLAR_EPC_REVENUE', currency: 'BDT', balance: 0 },
+    { code: '4020', name: 'SREDA Net-Metering & O&M Monitoring Retainers', type: 'REVENUE', classification: 'SOLAR_EPC_REVENUE', currency: 'BDT', balance: 0 },
+    { code: '5010', name: 'BOM Hardware (Jinko/LONGi Panels, Huawei Inverters)', type: 'EXPENSE', classification: 'COST_OF_GOODS_SOLD_MATERIALS', currency: 'BDT', balance: 0 },
+    { code: '5020', name: 'Subcontractor Installation, Rigging & Safety Walkways', type: 'EXPENSE', classification: 'COST_OF_GOODS_SOLD_SUBCONTRACTOR', currency: 'BDT', balance: 0 },
+    { code: '6010', name: 'Engineering Surveys, Drone Flights & Bespoke Dossiers', type: 'EXPENSE', classification: 'MARKETING_ENTERTAINMENT', currency: 'BDT', balance: 0 },
+    { code: '6030', name: 'Solar Electrical Engineers & SREDA Liaison Team', type: 'EXPENSE', classification: 'SALARIES_AND_WAGES', currency: 'BDT', balance: 0 },
+    { code: '6040', name: 'Testing, Grid Sync Calibration & Statutory Fees', type: 'EXPENSE', classification: 'OFFICE_RENT_UTILITIES', currency: 'BDT', balance: 0 },
   ],
 };
 

@@ -187,7 +187,7 @@ export default function DocumentCenterPage() {
     fileName: string;
     fileSize: string;
     fileType: DocumentFileType;
-    companyCode: 'ARIELMC' | 'BIZMAN' | 'LINDA' | 'PERSONAL' | 'CONSOLIDATED';
+    companyCode: 'ARIELMC' | 'BIZMAN' | 'LINDA' | 'ARIEL_ENERGY' | 'PERSONAL' | 'CONSOLIDATED';
     category: DocumentCategory;
     securityLevel: DocumentSecurityLevel;
     expiryDate: string;

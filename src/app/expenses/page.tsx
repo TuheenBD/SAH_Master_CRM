@@ -32,7 +32,7 @@ export default function ExpensesPage() {
   const [filterTab, setFilterTab] = useState<'ALL' | 'DUE_FROM_ENTITY' | 'SETTLED' | 'PERSONAL'>('ALL');
 
   // Form State
-  const [targetCompany, setTargetCompany] = useState<'BIZMAN' | 'LINDA' | 'ARIELMC'>(
+  const [targetCompany, setTargetCompany] = useState<'BIZMAN' | 'LINDA' | 'ARIELMC' | 'ARIEL_ENERGY'>(
     activeCompany === 'CONSOLIDATED' ? 'BIZMAN' : activeCompany
   );
   const [amount, setAmount] = useState<string>('');

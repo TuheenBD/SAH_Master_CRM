@@ -1,4 +1,4 @@
-export type CompanyCode = 'CONSOLIDATED' | 'ARIELMC' | 'BIZMAN' | 'LINDA';
+export type CompanyCode = 'CONSOLIDATED' | 'ARIELMC' | 'BIZMAN' | 'LINDA' | 'ARIEL_ENERGY';
 
 export interface CompanyMeta {
   code: CompanyCode;
@@ -74,6 +74,21 @@ export const COMPANIES: Record<CompanyCode, CompanyMeta> = {
       { label: 'Private Pool Villas', value: 'Couple & Family Villas' },
       { label: 'Corporate Retreats', value: 'Banquet & Day-Out Hub' },
       { label: 'Investor Timeshare', value: 'Active Share Sales' },
+    ],
+  },
+  ARIEL_ENERGY: {
+    code: 'ARIEL_ENERGY',
+    name: 'Ariel Renewable Energy Limited',
+    role: 'Managing Director / EPC Lead',
+    industry: 'Turnkey C&I Rooftop Solar EPC, SREDA Net-Metering, BESS, Factory Decarbonization & 4.5% Green Refinancing',
+    website: 'energy.arielmc.com',
+    currency: 'BDT / USD',
+    paletteDescription: 'Emerald Green (#059669), Golden Sun (#F59E0B) & Pearl White',
+    logoUrl: '/logos/ariel-energy-logo.png',
+    stats: [
+      { label: 'Pipeline Capacity', value: '32.4 MWp' },
+      { label: 'SREDA Applications', value: '7 Active Filings' },
+      { label: 'Refinancing Portfolio', value: '৳ 184 Cr CapEx' },
     ],
   },
 };
@@ -197,7 +212,7 @@ export interface ParallelProject {
 
 export interface CompanyLead {
   id: string;
-  companyCode: 'BIZMAN' | 'LINDA' | 'ARIELMC';
+  companyCode: 'BIZMAN' | 'LINDA' | 'ARIELMC' | 'ARIEL_ENERGY';
   companyName: string; // The Lead Company Account (e.g. Grameenphone Ltd., Robi Axiata, Unilever Bangladesh, EcoLiving UK)
   industry: string;
   clientType: 'Direct Brand' | 'Media Agency' | 'Government / Institutional' | 'International Buyer' | 'Corporate Client' | 'Vendor / Supplier' | 'Raw Material Supplier' | string;
@@ -220,7 +235,7 @@ export interface CompanyLead {
 
 export interface LeadItem {
   id: string;
-  companyCode: 'BIZMAN' | 'LINDA' | 'ARIELMC';
+  companyCode: 'BIZMAN' | 'LINDA' | 'ARIELMC' | 'ARIEL_ENERGY';
   title: string;
   customerName: string;
   contactPerson: string;
@@ -260,7 +275,7 @@ export type ReimbursementStatus = 'NON_REIMBURSABLE' | 'PENDING_REIMBURSEMENT' |
 
 export interface ExpenseItem {
   id: string;
-  companyCode: 'BIZMAN' | 'LINDA' | 'ARIELMC';
+  companyCode: 'BIZMAN' | 'LINDA' | 'ARIELMC' | 'ARIEL_ENERGY';
   expenseNumber: string;
   date: string;
   amount: number;
@@ -293,7 +308,7 @@ export interface JournalLineItem {
 
 export interface JournalEntryItem {
   id: string;
-  companyCode: 'BIZMAN' | 'LINDA' | 'ARIELMC';
+  companyCode: 'BIZMAN' | 'LINDA' | 'ARIELMC' | 'ARIEL_ENERGY';
   entryNumber: string;
   date: string;
   description: string;
@@ -335,7 +350,7 @@ export interface MasterContact {
   email: string;
   city: string;
   country: string;
-  companyAffiliation: 'BIZMAN' | 'LINDA' | 'ARIELMC' | 'PERSONAL' | 'GROUP';
+  companyAffiliation: 'BIZMAN' | 'LINDA' | 'ARIELMC' | 'ARIEL_ENERGY' | 'PERSONAL' | 'GROUP';
   relationshipNotes: string;
   isConvertibleToLead: boolean;
   convertedLeadId?: string;
@@ -433,7 +448,7 @@ export interface DocumentRecord {
   fileName: string;
   fileSize: string;
   fileType: DocumentFileType;
-  companyCode: 'ARIELMC' | 'BIZMAN' | 'LINDA' | 'PERSONAL' | 'CONSOLIDATED';
+  companyCode: 'ARIELMC' | 'BIZMAN' | 'LINDA' | 'ARIEL_ENERGY' | 'PERSONAL' | 'CONSOLIDATED';
   category: DocumentCategory;
   securityLevel: DocumentSecurityLevel;
   uploadDate: string;

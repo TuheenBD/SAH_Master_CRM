@@ -75,7 +75,7 @@ export default function ReportsPage() {
   const [customEndDate, setCustomEndDate] = useState('2026-10-29');
 
   // Corporate Accounts entity filter
-  const [accountsEntity, setAccountsEntity] = useState<'ALL' | 'ARIELMC' | 'BIZMAN' | 'LINDA'>(
+  const [accountsEntity, setAccountsEntity] = useState<'ALL' | 'ARIELMC' | 'BIZMAN' | 'LINDA' | 'ARIEL_ENERGY'>(
     initialCompany === 'CONSOLIDATED' ? 'ALL' : initialCompany
   );
 

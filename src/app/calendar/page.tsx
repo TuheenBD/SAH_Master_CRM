@@ -29,7 +29,7 @@ import { INITIAL_LEADS } from '@/lib/mock-data';
 
 export interface TaskItem {
   id: string;
-  company: 'BIZMAN' | 'LINDA' | 'ARIELMC';
+  company: 'BIZMAN' | 'LINDA' | 'ARIELMC' | 'ARIEL_ENERGY';
   title: string;
   dueDate: string;
   dueTime: string;
@@ -100,7 +100,7 @@ export default function CalendarPage() {
 
   // Form State
   const [formData, setFormData] = useState<{
-    company: 'BIZMAN' | 'LINDA' | 'ARIELMC';
+    company: 'BIZMAN' | 'LINDA' | 'ARIELMC' | 'ARIEL_ENERGY';
     title: string;
     dueDate: string;
     dueTime: string;
