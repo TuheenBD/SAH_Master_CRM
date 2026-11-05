@@ -161,9 +161,8 @@ export default function Sidebar() {
                   )}
 
                   {activeCompany === 'ARIEL_ENERGY' && (
-                    <div className="h-8 px-2.5 rounded-lg overflow-hidden border border-[#10B981]/50 bg-[#064E3B] flex items-center gap-1.5 shadow">
-                      <Sun className="h-4 w-4 text-[#F59E0B]" />
-                      <span className="text-[10px] font-extrabold tracking-wide text-emerald-100 font-serif">Ariel Renewable Energy</span>
+                    <div className="h-8 px-2.5 rounded-lg overflow-hidden border border-[var(--sidebar-border)] bg-white p-0.5 flex items-center justify-center shadow">
+                      <img src="/logos/ariel-energy-logo.png" alt="Ariel Renewable Energy" className="h-6 w-auto object-contain" />
                     </div>
                   )}
 
@@ -178,8 +177,8 @@ export default function Sidebar() {
                       <div className="h-7 px-1.5 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-[#112717] shadow flex items-center justify-center">
                         <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-4.5 w-auto object-contain" />
                       </div>
-                      <div className="h-7 w-7 rounded-md overflow-hidden border border-[#10B981]/40 bg-[#064E3B] shadow flex items-center justify-center" title="Ariel Renewable Energy">
-                        <Sun className="h-3.5 w-3.5 text-[#F59E0B]" />
+                      <div className="h-7 w-7 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-white p-0.5 shadow flex items-center justify-center" title="Ariel Renewable Energy">
+                        <img src="/logos/ariel-energy-icon.png" alt="Ariel Renewable Energy" className="h-5 w-5 object-contain" />
                       </div>
                     </div>
                   )}
