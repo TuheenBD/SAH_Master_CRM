@@ -68,3 +68,10 @@ Everywhere products, filters, navigation, or indices are rendered, they must str
 2. Tabletop & Hospitality
 3. Home Living & Décor
 4. Architectural Elements
+
+## Energy Sector Identity & Hierarchy
+- **Official Legal Entity**: `Ariel Renewable Energy Limited`
+- **Business Sector**: `Energy`
+- **Product**: `Solar` (Turnkey Commercial & Industrial [C&I] Rooftop Solar EPC, SREDA Net-Metering & Industrial Solar Infrastructure)
+- **Primary Domain**: `energy.arielmc.com`
+- **Operational Command Hub**: `energy.arielmc.com/crm`
