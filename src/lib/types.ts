@@ -207,7 +207,30 @@ export interface ParallelProject {
   payoutAmountReceived?: number;
   notepadMarkdown?: string;
   specifics?: Record<string, any>;
+  solarSpecifics?: SolarProjectSpecifics;
   createdAt: string;
+}
+
+export type SolarCustomerCategory = 'FACTORY' | 'COMMERCIAL' | 'HOUSEHOLD';
+
+export interface SolarProjectSpecifics {
+  customerCategory: SolarCustomerCategory;
+  sanctionedLoadKw: number;
+  monthlyElectricityBillBdt: number;
+  utilityProvider: 'DESCO' | 'DPDC' | 'BREB' | 'BPDB' | 'WZPDCL' | 'NESCO' | string;
+  tariffCategory?: string; // e.g. 'Industrial (E-1/E-2)', 'Commercial Peak', 'Residential (LT-A)'
+  roofAreaSqFt: number;
+  roofType: 'PEB_CORRUGATED' | 'RCC_SLAB' | 'ROOFTOP_GARDEN' | 'SLOPED_TILE' | string;
+  proposedDcCapacityKwp: number;
+  proposedAcInverterKw: number;
+  nem70PctCompliant: boolean; // proposedAcInverterKw <= sanctionedLoadKw * 0.70
+  financingChannel: 'GOVT_1500CR_FUND' | 'BB_GTF_4.5_REFINANCE' | 'ZERO_CAPEX_PPA' | 'CONSUMER_GREEN_LOAN' | 'SELF_FINANCED' | string;
+  gracePeriodMonths?: number;
+  year1EstimatedBillSavingsBdt?: number;
+  netMonthlyCashSurplusBdt?: number;
+  weekendBuybackYieldAnnualBdt?: number;
+  sredaSubcontractorHub?: string;
+  bankSfdPartner?: string;
 }
 
 export interface CompanyLead {
