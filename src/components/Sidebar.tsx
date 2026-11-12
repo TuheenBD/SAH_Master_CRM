@@ -171,14 +171,14 @@ export default function Sidebar() {
                       <div className="h-7 w-9 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-white p-0.5 shadow flex items-center justify-center">
                         <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-5 w-auto object-contain" />
                       </div>
+                      <div className="h-7 w-7 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-white p-0.5 shadow flex items-center justify-center" title="Ariel Renewable Energy">
+                        <img src="/logos/ariel-energy-icon.png" alt="Ariel Renewable Energy" className="h-5 w-5 object-contain" />
+                      </div>
                       <div className="h-7 w-7 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-[#0D3B29] p-0.5 shadow flex items-center justify-center">
                         <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-full w-full object-contain" />
                       </div>
                       <div className="h-7 px-1.5 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-[#112717] shadow flex items-center justify-center">
                         <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-4.5 w-auto object-contain" />
-                      </div>
-                      <div className="h-7 w-7 rounded-md overflow-hidden border border-[var(--sidebar-border)] bg-white p-0.5 shadow flex items-center justify-center" title="Ariel Renewable Energy">
-                        <img src="/logos/ariel-energy-icon.png" alt="Ariel Renewable Energy" className="h-5 w-5 object-contain" />
                       </div>
                     </div>
                   )}

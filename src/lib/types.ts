@@ -1,4 +1,4 @@
-export type CompanyCode = 'CONSOLIDATED' | 'ARIELMC' | 'BIZMAN' | 'LINDA' | 'ARIEL_ENERGY';
+export type CompanyCode = 'CONSOLIDATED' | 'ARIELMC' | 'ARIEL_ENERGY' | 'BIZMAN' | 'LINDA';
 
 export interface CompanyMeta {
   code: CompanyCode;
@@ -46,6 +46,21 @@ export const COMPANIES: Record<CompanyCode, CompanyMeta> = {
       { label: 'Core Categories', value: 'Jute, Leather, Ceramics' },
     ],
   },
+  ARIEL_ENERGY: {
+    code: 'ARIEL_ENERGY',
+    name: 'Ariel Renewable Energy Limited',
+    role: 'Managing Director / EPC Lead',
+    industry: 'Turnkey C&I Rooftop Solar EPC, SREDA Net-Metering, BESS, Factory Decarbonization & 4.5% Green Refinancing',
+    website: 'energy.arielmc.com',
+    currency: 'BDT / USD',
+    paletteDescription: 'Emerald Green (#059669), Golden Sun (#F59E0B) & Pearl White',
+    logoUrl: '/logos/ariel-energy-logo.png',
+    stats: [
+      { label: 'Pipeline Capacity', value: '32.4 MWp' },
+      { label: 'SREDA Applications', value: '7 Active Filings' },
+      { label: 'Refinancing Portfolio', value: '৳ 184 Cr CapEx' },
+    ],
+  },
   BIZMAN: {
     code: 'BIZMAN',
     name: 'Bizman Media Limited',
@@ -74,21 +89,6 @@ export const COMPANIES: Record<CompanyCode, CompanyMeta> = {
       { label: 'Private Pool Villas', value: 'Couple & Family Villas' },
       { label: 'Corporate Retreats', value: 'Banquet & Day-Out Hub' },
       { label: 'Investor Timeshare', value: 'Active Share Sales' },
-    ],
-  },
-  ARIEL_ENERGY: {
-    code: 'ARIEL_ENERGY',
-    name: 'Ariel Renewable Energy Limited',
-    role: 'Managing Director / EPC Lead',
-    industry: 'Turnkey C&I Rooftop Solar EPC, SREDA Net-Metering, BESS, Factory Decarbonization & 4.5% Green Refinancing',
-    website: 'energy.arielmc.com',
-    currency: 'BDT / USD',
-    paletteDescription: 'Emerald Green (#059669), Golden Sun (#F59E0B) & Pearl White',
-    logoUrl: '/logos/ariel-energy-logo.png',
-    stats: [
-      { label: 'Pipeline Capacity', value: '32.4 MWp' },
-      { label: 'SREDA Applications', value: '7 Active Filings' },
-      { label: 'Refinancing Portfolio', value: '৳ 184 Cr CapEx' },
     ],
   },
 };

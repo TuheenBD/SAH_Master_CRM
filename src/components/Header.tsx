@@ -175,6 +175,11 @@ export default function Header() {
                 <img src="/logos/arielmc-logo.png" alt="ArielMC" className="max-h-7 w-auto object-contain" />
               </div>
             )}
+            {activeCompany === 'ARIEL_ENERGY' && (
+              <div className="h-8 w-8 rounded-lg overflow-hidden border border-[var(--header-border)] bg-[#0D3B29] p-0.5 shadow flex items-center justify-center shrink-0">
+                <img src="/logos/ariel-energy-icon.png" alt="Ariel Energy" className="h-full w-full object-contain" />
+              </div>
+            )}
             {activeCompany === 'BIZMAN' && (
               <div className="h-8 w-8 rounded-lg overflow-hidden border border-[var(--header-border)] bg-[#0D3B29] p-0.5 shadow flex items-center justify-center shrink-0">
                 <img src="/logos/bizman-logo.jpg" alt="Bizman Media" className="h-full w-full object-contain" />
@@ -192,8 +197,16 @@ export default function Header() {
             )}
 
             <div className="min-w-0">
-              <div className="flex items-center gap-1.5 text-[9.5px] text-[var(--header-sub)] font-mono uppercase tracking-wider truncate">
-                <span>{meta.code === 'CONSOLIDATED' ? 'GROUP' : meta.code === 'ARIELMC' ? 'ArielMC' : meta.code}</span>
+              <div className="flex items-center gap-1.5 text-[10px] text-[var(--header-sub)] font-mono uppercase tracking-wider truncate">
+                <span>
+                  {meta.code === 'CONSOLIDATED'
+                    ? 'GROUP'
+                    : meta.code === 'ARIELMC'
+                    ? 'ArielMC'
+                    : meta.code === 'ARIEL_ENERGY'
+                    ? 'Ariel Energy'
+                    : meta.code}
+                </span>
                 <span>/</span>
                 <span className="text-[var(--header-accent)] font-bold">{getPageTitle()}</span>
               </div>
@@ -230,9 +243,9 @@ export default function Header() {
         </div>
 
         {/* Center: ACTIVE ENTITY VIEW with Brand Logos & Centered Designation */}
-        <div className="flex flex-col items-center justify-center gap-1 bg-[var(--sidebar-box-bg)] px-2.5 py-1.5 rounded-xl border border-[var(--header-border)] shadow-sm w-full md:w-auto md:mx-auto overflow-hidden">
-          {/* Top Row: Entity Switcher Pills (Touch-scrollable on mobile) */}
-          <div className="flex items-center gap-1 overflow-x-auto max-w-full justify-start sm:justify-center w-full py-0.5 no-scrollbar">
+        <div className="flex flex-col items-center justify-center gap-1 bg-[var(--sidebar-box-bg)] px-2 py-1.5 rounded-xl border border-[var(--header-border)] shadow-sm w-full md:w-auto md:mx-auto max-w-full overflow-hidden">
+          {/* Top Row: Entity Switcher Pills */}
+          <div className="flex items-center gap-1 flex-wrap sm:flex-nowrap justify-center w-full py-0.5">
             {(Object.keys(COMPANIES) as CompanyCode[]).map((code) => {
               const isSelected = activeCompany === code;
               let activeStyle = "text-[var(--header-sub)] hover:text-white hover:bg-[var(--sidebar-hover)]";
@@ -241,11 +254,22 @@ export default function Header() {
                 activeStyle = "bg-[var(--header-accent)] text-[var(--header-bg)] font-extrabold shadow-md";
               }
 
+              const label =
+                code === 'CONSOLIDATED'
+                  ? 'All Entities'
+                  : code === 'ARIELMC'
+                  ? 'ArielMC'
+                  : code === 'ARIEL_ENERGY'
+                  ? 'Ariel Energy'
+                  : code === 'BIZMAN'
+                  ? 'Bizman'
+                  : 'Linda Resort';
+
               return (
                 <button
                   key={code}
                   onClick={() => switchCompany(code)}
-                  className={`rounded-lg px-2 sm:px-3 py-1 text-[11px] sm:text-xs transition-all whitespace-nowrap flex items-center gap-1 shrink-0 ${activeStyle}`}
+                  className={`rounded-lg px-2 py-1 text-[11px] font-semibold transition-all whitespace-nowrap flex items-center gap-1 shrink-0 ${activeStyle}`}
                 >
                   {code === 'CONSOLIDATED' && (
                     <img src="/logos/master-crm-icon.png" alt="Master CRM" className="h-3.5 w-3.5 rounded-full object-contain shrink-0 border border-[#C8A96A]/40" />
@@ -253,13 +277,16 @@ export default function Header() {
                   {code === 'ARIELMC' && (
                     <img src="/logos/arielmc-logo.png" alt="ArielMC" className="h-3.5 w-auto object-contain shrink-0 bg-white px-0.5 rounded shadow-xs" />
                   )}
+                  {code === 'ARIEL_ENERGY' && (
+                    <img src="/logos/ariel-energy-icon.png" alt="Ariel Energy" className="h-3.5 w-3.5 rounded-full object-contain shrink-0 bg-white/95 p-[1px] shadow-xs" />
+                  )}
                   {code === 'BIZMAN' && (
                     <img src="/logos/bizman-logo.jpg" alt="Bizman" className="h-3.5 w-3.5 rounded object-contain shrink-0 shadow-xs" />
                   )}
                   {code === 'LINDA' && (
-                    <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-3.5 w-auto max-w-[50px] object-contain shrink-0 shadow-xs" />
+                    <img src="/logos/linda-logo.png" alt="Linda Resort" className="h-3.5 w-auto max-w-[44px] object-contain shrink-0 shadow-xs" />
                   )}
-                  <span>{code === 'CONSOLIDATED' ? 'ALL ENTITIES' : code === 'ARIELMC' ? 'ArielMC' : code === 'BIZMAN' ? 'Bizman' : 'Linda Resort'}</span>
+                  <span>{label}</span>
                 </button>
               );
             })}
