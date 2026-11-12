@@ -1130,7 +1130,7 @@ ${specificContent}
                   DOOH Screen Network Utilization & Vendor Payout Audit
                 </h2>
                 <p className="text-xs text-[#6B7269]">
-                  Bizman Media Limited &bull; 20 Own LED Boards + 50+ Countrywide Partner Vendor Screens
+                  Bizman Media Limited &bull; 18 Own Fixed LED Panels + 38 Partner Fixed + 5 Mobile Vans (61 Reconciled Units)
                 </p>
               </div>
               <div className="text-xs font-mono font-bold text-[#1E6B3A] bg-[#E4F3E9] px-2.5 py-1 rounded border border-[#B6E2C5]">
@@ -1141,8 +1141,8 @@ ${specificContent}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="rounded-xl bg-[#F4F6F4] p-4 border border-[#DDE3DD]">
                 <div className="text-xs text-[#556055] font-semibold">Own LED Displays (High Margin Asset)</div>
-                <div className="mt-1 text-2xl font-bold text-[#1F3A2E] font-mono">20 Screens</div>
-                <div className="text-xs text-[#1E6B3A] mt-1 font-medium">Prime Dhaka Hubs (Dhanmondi, Gulshan, Motijheel)</div>
+                <div className="mt-1 text-2xl font-bold text-[#1F3A2E] font-mono">18 Panels</div>
+                <div className="text-xs text-[#1E6B3A] mt-1 font-medium">Police Plaza, SKS Tower, Science Lab, Rail Stations, Cox&apos;s Bazar, Bogura &amp; Rangpur</div>
               </div>
               <div className="rounded-xl bg-[#F4F6F4] p-4 border border-[#DDE3DD]">
                 <div className="text-xs text-[#556055] font-semibold">Partner Vendor Network</div>

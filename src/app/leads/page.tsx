@@ -167,7 +167,7 @@ export default function LeadsPage() {
     initialContactEmail: '',
   });
 
-  // Load saved corporate company leads from localStorage if available
+  // Load saved corporate company leads from localStorage & merge newly seeded code records
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -175,12 +175,42 @@ export default function LeadsPage() {
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            setCompanyLeads(parsed);
-            setSelectedCompany(parsed[0]);
+            const seedById = new Map(INITIAL_COMPANY_LEADS.map(c => [c.id, c]));
+            const mergedMap = new Map<string, CompanyLead>();
+
+            // Preserve existing user state while merging any new contacts/projects added in code
+            for (const item of parsed as CompanyLead[]) {
+              const seed = seedById.get(item.id);
+              if (seed) {
+                const existingContactIds = new Set((item.contacts || []).map(c => c.id));
+                const newContacts = (seed.contacts || []).filter(c => !existingContactIds.has(c.id));
+                const existingProjIds = new Set((item.projects || []).map(p => p.id));
+                const newProjects = (seed.projects || []).filter(p => !existingProjIds.has(p.id));
+                mergedMap.set(item.id, {
+                  ...item,
+                  contacts: [...(item.contacts || []), ...newContacts],
+                  projects: [...(item.projects || []), ...newProjects],
+                });
+              } else {
+                mergedMap.set(item.id, item);
+              }
+            }
+
+            // Append any newly added companies from INITIAL_COMPANY_LEADS
+            for (const seed of INITIAL_COMPANY_LEADS) {
+              if (!mergedMap.has(seed.id)) {
+                mergedMap.set(seed.id, seed);
+              }
+            }
+
+            const merged = Array.from(mergedMap.values());
+            setCompanyLeads(merged);
+            setSelectedCompany(merged[0]);
+            localStorage.setItem('sah_master_crm_company_leads', JSON.stringify(merged));
           }
         }
       } catch (e) {
-        console.error('Failed to load company leads from localStorage', e);
+        console.error('Failed to load/merge company leads from localStorage', e);
       }
     }
   }, []);

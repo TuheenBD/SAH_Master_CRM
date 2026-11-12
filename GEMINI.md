@@ -75,3 +75,13 @@ Everywhere products, filters, navigation, or indices are rendered, they must str
 - **Product**: `Solar` (Turnkey Commercial & Industrial [C&I] Rooftop Solar EPC, SREDA Net-Metering & Industrial Solar Infrastructure)
 - **Primary Domain**: `energy.arielmc.com`
 - **Operational Command Hub**: `energy.arielmc.com/crm`
+
+## Mandatory Multi-Company Synchronization Directive (Bizman & Linda Resort)
+Master CRM serves as the central multi-entity executive operating system for:
+1. **ARIELMC** (`Ariel Marketing & Communications Limited` — Global Export Compendiums)
+2. **BIZMAN** (`Bizman Media Limited` — OOH, DOOH, Experiential Brand Activations & Bizman CRM)
+3. **LINDA** (`Linda Resort Limited` — Luxury Eco-Resort Hospitality, Pool Villas & Investor Timeshare)
+4. **ARIEL_ENERGY** (`Ariel Renewable Energy Limited` / AREL CRM — Turnkey C&I Solar EPC)
+
+**CRITICAL SYNC DIRECTIVE:**
+Every time work is performed in **Bizman CRM** (`My Drive/Bizman CRM`) or **Linda Resort** (`My Drive/Linda Resort`), the changes (contacts, leads, pipeline deals, project values, and status transitions) **MUST IMMEDIATELY BE SYNCHRONIZED WITH MASTER CRM** (`src/lib/mock-data.ts` under `INITIAL_LEADS`, `INITIAL_COMPANY_LEADS`, and `INITIAL_CONTACTS`).
