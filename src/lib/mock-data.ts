@@ -275,6 +275,36 @@ export const INITIAL_LEADS: LeadItem[] = [
     "entityPayoutStatus": "AWAITING_CUSTOMER_PAYMENT"
   },
   {
+    "id": "lead-proj-bd-006-3",
+    "companyCode": "BIZMAN",
+    "title": "Nagad — Dhaka Static Billboard Master Network (60 Prime Sites / 86,115 Sq. Ft.)",
+    "customerName": "Nagad (Bangladesh Post Office MFS)",
+    "contactPerson": "Mr. Redwan (Commercial & Activation Lead)",
+    "phone": "+880 9609616167",
+    "whatsapp": "+880 1347-529046",
+    "email": "redwan@nagad.com.bd",
+    "country": "Bangladesh",
+    "pipelineType": "Static Billboard & OOH Dominance",
+    "stage": "PROPOSAL_SENT",
+    "estimatedValue": 92780000,
+    "currency": "BDT",
+    "probability": 50,
+    "expectedCloseDate": "2026-12-31",
+    "notepadMarkdown": "### Nagad — Dhaka Static Billboard Master Network (60 Sites across 6 Regions)\n- **Portfolio Scope:** 60 Prime Static Billboards segmented into 6 Demographic Clusters (86,115 Sq. Ft.)\n- **Selective Procurement Framework:** Option Alpha (10 Flagships @ BDT 2.64 Cr) / Option Beta (6 Corridors @ BDT 66.9 Lakh) or Custom A La Carte Cluster\n- **Gross Portfolio Value:** BDT 9,27,80,000.00 / Year (BDT 9.28 Crore Base Value)\n- **Audience & Eyeballs:** 6,165,000 OTS Eyeballs / Day (2.25 Billion Gross Impressions / Year)\n- **Media Efficiency:** BDT 41.23 Blended CPM (< 0.42 Paisa per impression)\n- **Regional Clusters:** 1. Posh Diplomatic (Gulshan, Banani, Dhanmondi), 2. Mass Transit (Farmgate, Shahbagh, Mohakhali), 3. Expressways (Purbachal, Elevated Expressway), 4. Dense Residential (Mirpur, Badda), 5. Old Dhaka (Jatrabari, Postogola), 6. Highway Gateways (Kanchpur, Signboard 140ft Unipole)\n- **Primary Deliverables:** 73-Page Master Dossier PDF (1 Page Per Billboard with Photos, Specs & Tailored Rationale) + Regional Rate Card CSV\n- **Client Lead:** Mr. Redwan (Commercial & Activation Lead, Nagad)\n- **Agency Lead:** Syed Akramul Hassan, Managing Director, Bizman Media Limited\n- **Status:** Master Commercial Proposal Dossier, Regional Rate Card CSV, and 73-Page Boardroom PDF generated Nov 15, 2026.",
+    "specifics": {
+      "leadCompanyId": "corp-bd-006",
+      "priorityTemp": "HOT",
+      "industry": "MFS / Fintech",
+      "bizmanLeadId": "LEAD-2026-103",
+      "bizmanDealId": "BZM-2026-103"
+    },
+    "createdAt": "2026-11-15",
+    "commissionRate": 10,
+    "commissionAmount": 9278000,
+    "customerPaymentStatus": "PENDING",
+    "entityPayoutStatus": "AWAITING_CUSTOMER_PAYMENT"
+  },
+  {
     "id": "lead-proj-bd-007-1",
     "companyCode": "BIZMAN",
     "title": "Upay (UCB Fintech) - Countrywide LED & DOOH Campaign",
@@ -24597,6 +24627,29 @@ export const INITIAL_CONTACTS: MasterContact[] = [
       "Export Sourcing"
     ],
     "createdAt": "2026-10-11"
+  },
+  {
+    "id": "cnt-supplier-mib-001",
+    "fullName": "Studio Operations & Sourcing Lead",
+    "organization": "MIB Spirit (Made in Bangladesh)",
+    "designation": "Head of Production & Sourcing",
+    "category": "SUPPLIER_RAW_MATERIAL",
+    "primaryPhone": "+880 1403-001291",
+    "whatsappNumber": "+880 1403-001291",
+    "email": "inbangladesh1971@gmail.com",
+    "city": "Dhaka",
+    "country": "Bangladesh",
+    "companyAffiliation": "ARIELMC",
+    "relationshipNotes": "Enlisted artisan studio partner for green and locally sourced lifestyle goods, including the Siofra Velvety Forest Cashmere Canvas & Suede shoulder tote (LD-SCB-08). Studios in Lalmatia & Gulshan-2.",
+    "isConvertibleToLead": false,
+    "tags": [
+      "Supplier",
+      "Artisan Studio",
+      "Leather & Canvas",
+      "Green Sourcing",
+      "FAC-MIB-01"
+    ],
+    "createdAt": "2026-11-16"
   }
 ];
 
