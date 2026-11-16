@@ -24640,7 +24640,7 @@ export const INITIAL_CONTACTS: MasterContact[] = [
     "city": "Dhaka",
     "country": "Bangladesh",
     "companyAffiliation": "ARIELMC",
-    "relationshipNotes": "Enlisted artisan studio partner for green and locally sourced lifestyle goods, including the Siofra Velvety Forest Cashmere Canvas & Suede shoulder tote (LD-SCB-08). Studios in Lalmatia & Gulshan-2.",
+    "relationshipNotes": "Enlisted artisan studio partner for green and locally sourced lifestyle goods, including the Siofra Velvety Forest Cashmere Canvas & Suede shoulder tote (LD-SCB-08) and Talisman Graphite Black Field Messenger (LD-SCB-09). Studios in Lalmatia & Gulshan-2.",
     "isConvertibleToLead": false,
     "tags": [
       "Supplier",
