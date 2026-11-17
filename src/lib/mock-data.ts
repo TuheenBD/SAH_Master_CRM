@@ -8886,6 +8886,38 @@ export const INITIAL_LEADS: LeadItem[] = [
     "commissionAmount": 6500,
     "customerPaymentStatus": "PENDING",
     "entityPayoutStatus": "AWAITING_CUSTOMER_PAYMENT"
+  },
+  {
+    "id": "lead-tagwise-001",
+    "companyCode": "ARIELMC",
+    "title": "Tagwise Shop (Germany) — Wholesale & Sample Evaluation Inquiry",
+    "customerName": "Tagwise Shop",
+    "contactPerson": "Wolfgang Lütscher",
+    "phone": "",
+    "whatsapp": "",
+    "email": "tagwise.shop@gmail.com",
+    "country": "Germany",
+    "pipelineType": "International Wholesale & Sampling (EU)",
+    "stage": "CONTACTED",
+    "estimatedValue": 5000,
+    "currency": "USD",
+    "probability": 15,
+    "expectedCloseDate": "2026-12-15",
+    "notepadMarkdown": "### Tagwise Shop (Germany) — Inbound Commercial Inquiry Dossier\n- **Inquiry Date:** 2026-11-17 11:01 AM BDT\n- **Contact Person:** Wolfgang Lütscher (`tagwise.shop@gmail.com`)\n- **Shipping Consignee:** Pia Göring, Idastr. 4, 46284 Dorsten, Germany\n- **Inquiry Focus:** Request for complimentary samples, full wholesale/export price list, MOQs, customization options, and air delivery times to Germany.\n- **ArielMC Official Response (Sent: 2026-11-17 12:11:54 +06:00):**\n  - Dispatched official institutional response adhering to **`SOP-B2B-SMP-2026-V1`** (Standard Operating Procedure for Commercial Sampling).\n  - Clarified that evaluation samples are billed upfront and **100% credited against first commercial bulk Purchase Order**.\n  - Courier handling: Dispatched via DHL Express / FedEx Priority under buyer's import account or billed at cost (~€45–€55 EUR).\n  - Requested buyer's corporate details: Legal Entity Name, Website, German VAT Number (*USt-IdNr*), specific catalog SKU selections, and intended initial order volume.\n- **Current Status:** Awaiting buyer's SKU selection, corporate VAT credentials, and courier billing preference.\n- **Next Follow-up:** 2026-11-20 (72-hour commercial inquiry check-in).",
+    "specifics": {
+      "tier": "Boutique E-commerce / Retailer",
+      "market": "EU",
+      "priority": "B",
+      "touches": 1,
+      "source": "Inbound Email (tagwise.shop@gmail.com to info@arielmc.com)",
+      "sopReference": "SOP-B2B-SMP-2026-V1",
+      "consigneeAddress": "Pia Göring, Idastr. 4, 46284 Dorsten, Germany"
+    },
+    "createdAt": "2026-11-17",
+    "commissionRate": 10,
+    "commissionAmount": 500,
+    "customerPaymentStatus": "PENDING",
+    "entityPayoutStatus": "AWAITING_CUSTOMER_PAYMENT"
   }
 ];
 
@@ -20429,6 +20461,66 @@ export const INITIAL_COMPANY_LEADS: CompanyLead[] = [
       }
     ],
     "projects": []
+  },
+  {
+    "id": "corp-tagwise-001",
+    "companyCode": "ARIELMC",
+    "companyName": "Tagwise Shop",
+    "industry": "Export: Lifestyle, Leather & Sustainable Goods",
+    "clientType": "International Buyer",
+    "priorityTemp": "WARM",
+    "country": "Germany",
+    "city": "Dorsten",
+    "website": "https://tagwise.shop",
+    "address": "Idastr. 4, 46284 Dorsten, Germany",
+    "createdAt": "2026-11-17",
+    "contacts": [
+      {
+        "id": "cnt-tagwise-01",
+        "name": "Wolfgang Lütscher",
+        "designation": "Commercial Inquiries & Buying",
+        "department": "Procurement",
+        "roleType": "PRIMARY_DECISION_MAKER",
+        "phone": "",
+        "email": "tagwise.shop@gmail.com",
+        "whatsapp": "",
+        "isPrimary": true,
+        "notes": "Inbound inquiry sender for Tagwise Shop"
+      },
+      {
+        "id": "cnt-tagwise-02",
+        "name": "Pia Göring",
+        "designation": "Shipping / Consignee Recipient",
+        "department": "Logistics",
+        "roleType": "OPERATIONS",
+        "phone": "",
+        "email": "tagwise.shop@gmail.com",
+        "whatsapp": "",
+        "isPrimary": false,
+        "notes": "Nominated recipient address: Idastr. 4, 46284 Dorsten, Germany"
+      }
+    ],
+    "projects": [
+      {
+        "id": "proj-tagwise-01",
+        "projectCode": "PRJ-TAG-SMP-01",
+        "title": "EU Evaluation Sampling & Wholesale Onboarding",
+        "pipelineType": "International Wholesale & Sampling (EU)",
+        "stage": "CONTACTED",
+        "estimatedValue": 5000,
+        "currency": "USD",
+        "probability": 15,
+        "expectedCloseDate": "2026-12-15",
+        "contactPersonId": "cnt-tagwise-01",
+        "contactPersonName": "Wolfgang Lütscher",
+        "commissionRate": 10,
+        "commissionAmount": 500,
+        "customerPaymentStatus": "PENDING",
+        "entityPayoutStatus": "AWAITING_CUSTOMER_PAYMENT",
+        "notepadMarkdown": "Sampling evaluation under SOP-B2B-SMP-2026-V1 with 100% credit against initial bulk PO",
+        "createdAt": "2026-11-17"
+      }
+    ]
   }
 ];
 
@@ -24650,6 +24742,31 @@ export const INITIAL_CONTACTS: MasterContact[] = [
       "FAC-MIB-01"
     ],
     "createdAt": "2026-11-16"
+  },
+  {
+    "id": "cnt-buyer-tagwise-001",
+    "fullName": "Wolfgang Lütscher",
+    "organization": "Tagwise Shop",
+    "designation": "Commercial Buyer / Sourcing Lead",
+    "category": "LEAD_PROSPECT",
+    "primaryPhone": "",
+    "whatsappNumber": "",
+    "email": "tagwise.shop@gmail.com",
+    "city": "Dorsten",
+    "country": "Germany",
+    "companyAffiliation": "ARIELMC",
+    "relationshipNotes": "Inbound inquiry on 2026-11-17 requesting wholesale catalog and product samples. Dispatched SOP-B2B-SMP-2026-V1 sampling protocol. Recipient address: Pia Göring, Idastr. 4, 46284 Dorsten, Germany.",
+    "isConvertibleToLead": false,
+    "convertedLeadId": "lead-tagwise-001",
+    "tags": [
+      "International Buyer",
+      "Germany",
+      "EU",
+      "Wholesale",
+      "Sample Inquiry",
+      "SOP-B2B-SMP-2026-V1"
+    ],
+    "createdAt": "2026-11-17"
   }
 ];
 
